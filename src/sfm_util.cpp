@@ -8,4 +8,3 @@
 bool SFMUtilities::PassesLoweRatioTest(const std::vector<cv::DMatch> &match) {
     return match.size() == 2 && static_cast<double>(match[0].distance) < static_cast<double>(match[1].distance) * LOWE_RATIO;
 }
-

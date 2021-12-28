@@ -13,6 +13,7 @@ typedef size_t ImageID;
 
 enum class DetectorType { SIFT, ORB };
 typedef cv::DescriptorMatcher::MatcherType MatcherType;
+enum DebugLevel { BASIC, NUMERIC, EXAMPLES };
 
 struct Args {
     std::string inputImageDir;
@@ -24,7 +25,6 @@ struct Args {
 
 // Matches between two images
 typedef std::vector<cv::DMatch> Matching2;
-
 typedef std::vector<std::vector<Matching2>> MatchMatrix;
 
 #endif //SFM_TYPES_H

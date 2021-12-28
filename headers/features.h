@@ -17,7 +17,7 @@ private:
 public:
     Features(const cv::Ptr<cv::FeatureDetector>& detector, const Image& image);
 
-    Matching2& FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher>& matcher, Features& other);
+    void FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher>& matcher, Features& other, Matching2& out);
 
     std::vector<cv::KeyPoint>& getCVKeyPoints();
 

@@ -5,6 +5,8 @@
 #include <headers/features.h>
 #include <headers/image.h>
 #include <headers/sfm_util.h>
+#include <headers/constants.h>
+#include <iostream>
 
 Features::Features(const cv::Ptr<cv::FeatureDetector>& detector, const Image& image) {
     detector->detectAndCompute(image.data, cv::noArray(), _keypoints, _descriptors);
@@ -22,7 +24,7 @@ cv::Mat& Features::getCVDescriptors() {
     return _descriptors;
 }
 
-Matching2& Features::FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Features &other) {
+void Features::FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Features &other, Matching2& out) {
     std::vector<std::vector<cv::DMatch>> initialMatching;
     matcher->knnMatch(_descriptors, other.getCVDescriptors(), initialMatching, 2);
 
@@ -35,5 +37,10 @@ Matching2& Features::FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &match
 
     // TODO: geometric verification of matches by fundamental matrix
 
-    return loweRatioMatching;
+    if (DEFAULT_DEBUG >= DebugLevel::NUMERIC) {
+        std::cout << "Initial KNN Matching: " << initialMatching.size() << " pairs of matches." << std::endl;
+        std::cout << "Lowe Ratio Matching: " << loweRatioMatching.size() << " matches." << std::endl;
+    }
+
+    out = loweRatioMatching;
 }

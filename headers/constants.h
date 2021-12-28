@@ -14,5 +14,6 @@ const int SCENE_GRAPH_EDGE_THRESHOLD = 25;
 
 const DetectorType DEFAULT_DETECTOR = DetectorType::SIFT;
 const MatcherType DEFAULT_MATCHER = MatcherType::FLANNBASED;
+const DebugLevel DEFAULT_DEBUG = DebugLevel::EXAMPLES;
 
 #endif //SFM_CONSTANTS_H

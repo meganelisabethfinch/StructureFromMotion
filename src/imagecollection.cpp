@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
 
 ImageCollection::ImageCollection(std::string directory) {
     std::vector<cv::String> filenames;
@@ -62,6 +63,28 @@ bool ImageCollection::FindMatches(const cv::Ptr<cv::DescriptorMatcher> &matcher)
 
 size_t ImageCollection::size() const {
     return mImages.size();
+}
+
+Image &ImageCollection::getImage(ImageID id) {
+    return mImages[id];
+}
+
+void ImageCollection::visualiseKeyPoints(ImageID id) {
+    cv::Mat out;
+    std::vector<cv::KeyPoint> keypoints = mImageFeatures[id].getCVKeyPoints();
+    cv::drawKeypoints(mImages[id].data, keypoints, out, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    cv::imshow("Keypoints", out);
+    cv::waitKey(0);
+}
+
+void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
+    cv::Mat out;
+    std::vector<cv::KeyPoint> iKeypoints = mImageFeatures[i].getCVKeyPoints();
+    std::vector<cv::KeyPoint> jKeypoints = mImageFeatures[j].getCVKeyPoints();
+    Matching2 matches = mFeatureMatchMatrix.GetMatchingBetween(i,j);
+    cv::drawMatches(mImages[i].data, iKeypoints, mImages[j].data, jKeypoints, matches, out);
+    cv::imshow("Matches", out);
+    cv::waitKey(0);
 }
 
 

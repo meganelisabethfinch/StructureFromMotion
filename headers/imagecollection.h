@@ -29,6 +29,12 @@ public:
     bool FindMatches(const cv::Ptr<cv::DescriptorMatcher>& matcher);
 
     [[nodiscard]] size_t size() const;
+
+    Image& getImage(ImageID id);
+
+    void visualiseKeyPoints(ImageID id);
+
+    void visualiseMatches(ImageID i, ImageID j);
 };
 
 #endif //SFM_IMAGECOLLECTION_H

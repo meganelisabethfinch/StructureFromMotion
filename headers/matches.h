@@ -16,7 +16,7 @@ public:
 
     Matches(); // TODO: remove this while keeping the compiler happy
 
-    Matching2& GetMatchingBetween(const ImageID i, const ImageID j);
+    Matching2& GetMatchingBetween(ImageID i, ImageID j);
 };
 
 #endif //SFM_MATCHES_H

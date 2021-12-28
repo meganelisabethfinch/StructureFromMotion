@@ -7,11 +7,20 @@
 
 class PointCloud {
 private:
+    std::vector<Point> points;
+
+    AddView(); // IN: Features, Matches, Intrinsic, ImageID
+
+    BundleAdjust();
 
 public:
-    PointCloud(); // constructor
+    PointCloud(ImageCollection& images); // constructor
 
-    AddView(); // IN: Features, Matches, Camera, ImageID
+    PointCloud(ImageCollection& images, ImageID baseline1, ImageID baseline2);
+
+    toColmap();
+
+    toPly();
 };
 
 #endif //SFM_POINTCLOUD_H

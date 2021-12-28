@@ -42,7 +42,7 @@ message(" ")
 add_executable(
         StructureFromMotion
         src/main.cpp
-        headers/constants.h headers/image.h headers/pointcloud.h headers/camera.h headers/types.h src/image.cpp headers/cli.h src/cli.cpp headers/imagecollection.h src/imagecollection.cpp)
+        headers/constants.h headers/pointcloud.h headers/intrinsic.h headers/types.h headers/cli.h src/cli.cpp headers/imagecollection.h src/imagecollection.cpp headers/scenegraph.h headers/image.h src/intrinsic.cpp)
 
 target_sources(
         StructureFromMotion

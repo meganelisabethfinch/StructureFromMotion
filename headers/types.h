@@ -10,10 +10,23 @@
 
 typedef size_t ImageID;
 
+enum class DetectorType { SIFT, ORB };
+enum class MatcherType { FLANNBASED, BRUTEFORCE };
+
 struct Args {
     std::string inputImageDir;
     std::string outputDir;
-    // baseline pair
+    // TODO: add manually specified baseline pair
+    DetectorType detectorType;
+    MatcherType matcherType;
+};
+
+struct Features {
+
+};
+
+struct Matches {
+
 };
 
 #endif //SFM_TYPES_H

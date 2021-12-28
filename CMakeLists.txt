@@ -42,7 +42,7 @@ message(" ")
 add_executable(
         StructureFromMotion
         src/main.cpp
-        headers/constants.h headers/pointcloud.h headers/intrinsic.h headers/types.h headers/cli.h src/cli.cpp headers/imagecollection.h src/imagecollection.cpp headers/scenegraph.h headers/image.h src/intrinsic.cpp)
+        headers/constants.h headers/pointcloud.h headers/intrinsic.h headers/types.h headers/cli_util.h src/cli_util.cpp headers/imagecollection.h src/imagecollection.cpp headers/image.h src/intrinsic.cpp headers/features.h headers/matches.h src/matches.cpp src/features.cpp headers/sfm_util.h src/sfm_util.cpp headers/scene_graph.h src/scene_graph.cpp)
 
 target_sources(
         StructureFromMotion
@@ -54,7 +54,7 @@ target_include_directories(
         PUBLIC
         ${CMAKE_SOURCE_DIR}
         /Users/meganfinch/opencv-4.5.3/include
-        /Users/meganfinch/opencv-4.5.3/cmake-build-debug
+        /Users/meganfinch/opencv-4.5.3/cmake-build-release
         /Users/meganfinch/opencv-4.5.3/modules/calib3d/include
         /Users/meganfinch/opencv-4.5.3/modules/core/include
         /Users/meganfinch/opencv-4.5.3/modules/features2d/include
@@ -81,7 +81,7 @@ target_link_directories(
         StructureFromMotion
         PUBLIC
         "${CMAKE_SOURCE_DIR}"
-        "/Users/meganfinch/opencv-4.5.3/cmake-build-debug/lib"
+        "/Users/meganfinch/opencv-4.5.3/cmake-build-release/lib"
 )
 
 

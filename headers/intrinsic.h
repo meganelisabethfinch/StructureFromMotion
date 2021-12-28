@@ -18,6 +18,4 @@ public:
 
 };
 
-typedef std::vector<Intrinsic> Intrinsics;
-
 #endif //SFM_CAMERA_H

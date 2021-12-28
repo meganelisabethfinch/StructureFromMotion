@@ -7,11 +7,12 @@
 
 #include <cstddef>
 #include <string>
+#include <opencv2/features2d.hpp>
 
 typedef size_t ImageID;
 
 enum class DetectorType { SIFT, ORB };
-enum class MatcherType { FLANNBASED, BRUTEFORCE };
+typedef cv::DescriptorMatcher::MatcherType MatcherType;
 
 struct Args {
     std::string inputImageDir;
@@ -21,12 +22,9 @@ struct Args {
     MatcherType matcherType;
 };
 
-struct Features {
+// Matches between two images
+typedef std::vector<cv::DMatch> Matching2;
 
-};
-
-struct Matches {
-
-};
+typedef std::vector<std::vector<Matching2>> MatchMatrix;
 
 #endif //SFM_TYPES_H

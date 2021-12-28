@@ -21,6 +21,10 @@ public:
                 return cv::ORB::create(5000);
         }
     }
+
+    static cv::Ptr<cv::DescriptorMatcher> CreateMatcher(MatcherType type) {
+        return cv::DescriptorMatcher::create(type);
+    }
 };
 
 #endif //SFM_CLI_H

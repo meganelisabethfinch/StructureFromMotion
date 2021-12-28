@@ -2,7 +2,7 @@
 // Created by Megan Finch on 23/12/2021.
 //
 
-#include <headers/cli.h>
+#include <headers/cli_util.h>
 #include "headers/constants.h"
 
 #include <unistd.h>

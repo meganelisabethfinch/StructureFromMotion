@@ -12,7 +12,7 @@ Matches::Matches(const cv::Ptr<cv::DescriptorMatcher>& matcher, std::vector<Feat
     for (size_t i = 0; i < mFeatures.size() - 1; i++) {
         for (size_t j = i + 1; j < mFeatures.size(); j++) {
             std::cout << "Finding matches between images " << i << " and " << j << std::endl;
-            mFeatures[i].FindMatchesWith(matcher, mFeatures[j], matrix[i][j]);
+            mFeatures[i].findMatchesWith(matcher, mFeatures[j], matrix[i][j]);
         }
     }
 }
@@ -23,6 +23,25 @@ Matching2& Matches::GetMatchingBetween(const ImageID i, const ImageID j) {
         return matrix[i][j];
     }
     return matrix[j][i];
+}
+
+void Matches::prune(ImageID i, ImageID j, cv::Mat& mask) {
+    if (j > i) {
+        ImageID tmp = i;
+        i = j;
+        j = tmp;
+    }
+
+    auto matching = matrix[i][j];
+    Matching2 prunedMatching;
+
+    for (size_t i = 0; i < mask.rows; i++) {
+        if (mask.at<uchar>(i)) {
+            prunedMatching.push_back(matching[i]);
+        }
+    }
+
+    matrix[i][j] = prunedMatching;
 }
 
 Matches::Matches() = default;

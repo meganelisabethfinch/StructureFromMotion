@@ -17,13 +17,15 @@ private:
 public:
     Features(const cv::Ptr<cv::FeatureDetector>& detector, const Image& image);
 
-    void FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher>& matcher, Features& other, Matching2& out);
+    void findMatchesWith(const cv::Ptr<cv::DescriptorMatcher>& matcher, Features& other, Matching2& out);
 
     std::vector<cv::KeyPoint>& getCVKeyPoints();
 
     cv::Mat& getCVDescriptors();
 
     std::vector<cv::Point2d> GetPointsFromMatches(Matching2& matching, bool query);
+
+    [[nodiscard]] size_t size() const;
 };
 
 #endif //SFM_FEATURES_H

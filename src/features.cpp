@@ -24,7 +24,8 @@ cv::Mat& Features::getCVDescriptors() {
     return _descriptors;
 }
 
-void Features::FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Features &other, Matching2& out) {
+// TODO: move to Matches class?
+void Features::findMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Features &other, Matching2& out) {
     std::vector<std::vector<cv::DMatch>> initialMatching;
     matcher->knnMatch(_descriptors, other.getCVDescriptors(), initialMatching, 2);
 
@@ -38,8 +39,8 @@ void Features::FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Fe
     // TODO: geometric verification of matches by fundamental matrix
 
     if (DEFAULT_DEBUG >= DebugLevel::NUMERIC) {
-        std::cout << "Initial KNN Matching: " << initialMatching.size() << " pairs of matches." << std::endl;
-        std::cout << "Lowe Ratio Matching: " << loweRatioMatching.size() << " matches." << std::endl;
+        std::cout << "Initial KNN Matching: " << initialMatching.size() << " matches" << std::endl;
+        std::cout << "Lowe Ratio Matching: " << loweRatioMatching.size() << " matches" << std::endl;
     }
 
     out = loweRatioMatching;
@@ -47,6 +48,7 @@ void Features::FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Fe
 
 std::vector<cv::Point2d> Features::GetPointsFromMatches(Matching2 &matching, bool query) {
     std::vector<cv::Point2d> points;
+    // TODO: we also want to keep the query or trainIdx
     if (query) {
         for (auto match : matching) {
             points.push_back(_points2d[match.queryIdx]);
@@ -57,4 +59,8 @@ std::vector<cv::Point2d> Features::GetPointsFromMatches(Matching2 &matching, boo
         }
     }
     return points;
+}
+
+size_t Features::size() const {
+    return _keypoints.size();
 }

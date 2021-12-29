@@ -25,20 +25,6 @@ private:
     std::vector<Features>& _mImageFeatures;
     Matches& _mFeatureMatchMatrix;
 
-    bool recoverPose(Camera& cam1, Camera& cam2,
-                     Features& features1, Features& features2,
-                     Matching2& matching,
-                     Matching2& prunedMatching,
-                     cv::Matx34d& pose1, cv::Matx34d& pose2);
-
-    // TODO: pass a struct instead of a long list of parameters
-    bool triangulateViews(ImageID img1, ImageID img2,
-                          Camera& cam1, Camera& cam2,
-                          Features& features1, Features& features2,
-                          Matching2& matching,
-                          Pose& pose1, Pose& pose2,
-                          PointCloud& pointCloud);
-
 public:
     SceneReconstruction(std::vector<Image>& mImages,
                         std::vector<Camera>& mCameras,

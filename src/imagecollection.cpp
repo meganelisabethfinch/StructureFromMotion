@@ -41,18 +41,19 @@ void ImageCollection::ExtractFeatures(const cv::Ptr<cv::FeatureDetector>& detect
 
     for (auto & image : mImages) {
         mImageFeatures.emplace_back(Features(detector, image));
+        std::cout << "Image " << image.id << ": " << mImageFeatures.back().size() << " keypoints" << std::endl;
     }
 }
 
 bool ImageCollection::FindMatches(const cv::Ptr<cv::DescriptorMatcher> &matcher) {
     if (mImageFeatures.size() != mImages.size())
     {
-        std::cout << "Features must be initialised before matches are found." << std::endl;
+        std::cout << "Features must be initialised before matches are found" << std::endl;
         return false;
     }
 
     if (mImageFeatures.size() < 2) {
-        std::cout << "At least two sets of features are required to find matches." << std::endl;
+        std::cout << "At least two sets of features are required to find matches" << std::endl;
         return false;
     }
 

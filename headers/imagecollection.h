@@ -14,6 +14,7 @@
 #include "features.h"
 #include "matches.h"
 #include "scene_reconstruction.h"
+#include "scene_graph.h"
 
 class ImageCollection {
 private:
@@ -39,7 +40,9 @@ public:
 
     void visualiseMatches(ImageID i, ImageID j);
 
-    SceneReconstruction reconstruct();
+    SceneReconstruction toSceneReconstruction(ImageID baseline1, ImageID baseline2);
+
+    SceneGraph toSceneGraph();
 };
 
 #endif //SFM_IMAGECOLLECTION_H

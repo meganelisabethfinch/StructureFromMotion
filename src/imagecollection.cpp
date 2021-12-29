@@ -29,8 +29,8 @@ ImageCollection::ImageCollection(std::string directory) {
         mImages.push_back(image);
 
         // Initialise intrinsic/camera matrix
-        Intrinsic camera = Intrinsic(image);
-        mIntrinsics.push_back(camera);
+        auto camera = Camera(image);
+        mCameras.push_back(camera);
     }
 
     mFeatureMatchMatrix = Matches();
@@ -85,6 +85,16 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
     cv::drawMatches(mImages[i].data, iKeypoints, mImages[j].data, jKeypoints, matches, out);
     cv::imshow("Matches", out);
     cv::waitKey(0);
+}
+
+SceneReconstruction ImageCollection::toSceneReconstruction(ImageID baseline1, ImageID baseline2) {
+    auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix);
+    recon.initialise(baseline1, baseline2);
+    return recon;
+}
+
+SceneGraph ImageCollection::toSceneGraph() {
+    return SceneGraph(mImages, mFeatureMatchMatrix);
 }
 
 ImageCollection::ImageCollection() = default;

@@ -22,6 +22,8 @@ public:
     std::vector<cv::KeyPoint>& getCVKeyPoints();
 
     cv::Mat& getCVDescriptors();
+
+    std::vector<cv::Point2d> GetPointsFromMatches(Matching2& matching, bool query);
 };
 
 #endif //SFM_FEATURES_H

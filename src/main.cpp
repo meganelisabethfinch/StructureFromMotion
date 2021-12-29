@@ -30,8 +30,12 @@ int main(int argc, char** argv) {
         images.visualiseMatches(0, 1);
     }
 
+    auto graph = images.toSceneGraph();
+    graph.toDotFile("scene_graph.dot");
 
     std::cout << "---- Find Baseline Triangulation ---" << std::endl;
+    auto recon = images.toSceneReconstruction(0,1);
+    recon.toPlyFile("point_cloud.ply");
 
     return 0;
 }

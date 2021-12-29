@@ -25,9 +25,11 @@ SceneGraph::SceneGraph(const std::vector<Image>& images, Matches& matches) {
 }
 
 void SceneGraph::toDotFile(const std::string& filename) {
-    std::cout << "Writing scene graph to file." << std::endl;
+    std::cout << "Writing scene graph to .DOT file." << std::endl;
 
     std::ofstream graph(filename);
+
+    graph << "graph sceneGraph {" << std::endl;
 
     for (size_t i = 0; i < nodes.size() - 1; i++) {
         for (size_t j = 0; j < nodes.size(); j++) {

@@ -15,6 +15,14 @@ Camera::Camera(const Image& image) {
     this->distortion = cv::Mat_<double>::zeros(1, 4);
 }
 
-cv::Matx33d Camera::getIntrinsicMatrix() const {
+cv::Matx33d Camera::getCameraMatrix() const {
     return K;
 };
+
+double Camera::getFocalLength() {
+    return K(0,0);
+}
+
+cv::Point2d Camera::getCentre() {
+    return cv::Point2d(K(0,2), K(1,2));
+}

@@ -16,7 +16,11 @@ private:
 public:
     explicit Camera(const Image& image);
 
-    cv::Matx33d getIntrinsicMatrix() const;
+    [[nodiscard]] cv::Matx33d getCameraMatrix() const;
+
+    double getFocalLength();
+
+    cv::Point2d getCentre();
 };
 
 #endif //SFM_CAMERA_H

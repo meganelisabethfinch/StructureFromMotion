@@ -44,3 +44,17 @@ void Features::FindMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Fe
 
     out = loweRatioMatching;
 }
+
+std::vector<cv::Point2d> Features::GetPointsFromMatches(Matching2 &matching, bool query) {
+    std::vector<cv::Point2d> points;
+    if (query) {
+        for (auto match : matching) {
+            points.push_back(_points2d[match.queryIdx]);
+        }
+    } else {
+        for (auto match : matching) {
+            points.push_back(_points2d[match.trainIdx]);
+        }
+    }
+    return points;
+}

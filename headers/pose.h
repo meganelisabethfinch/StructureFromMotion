@@ -14,7 +14,7 @@ private:
 public:
     explicit Pose(const cv::Matx34d& mat);
 
-    cv::Matx34d getPoseMatrix();
+    cv::Matx34d getProjectionMatrix();
 
     // get Rotation vector
 

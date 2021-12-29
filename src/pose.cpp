@@ -8,7 +8,7 @@
 
 Pose::Pose(const cv::Matx34d& mat) : _mat(mat) {}
 
-cv::Matx34d Pose::getPoseMatrix() {
+cv::Matx34d Pose::getProjectionMatrix() {
     return _mat;
 }
 

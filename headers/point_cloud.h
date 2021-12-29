@@ -5,22 +5,13 @@
 #ifndef SFM_POINTCLOUD_H
 #define SFM_POINTCLOUD_H
 
-class PointCloud {
-private:
-    std::vector<Point> points;
+#include <map>
 
-    AddView(); // IN: Features, Matches, Intrinsic, ImageID
-
-    BundleAdjust();
-
-public:
-    PointCloud(ImageCollection& images); // constructor
-
-    PointCloud(ImageCollection& images, ImageID baseline1, ImageID baseline2);
-
-    toColmap();
-
-    toPly();
+struct Point3DInMap {
+    cv::Point3d pt;
+    std::map<ImageID, int> originatingViews;
 };
+
+typedef std::vector<Point3DInMap> PointCloud;
 
 #endif //SFM_POINTCLOUD_H

@@ -10,19 +10,22 @@
 #include <opencv2/features2d.hpp>
 #include "image.h"
 #include "types.h"
-#include "intrinsic.h"
+#include "camera.h"
 #include "features.h"
 #include "matches.h"
+#include "scene_reconstruction.h"
 
 class ImageCollection {
 private:
     std::vector<Image> mImages;
-    std::vector<Intrinsic> mIntrinsics;
+    std::vector<Camera> mCameras;
     std::vector<Features> mImageFeatures;
     Matches mFeatureMatchMatrix;
 
 public:
     explicit ImageCollection(std::string filepath);
+
+    ImageCollection();
 
     void ExtractFeatures(const cv::Ptr<cv::FeatureDetector>& detector);
 
@@ -35,6 +38,8 @@ public:
     void visualiseKeyPoints(ImageID id);
 
     void visualiseMatches(ImageID i, ImageID j);
+
+    SceneReconstruction reconstruct();
 };
 
 #endif //SFM_IMAGECOLLECTION_H

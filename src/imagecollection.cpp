@@ -65,14 +65,14 @@ size_t ImageCollection::size() const {
     return mImages.size();
 }
 
-Image &ImageCollection::getImage(ImageID id) {
-    return mImages[id];
+Image &ImageCollection::getImage(ImageID idx) {
+    return mImages[idx];
 }
 
-void ImageCollection::visualiseKeyPoints(ImageID id) {
+void ImageCollection::visualiseKeyPoints(ImageID idx) {
     cv::Mat out;
-    std::vector<cv::KeyPoint> keypoints = mImageFeatures[id].getCVKeyPoints();
-    cv::drawKeypoints(mImages[id].data, keypoints, out, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    std::vector<cv::KeyPoint> keypoints = mImageFeatures[idx].getCVKeyPoints();
+    cv::drawKeypoints(mImages[idx].data, keypoints, out, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
     cv::imshow("Keypoints", out);
     cv::waitKey(0);
 }
@@ -87,4 +87,4 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
     cv::waitKey(0);
 }
 
-
+ImageCollection::ImageCollection() = default;

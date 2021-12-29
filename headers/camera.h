@@ -8,14 +8,15 @@
 #include <iostream>
 #include "image.h"
 
-class Intrinsic {
+class Camera {
 private:
     cv::Mat_<double> distortion;
     cv::Matx33d K;
 
 public:
-    explicit Intrinsic(const Image& image);
+    explicit Camera(const Image& image);
 
+    cv::Matx33d getIntrinsicMatrix() const;
 };
 
 #endif //SFM_CAMERA_H

@@ -18,3 +18,11 @@ std::vector<Point3DInMap>::iterator PointCloud::begin() {
 std::vector<Point3DInMap>::iterator PointCloud::end() {
     return map.end();
 }
+
+size_t PointCloud::size() const {
+    return map.size();
+}
+
+void PointCloud::addPoint(const Point3DInMap& pt) {
+    map.push_back(pt);
+}

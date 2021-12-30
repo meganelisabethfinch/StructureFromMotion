@@ -86,7 +86,7 @@ PointCloud SFMUtilities::triangulateViews(ImageID img1, ImageID img2,
 
         // p.originatingViews[img1] =
 
-        pc.push_back(p);
+        pc.addPoint(p);
     }
 
     return pc;

@@ -21,7 +21,7 @@ bool SceneReconstruction::initialise(ImageID baseline1, ImageID baseline2) {
     // Clear existing state
     _registeredImages.clear();
     _mCameraPoses.clear();
-    _pointCloud.clear();
+    _pointCloud = PointCloud();
 
     // Recover pose
     if (baseline1 == baseline2) {

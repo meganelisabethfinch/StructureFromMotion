@@ -20,10 +20,12 @@ private:
 public:
     PointCloud();
 
-    Point3DInMap operator[](size_t i);
+    void addPoint(const Point3DInMap& pt);
 
+    Point3DInMap operator[](size_t i);
     std::vector<Point3DInMap>::iterator begin();
     std::vector<Point3DInMap>::iterator end();
+    size_t size() const;
 };
 
 #endif //SFM_POINTCLOUD_H

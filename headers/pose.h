@@ -16,7 +16,9 @@ public:
 
     cv::Matx34d getProjectionMatrix();
 
-    // get Rotation vector
+    [[nodiscard]] cv::Matx31d getRotationVector() const;
+
+    [[nodiscard]] cv::Matx13d getTranslationVector() const;
 
     // get Rotation as Quaternion
 };

@@ -3,6 +3,7 @@
 //
 
 #include <headers/scene_reconstruction.h>
+#include <headers/pose.h>
 #include <fstream>
 
 #include <opencv2/calib3d.hpp>
@@ -21,7 +22,6 @@ bool SceneReconstruction::initialise(ImageID baseline1, ImageID baseline2) {
     // Clear existing state
     _registeredImages.clear();
     _mCameraPoses.clear();
-    _pointCloud = PointCloud();
 
     // Recover pose
     if (baseline1 == baseline2) {
@@ -50,10 +50,12 @@ bool SceneReconstruction::initialise(ImageID baseline1, ImageID baseline2) {
                                prunedMatching,
                                pose1, pose2);
 
-
     // Save recovered poses
+    _mCameraPoses.emplace(baseline1, pose1);
+    _mCameraPoses.emplace(baseline2, pose2);
 
     // Save triangulated points
+    _pointCloud = pc;
 
     // Register images
     _registeredImages.insert(baseline1);
@@ -76,13 +78,16 @@ void SceneReconstruction::toPlyFile(std::string filename) {
     file << "property float x" << std::endl;
     file << "property float y" << std::endl;
     file << "property float z" << std::endl;
+    // file << "property uchar red" << std::endl;
+    // file << "property uchar green" << std::endl;
+    // file << "property uchar blue" << std::endl;
     // TODO: add colour
     file << "end_header" << std::endl;
 
     for (const auto& point3D : _pointCloud) {
-        file << point3D.pt.x << " ";
-        file << point3D.pt.y << " ";
-        file << point3D.pt.z << std::endl;
+        file << static_cast<float>(point3D.pt.x) << " ";
+        file << static_cast<float>(point3D.pt.y) << " ";
+        file << static_cast<float>(point3D.pt.z) << std::endl;
     }
 
     file.close();

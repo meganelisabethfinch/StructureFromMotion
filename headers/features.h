@@ -23,7 +23,9 @@ public:
 
     cv::Mat& getCVDescriptors();
 
-    std::vector<cv::Point2d> GetPointsFromMatches(Matching2& matching, bool query);
+    cv::Point2d getPoint(size_t i);
+
+    std::vector<cv::Point2d> GetPointsFromMatches(Matching2& matching, bool query, std::vector<int>& backReference);
 
     [[nodiscard]] size_t size() const;
 };

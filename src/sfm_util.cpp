@@ -17,11 +17,13 @@ SFMUtilities::recoverPose(Camera &cam1, Camera &cam2,
                           Matching2 &prunedMatching)
 {
     // Get two arrays of matching points
-    auto points1 = features1.GetPointsFromMatches(matching, true);
-    auto points2 = features2.GetPointsFromMatches(matching, false);
+    std::vector<int> backRef1;
+    std::vector<int> backRef2;
+    auto points1 = features1.GetPointsFromMatches(matching, true, backRef1);
+    auto points2 = features2.GetPointsFromMatches(matching, false, backRef2);
 
     // TODO: for now, assumes cam1.K == cam2.K
-    // but this is not always true
+    // but this is not always true e.g. if images are different size
     double focal = cam1.getFocalLength();
     auto pp = cam1.getCentre();
 
@@ -60,13 +62,20 @@ PointCloud SFMUtilities::triangulateViews(ImageID img1, ImageID img2,
                                    Pose& pose1, Pose& pose2)
 {
     // Get two arrays of matching points
-    auto points1 = features1.GetPointsFromMatches(matching, true);
-    auto points2 = features2.GetPointsFromMatches(matching, false);
+    std::vector<cv::Point2d> alignedPoints1;
+    std::vector<cv::Point2d> alignedPoints2;
+    std::vector<int> backReference1;
+    std::vector<int> backReference2;
+
+    SFMUtilities::getAlignedPointsFromMatch(features1, features2,
+                                            matching,
+                                            alignedPoints1, alignedPoints2,
+                                            backReference1, backReference2);
 
     cv::Mat normalisedPoints1;
     cv::Mat normalisedPoints2;
-    cv::undistortPoints(points1, normalisedPoints1, cam1.getCameraMatrix(), cv::Mat());
-    cv::undistortPoints(points2, normalisedPoints2, cam2.getCameraMatrix(), cv::Mat());
+    cv::undistortPoints(alignedPoints1, normalisedPoints1, cam1.getCameraMatrix(), cv::Mat());
+    cv::undistortPoints(alignedPoints2, normalisedPoints2, cam2.getCameraMatrix(), cv::Mat());
 
     cv::Mat points3dHomogenous;
     cv::triangulatePoints(pose1.getProjectionMatrix(), pose2.getProjectionMatrix(), normalisedPoints1, normalisedPoints2, points3dHomogenous);
@@ -75,19 +84,75 @@ PointCloud SFMUtilities::triangulateViews(ImageID img1, ImageID img2,
     cv::convertPointsFromHomogeneous(points3dHomogenous.t(), points3d);
 
     // TODO: reprojection errors
-
+    auto reprojectionErrors1 = SFMUtilities::getReprojectionErrors(alignedPoints1, points3d, cam1, pose1);
+    auto reprojectionErrors2 = SFMUtilities::getReprojectionErrors(alignedPoints2, points3d, cam2, pose2);
 
     // Populate PointCloud
     PointCloud pc;
 
     for (size_t i = 0; i < points3d.rows; i++) {
-        Point3DInMap p;
-        p.pt = cv::Point3d(points3d.at<float>(i, 0), points3d.at<float>(i,1), points3d.at<float>(i,2));
+        if (reprojectionErrors1[i] > REPROJECTION_ERROR_THRESHOLD or
+            reprojectionErrors2[i] > REPROJECTION_ERROR_THRESHOLD) {
+            continue;
+        }
 
-        // p.originatingViews[img1] =
+        Point3DInMap p;
+        p.pt = cv::Point3d(points3d.at<double>(i, 0),
+                points3d.at<double>(i,1),
+                points3d.at<double>(i,2));
+
+        p.originatingViews[img1] = backReference1[i];
+        p.originatingViews[img2] = backReference2[i];
 
         pc.addPoint(p);
     }
 
     return pc;
+}
+
+void SFMUtilities::getAlignedPointsFromMatch(Features& queryFeatures, Features& trainFeatures,
+                                             Matching2& matching,
+                                             std::vector<cv::Point2d>& queryAlignedPoints, std::vector<cv::Point2d>& trainAlignedPoints,
+                                             std::vector<int>& queryBackReference, std::vector<int>& trainBackReference)
+{
+    queryAlignedPoints.clear();
+    trainAlignedPoints.clear();
+    queryBackReference.clear();
+    trainBackReference.clear();
+
+    for (auto match : matching) {
+        queryAlignedPoints.push_back(queryFeatures.getPoint(match.queryIdx));
+        trainAlignedPoints.push_back(trainFeatures.getPoint(match.trainIdx));
+        queryBackReference.push_back(match.queryIdx);
+        trainBackReference.push_back(match.trainIdx);
+    }
+}
+
+std::vector<double>
+SFMUtilities::getReprojectionErrors(const std::vector<cv::Point2d>& points2d, const cv::Mat& points3d, const Camera &camera, const Pose &pose) {
+    cv::Matx31d rvec = pose.getRotationVector();
+    auto tvec = pose.getTranslationVector();
+
+    // Reproject points
+    std::vector<cv::Point2d> reprojectedPoints(points2d.size());
+    cv::projectPoints(points3d, rvec, tvec, camera.getCameraMatrix(), cv::Mat(), reprojectedPoints);
+
+    // Calculate errors
+    std::vector<double> reprojectionErrors(points2d.size());
+    for (size_t i = 0; i < points3d.rows; i++) {
+
+        double error = cv::norm(reprojectedPoints[i] - points2d[i]);
+        reprojectionErrors[i] = error;
+    }
+
+    if (DEFAULT_DEBUG >= DebugLevel::DETAILED) {
+        for (size_t i = 0; i < points3d.rows; i++) {
+            std::cout << "-----Point #" << i << "-----" << std::endl;
+            std::cout << "Actual: " << points2d[i] << std::endl;
+            std::cout << "Reprojected: " << reprojectedPoints[i] << std::endl;
+            std::cout << "Error: " << reprojectionErrors[i] << std::endl;
+        }
+    }
+
+    return reprojectionErrors;
 }

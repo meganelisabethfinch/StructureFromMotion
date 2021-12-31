@@ -16,7 +16,7 @@
 class SceneReconstruction {
 private:
     std::vector<Image>& _mImages;
-    std::vector<Pose> _mCameraPoses;
+    std::map<ImageID, Pose> _mCameraPoses;
     std::set<ImageID> _registeredImages;
     PointCloud _pointCloud;
 

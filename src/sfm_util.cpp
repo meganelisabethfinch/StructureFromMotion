@@ -53,7 +53,34 @@ SFMUtilities::recoverPose(Camera &cam1, Camera &cam2,
     return pose2;
 }
 
+Pose SFMUtilities::recoverPoseFrom2D3DMatches(Camera& camera, Image2D3DMatch matching) {
+    cv::Matx31d rvec, tvec;
+    cv::Mat inliers;
 
+    cv::solvePnPRansac(matching.points3D,
+                       matching.points2D,
+                       camera.getCameraMatrix(),
+                       camera.getDistortion(),
+                       rvec,
+                       tvec,
+                       false,
+                       100,
+                       (float)RANSAC_THRESHOLD,
+                       0.99,
+                       inliers
+                       );
+
+    // Check inliers ratio, reject if too small
+    double inliersRatio = ((double)cv::countNonZero(inliers)) / ((double)matching.points2D.size());
+    if (inliersRatio < POSE_INLIERS_MINIMAL_RATIO) {
+        std::cerr << "Inliers ratio is too small: " << cv::countNonZero(inliers) << " / " << matching.points2D.size() << std::endl;
+        // TODO: error
+    }
+
+    Pose pose = Pose(rvec, tvec);
+
+    return pose;
+}
 
 PointCloud SFMUtilities::triangulateViews(ImageID img1, ImageID img2,
                                    Camera& cam1, Camera& cam2,
@@ -156,3 +183,4 @@ SFMUtilities::getReprojectionErrors(const std::vector<cv::Point2d>& points2d, co
 
     return reprojectionErrors;
 }
+

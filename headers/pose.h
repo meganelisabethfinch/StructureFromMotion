@@ -6,13 +6,17 @@
 #define SFM_POSE_H
 
 #include <opencv2/core/matx.hpp>
+#include <opencv2/core/types.hpp>
 
 class Pose {
 private:
+
     cv::Matx34d _mat;
 
 public:
     explicit Pose(const cv::Matx34d& mat);
+
+    Pose(const cv::Matx31d& rvec, const cv::Matx31d& tvec);
 
     cv::Matx34d getProjectionMatrix();
 

@@ -65,6 +65,6 @@ size_t Features::size() const {
     return _keypoints.size();
 }
 
-cv::Point2d Features::getPoint(size_t i) {
+cv::Point2d Features::getPoint(size_t i) const {
     return _points2d[i];
 }

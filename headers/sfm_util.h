@@ -21,6 +21,9 @@ public:
                             Matching2 &matching,
                             Matching2 &prunedMatching);
 
+    static Pose recoverPoseFrom2D3DMatches(Camera& camera,
+                                           Image2D3DMatch matching);
+
     static PointCloud triangulateViews(ImageID img1, ImageID img2,
             Camera& cam1, Camera& cam2,
             Features& features1, Features& features2,

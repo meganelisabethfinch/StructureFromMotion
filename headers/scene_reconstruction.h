@@ -33,6 +33,8 @@ public:
 
     bool initialise(ImageID baseline1, ImageID baseline2);
 
+    bool registerImage(ImageID imageId);
+
     void toColmapFile(std::string filename);
 
     void toPlyFile(std::string filename);

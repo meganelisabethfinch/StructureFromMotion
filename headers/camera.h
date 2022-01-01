@@ -18,9 +18,11 @@ public:
 
     [[nodiscard]] cv::Matx33d getCameraMatrix() const;
 
-    double getFocalLength();
+    [[nodiscard]] double getFocalLength() const;
 
-    cv::Point2d getCentre();
+    [[nodiscard]] cv::Point2d getCentre() const;
+
+    cv::Mat_<double> getDistortion();
 };
 
 #endif //SFM_CAMERA_H

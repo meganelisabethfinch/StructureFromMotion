@@ -64,6 +64,60 @@ bool SceneReconstruction::initialise(ImageID baseline1, ImageID baseline2) {
     return true;
 }
 
+bool SceneReconstruction::registerImage(ImageID imageId) {
+    if (_registeredImages.contains(imageId)) {
+        std::cout << "Image " << imageId << " is already registered." << std::endl;
+        return false;
+    }
+
+    Image2D3DMatch match2D3D;
+
+    // Scan all 3D points currently in point cloud
+    for (const Point3DInMap& cloudPoint : _pointCloud) {
+        bool found2DPoint = false;
+        // true if we find a 2D point in the new image that corresponds to cloudPoint
+
+        // Scan all originating views for that 3D point
+        for (const auto& origViewAndPoint : cloudPoint.originatingViews) {
+            // Check for 2D-2D matching via the match matrix
+            const ImageID originatingImgId = origViewAndPoint.first;
+            const int originatingKeyPointIndex = origViewAndPoint.second;
+
+            // if (originatingImgId != imageId - 1) continue;
+
+            for (const cv::DMatch& m : _mFeatureMatchMatrix.GetMatchingBetween(originatingImgId, imageId)) {
+                int matching2DPoint = -1;
+
+                if (originatingImgId < imageId) {
+                    // originatingImg is query, image being registered is train
+                    if (m.queryIdx == originatingKeyPointIndex) {
+                        matching2DPoint = m.trainIdx;
+                    }
+                } else {
+                    // image being registered is query, originatingImg is train
+                    if (m.trainIdx == originatingKeyPointIndex) {
+                        matching2DPoint = m.queryIdx;
+                    }
+                }
+
+                if (matching2DPoint > -1) {
+                    const Features& newImageFeatures = _mImageFeatures[imageId];
+                    match2D3D.points2D.push_back(newImageFeatures.getPoint(matching2DPoint));
+                    match2D3D.points3D.push_back(cloudPoint.pt);
+                    found2DPoint = true;
+                    break; // out of matches loop
+                }
+            }
+
+            if (found2DPoint) { break; } // out of originatingViews loop
+        }
+    }
+
+    // Recover camera pose for new image to be registered
+    Pose newCameraPose = SFMUtilities::recoverPoseFrom2D3DMatches(_mCameras[imageId], match2D3D);
+    return true;
+}
+
 void SceneReconstruction::toColmapFile(std::string filename) {
     // TODO
 }

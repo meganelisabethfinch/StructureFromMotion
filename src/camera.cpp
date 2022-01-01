@@ -19,10 +19,14 @@ cv::Matx33d Camera::getCameraMatrix() const {
     return K;
 };
 
-double Camera::getFocalLength() {
+double Camera::getFocalLength() const {
     return K(0,0);
 }
 
-cv::Point2d Camera::getCentre() {
-    return cv::Point2d(K(0,2), K(1,2));
+cv::Point2d Camera::getCentre() const {
+    return {K(0,2), K(1,2)};
+}
+
+cv::Mat_<double> Camera::getDistortion() {
+    return distortion;
 }

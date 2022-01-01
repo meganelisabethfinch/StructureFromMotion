@@ -10,6 +10,16 @@
 
 Pose::Pose(const cv::Matx34d& mat) : _mat(mat) {}
 
+Pose::Pose(const cv::Matx31d& rvec, const cv::Matx31d& tvec) {
+    cv::Matx33d rmat;
+    cv::Rodrigues(rvec, rmat);
+
+    // TODO: verify correctness
+    _mat = cv::Matx34d(rmat(0,0), rmat(0,1), rmat(0,2), tvec(0,0),
+                       rmat(1,0), rmat(1,1), rmat(1,2), tvec(1,0),
+                       rmat(2,0), rmat(2,1), rmat(2,2), tvec(2,0));
+}
+
 cv::Matx34d Pose::getProjectionMatrix() {
     return _mat;
 }

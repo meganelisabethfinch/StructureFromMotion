@@ -27,4 +27,9 @@ struct Args {
 typedef std::vector<cv::DMatch> Matching2;
 typedef std::vector<std::vector<Matching2>> MatchMatrix;
 
+struct Image2D3DMatch {
+    std::vector<cv::Point2d> points2D;
+    std::vector<cv::Point3d> points3D;
+};
+
 #endif //SFM_TYPES_H

@@ -82,7 +82,7 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
     cv::Mat out;
     std::vector<cv::KeyPoint> iKeypoints = mImageFeatures[i].getCVKeyPoints();
     std::vector<cv::KeyPoint> jKeypoints = mImageFeatures[j].getCVKeyPoints();
-    Matching2 matches = mFeatureMatchMatrix.GetMatchingBetween(i,j);
+    Matching2 matches = mFeatureMatchMatrix.getMatchingBetween(i, j);
     cv::drawMatches(mImages[i].data, iKeypoints, mImages[j].data, jKeypoints, matches, out);
     cv::imshow("Matches", out);
     cv::waitKey(0);
@@ -91,6 +91,12 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
 SceneReconstruction ImageCollection::toSceneReconstruction(ImageID baseline1, ImageID baseline2) {
     auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix);
     recon.initialise(baseline1, baseline2);
+
+    // TODO: decide order of registration based on number of inliers/matches
+    for (ImageID i = 0; i < mImages.size(); i++) {
+        recon.registerImage(i);
+    }
+
     return recon;
 }
 

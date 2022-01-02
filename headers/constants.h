@@ -21,8 +21,11 @@ const double POSE_INLIERS_MINIMAL_RATIO = 0.15;
 // Number of matches needed for an edge between two images
 const int SCENE_GRAPH_EDGE_THRESHOLD = 25;
 
+const double MERGE_CLOUD_POINT_MIN_MATCH_DISTANCE = 0.01;
+const double MERGE_CLOUD_FEATURE_MIN_MATCH_DISTANCE = 20.0;
+
 const DetectorType DEFAULT_DETECTOR = DetectorType::SIFT;
 const MatcherType DEFAULT_MATCHER = MatcherType::FLANNBASED;
-const DebugLevel DEFAULT_DEBUG = DebugLevel::EXAMPLES;
+const DebugLevel DEFAULT_DEBUG = DebugLevel::BASIC;
 
 #endif //SFM_CONSTANTS_H

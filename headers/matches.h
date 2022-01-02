@@ -16,9 +16,11 @@ public:
 
     Matches(); // TODO: remove this while keeping the compiler happy
 
-    Matching2& GetMatchingBetween(ImageID i, ImageID j);
+    Matching2& getMatchingBetween(ImageID i, ImageID j);
 
     void prune(ImageID i, ImageID j, cv::Mat& mask);
+
+    size_t size();
 };
 
 #endif //SFM_MATCHES_H

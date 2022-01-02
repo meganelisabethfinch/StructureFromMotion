@@ -17,7 +17,7 @@ Matches::Matches(const cv::Ptr<cv::DescriptorMatcher>& matcher, std::vector<Feat
     }
 }
 
-Matching2& Matches::GetMatchingBetween(const ImageID i, const ImageID j) {
+Matching2& Matches::getMatchingBetween(const ImageID i, const ImageID j) {
     // Always index by smaller number first
     const ImageID leftID = (i < j) ? i : j;
     const ImageID rightID = (i < j) ? j : i;
@@ -41,6 +41,10 @@ void Matches::prune(ImageID i, ImageID j, cv::Mat& mask) {
     }
 
     matrix[i][j] = prunedMatching;
+}
+
+size_t Matches::size() {
+    return matrix.size();
 }
 
 Matches::Matches() = default;

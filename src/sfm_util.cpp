@@ -11,16 +11,17 @@ bool SFMUtilities::PassesLoweRatioTest(const std::vector<cv::DMatch> &match) {
 }
 
 Pose
-SFMUtilities::recoverPose(Camera &cam1, Camera &cam2,
-                          Features &features1, Features &features2,
-                          Matching2 &matching,
-                          Matching2 &prunedMatching)
+SFMUtilities::recoverPoseFromMatches(Camera &cam1, Camera &cam2,
+                                     Features &features1, Features &features2,
+                                     Matching2 &matching,
+                                     Matching2 &prunedMatching)
 {
     // Get two arrays of matching points
     std::vector<int> backRef1;
     std::vector<int> backRef2;
-    auto points1 = features1.GetPointsFromMatches(matching, true, backRef1);
-    auto points2 = features2.GetPointsFromMatches(matching, false, backRef2);
+    std::vector<cv::Point2d> points1;
+    std::vector<cv::Point2d> points2;
+    SFMUtilities::getAlignedPointsFromMatch(features1, features2, matching, points1, points2, backRef1, backRef2);
 
     // TODO: for now, assumes cam1.K == cam2.K
     // but this is not always true e.g. if images are different size
@@ -184,3 +185,45 @@ SFMUtilities::getReprojectionErrors(const std::vector<cv::Point2d>& points2d, co
     return reprojectionErrors;
 }
 
+Image2D3DMatch
+SFMUtilities::find2D3DMatches(ImageID imageId,
+                              Features &imageFeatures,
+                              Matches &matches,
+                              PointCloud &pointCloud)
+{
+    Image2D3DMatch match2D3D;
+
+    for (const Point3DInMap& cloudPoint : pointCloud) {
+        bool found2DPoint = false;
+
+        for (const auto& origViewAndPoint : cloudPoint.originatingViews) {
+            const ImageID originatingViewIndex = origViewAndPoint.first;
+            const int originatingPointIndex = origViewAndPoint.second;
+
+            for (const cv::DMatch& m : matches.getMatchingBetween(imageId, originatingViewIndex)) {
+                int matched2DPointInNewView = -1;
+
+                if (originatingViewIndex < imageId) {
+                    if (m.queryIdx == originatingPointIndex) {
+                        matched2DPointInNewView = m.trainIdx;
+                    }
+                } else {
+                    if (m.trainIdx == originatingPointIndex) {
+                        matched2DPointInNewView = m.queryIdx;
+                    }
+                }
+
+                if (matched2DPointInNewView > -1) {
+                    match2D3D.points2D.push_back(imageFeatures.getPoint(matched2DPointInNewView));
+                    match2D3D.points3D.push_back(cloudPoint.pt);
+                    found2DPoint = true;
+                    break; // out of matches loop
+                }
+            }
+
+            if (found2DPoint) { break; } // out of originating views loop
+        }
+    }
+
+    return match2D3D;
+}

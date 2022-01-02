@@ -35,10 +35,10 @@ bool SceneReconstruction::initialise(ImageID baseline1, ImageID baseline2) {
 
     Matching2 prunedMatching;
 
-    auto pose2 = SFMUtilities::recoverPose(_mCameras[baseline1], _mCameras[baseline2],
-                               _mImageFeatures[baseline1], _mImageFeatures[baseline2],
-                               _mFeatureMatchMatrix.GetMatchingBetween(baseline1, baseline2),
-                               prunedMatching);
+    auto pose2 = SFMUtilities::recoverPoseFromMatches(_mCameras[baseline1], _mCameras[baseline2],
+                                                      _mImageFeatures[baseline1], _mImageFeatures[baseline2],
+                                                      _mFeatureMatchMatrix.getMatchingBetween(baseline1, baseline2),
+                                                      prunedMatching);
 
     auto pose1 = Pose(cv::Matx34d::eye());
 
@@ -65,56 +65,48 @@ bool SceneReconstruction::initialise(ImageID baseline1, ImageID baseline2) {
 }
 
 bool SceneReconstruction::registerImage(ImageID imageId) {
+    std::cout << "--------- Register Image " << imageId << " ---------" << std::endl;
     if (_registeredImages.contains(imageId)) {
         std::cout << "Image " << imageId << " is already registered." << std::endl;
         return false;
     }
 
-    Image2D3DMatch match2D3D;
-
-    // Scan all 3D points currently in point cloud
-    for (const Point3DInMap& cloudPoint : _pointCloud) {
-        bool found2DPoint = false;
-        // true if we find a 2D point in the new image that corresponds to cloudPoint
-
-        // Scan all originating views for that 3D point
-        for (const auto& origViewAndPoint : cloudPoint.originatingViews) {
-            // Check for 2D-2D matching via the match matrix
-            const ImageID originatingImgId = origViewAndPoint.first;
-            const int originatingKeyPointIndex = origViewAndPoint.second;
-
-            // if (originatingImgId != imageId - 1) continue;
-
-            for (const cv::DMatch& m : _mFeatureMatchMatrix.GetMatchingBetween(originatingImgId, imageId)) {
-                int matching2DPoint = -1;
-
-                if (originatingImgId < imageId) {
-                    // originatingImg is query, image being registered is train
-                    if (m.queryIdx == originatingKeyPointIndex) {
-                        matching2DPoint = m.trainIdx;
-                    }
-                } else {
-                    // image being registered is query, originatingImg is train
-                    if (m.trainIdx == originatingKeyPointIndex) {
-                        matching2DPoint = m.queryIdx;
-                    }
-                }
-
-                if (matching2DPoint > -1) {
-                    const Features& newImageFeatures = _mImageFeatures[imageId];
-                    match2D3D.points2D.push_back(newImageFeatures.getPoint(matching2DPoint));
-                    match2D3D.points3D.push_back(cloudPoint.pt);
-                    found2DPoint = true;
-                    break; // out of matches loop
-                }
-            }
-
-            if (found2DPoint) { break; } // out of originatingViews loop
-        }
-    }
+    // Get a list of matches between keypoints in this image (2D points) and 3D points in the point cloud
+    Image2D3DMatch match2D3D = SFMUtilities::find2D3DMatches(imageId, _mImageFeatures[imageId], _mFeatureMatchMatrix, _pointCloud);
 
     // Recover camera pose for new image to be registered
     Pose newCameraPose = SFMUtilities::recoverPoseFrom2D3DMatches(_mCameras[imageId], match2D3D);
+
+    // (Check pose is found OK)
+    _mCameraPoses.emplace(imageId, newCameraPose);
+
+    // For each image already registered
+    // Triangulate points between that and the new image
+    for (const ImageID oldId : _registeredImages) {
+        ImageID left = (oldId < imageId) ? oldId : imageId;
+        ImageID right = (oldId < imageId) ? imageId : oldId;
+
+        Matching2 prunedMatching;
+
+        // use essential matrix recovery to prune matches
+        auto pose_right = SFMUtilities::recoverPoseFromMatches(_mCameras[left], _mCameras[right],
+                                                               _mImageFeatures[left], _mImageFeatures[right],
+                                                               _mFeatureMatchMatrix.getMatchingBetween(left, right),
+                                                               prunedMatching);
+        // _mFeatureMatchMatrix[left][right] = prunedMatching;
+
+        auto pc = SFMUtilities::triangulateViews(left, right,
+            _mCameras[left], _mCameras[right],
+            _mImageFeatures[left], _mImageFeatures[right],
+            prunedMatching,
+            _mCameraPoses.at(left), _mCameraPoses.at(right));
+
+        // TODO: check triangulation successful
+        _pointCloud.mergePoints(pc, _mFeatureMatchMatrix);
+    }
+
+    _registeredImages.insert(imageId);
+
     return true;
 }
 

@@ -11,15 +11,16 @@
 #include "features.h"
 #include "pose.h"
 #include "point_cloud.h"
+#include "matches.h"
 
 class SFMUtilities {
 public:
     static bool PassesLoweRatioTest(const std::vector<cv::DMatch>& match);
 
-    static Pose recoverPose(Camera &cam1, Camera &cam2,
-                            Features &features1, Features &features2,
-                            Matching2 &matching,
-                            Matching2 &prunedMatching);
+    static Pose recoverPoseFromMatches(Camera &cam1, Camera &cam2,
+                                       Features &features1, Features &features2,
+                                       Matching2 &matching,
+                                       Matching2 &prunedMatching);
 
     static Pose recoverPoseFrom2D3DMatches(Camera& camera,
                                            Image2D3DMatch matching);
@@ -39,6 +40,11 @@ public:
                                                      const cv::Mat& points3d,
                                                      const Camera& camera,
                                                      const Pose& pose);
+
+    static Image2D3DMatch find2D3DMatches(ImageID imageId,
+                                          Features& imageFeatures,
+                                          Matches& matches,
+                                          PointCloud& pointCloud);
 };
 
 #endif //SFM_UTIL_H

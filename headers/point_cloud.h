@@ -7,6 +7,7 @@
 
 #include <map>
 #include "types.h"
+#include "matches.h"
 
 struct Point3DInMap {
     cv::Point3d pt;
@@ -21,6 +22,8 @@ public:
     PointCloud();
 
     void addPoint(const Point3DInMap& pt);
+
+    void mergePoints(PointCloud& pc, Matches& matches); // Merge an existing point cloud into this one
 
     Point3DInMap operator[](size_t i);
     std::vector<Point3DInMap>::iterator begin();

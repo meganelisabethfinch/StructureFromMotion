@@ -5,6 +5,7 @@
 #include <headers/sfm_util.h>
 #include <opencv2/calib3d.hpp>
 #include "headers/constants.h"
+#include "headers/exceptions.h"
 
 bool SFMUtilities::PassesLoweRatioTest(const std::vector<cv::DMatch> &match) {
     return match.size() == 2 && static_cast<double>(match[0].distance) < static_cast<double>(match[1].distance) * LOWE_RATIO;
@@ -27,6 +28,13 @@ SFMUtilities::recoverPoseFromMatches(Camera &cam1, Camera &cam2,
     // but this is not always true e.g. if images are different size
     double focal = cam1.getFocalLength();
     auto pp = cam1.getCentre();
+
+    std::cout << points1.size() << std::endl;
+    std::cout << points2.size() << std::endl;
+
+    if (points1.size() < POINTS_NEEDED_ESSENTIAL_MATRIX) {
+        throw std::runtime_error("Not enough points to compute essential matrix.");
+    }
 
     // Find essential matrix
     cv::Mat E, R, t;
@@ -75,7 +83,7 @@ Pose SFMUtilities::recoverPoseFrom2D3DMatches(Camera& camera, Image2D3DMatch mat
     double inliersRatio = ((double)cv::countNonZero(inliers)) / ((double)matching.points2D.size());
     if (inliersRatio < POSE_INLIERS_MINIMAL_RATIO) {
         std::cerr << "Inliers ratio is too small: " << cv::countNonZero(inliers) << " / " << matching.points2D.size() << std::endl;
-        // TODO: error
+        throw "Inlier ratio is too small."; // TODO
     }
 
     Pose pose = Pose(rvec, tvec);

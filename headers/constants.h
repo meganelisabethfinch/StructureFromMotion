@@ -24,6 +24,9 @@ const int SCENE_GRAPH_EDGE_THRESHOLD = 25;
 const double MERGE_CLOUD_POINT_MIN_MATCH_DISTANCE = 0.01;
 const double MERGE_CLOUD_FEATURE_MIN_MATCH_DISTANCE = 20.0;
 
+// Number of matching points needed to calculate essential matrix
+const int POINTS_NEEDED_ESSENTIAL_MATRIX = 7;
+
 const DetectorType DEFAULT_DETECTOR = DetectorType::SIFT;
 const MatcherType DEFAULT_MATCHER = MatcherType::FLANNBASED;
 const DebugLevel DEFAULT_DEBUG = DebugLevel::BASIC;

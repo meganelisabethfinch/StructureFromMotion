@@ -8,6 +8,7 @@
 
 #include <opencv2/calib3d.hpp>
 #include <headers/sfm_util.h>
+#include <headers/exceptions.h>
 
 SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Camera> &mCameras,
@@ -33,35 +34,40 @@ bool SceneReconstruction::initialise(ImageID baseline1, ImageID baseline2) {
         baseline2 = tmp;
     }
 
-    Matching2 prunedMatching;
+    try {
+        Matching2 prunedMatching;
 
-    auto pose2 = SFMUtilities::recoverPoseFromMatches(_mCameras[baseline1], _mCameras[baseline2],
-                                                      _mImageFeatures[baseline1], _mImageFeatures[baseline2],
-                                                      _mFeatureMatchMatrix.getMatchingBetween(baseline1, baseline2),
-                                                      prunedMatching);
+        auto pose2 = SFMUtilities::recoverPoseFromMatches(_mCameras[baseline1], _mCameras[baseline2],
+                                                          _mImageFeatures[baseline1], _mImageFeatures[baseline2],
+                                                          _mFeatureMatchMatrix.getMatchingBetween(baseline1, baseline2),
+                                                          prunedMatching);
 
-    auto pose1 = Pose(cv::Matx34d::eye());
+        auto pose1 = Pose(cv::Matx34d::eye());
 
-    // _mFeatureMatchMatrix[baseline1][baseline2] = prunedMatching;
+        // _mFeatureMatchMatrix[baseline1][baseline2] = prunedMatching;
 
-    auto pc = SFMUtilities::triangulateViews(baseline1, baseline2,
-                               _mCameras[baseline1], _mCameras[baseline2],
-                               _mImageFeatures[baseline1], _mImageFeatures[baseline2],
-                               prunedMatching,
-                               pose1, pose2);
+        auto pc = SFMUtilities::triangulateViews(baseline1, baseline2,
+                                                 _mCameras[baseline1], _mCameras[baseline2],
+                                                 _mImageFeatures[baseline1], _mImageFeatures[baseline2],
+                                                 prunedMatching,
+                                                 pose1, pose2);
 
-    // Save recovered poses
-    _mCameraPoses.emplace(baseline1, pose1);
-    _mCameraPoses.emplace(baseline2, pose2);
+        // Save recovered poses
+        _mCameraPoses.emplace(baseline1, pose1);
+        _mCameraPoses.emplace(baseline2, pose2);
 
-    // Save triangulated points
-    _pointCloud = pc;
+        // Save triangulated points
+        _pointCloud = pc;
 
-    // Register images
-    _registeredImages.insert(baseline1);
-    _registeredImages.insert(baseline2);
+        // Register images
+        _registeredImages.insert(baseline1);
+        _registeredImages.insert(baseline2);
 
-    return true;
+        return true;
+    } catch (std::runtime_error& e) {
+        std::cerr << "Failed to initialise reconstruction from baseline images " << baseline1 << " and " << baseline2 << ". Please try an alternative baseline pair." << std::endl;
+        return false;
+    }
 }
 
 bool SceneReconstruction::registerImage(ImageID imageId) {
@@ -86,23 +92,28 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
         ImageID left = (oldId < imageId) ? oldId : imageId;
         ImageID right = (oldId < imageId) ? imageId : oldId;
 
-        Matching2 prunedMatching;
+        try {
+            Matching2 prunedMatching;
 
-        // use essential matrix recovery to prune matches
-        auto pose_right = SFMUtilities::recoverPoseFromMatches(_mCameras[left], _mCameras[right],
-                                                               _mImageFeatures[left], _mImageFeatures[right],
-                                                               _mFeatureMatchMatrix.getMatchingBetween(left, right),
-                                                               prunedMatching);
-        // _mFeatureMatchMatrix[left][right] = prunedMatching;
+            // use essential matrix recovery to prune matches
+            auto pose_right = SFMUtilities::recoverPoseFromMatches(_mCameras[left], _mCameras[right],
+                                                                   _mImageFeatures[left], _mImageFeatures[right],
+                                                                   _mFeatureMatchMatrix.getMatchingBetween(left, right),
+                                                                   prunedMatching);
+            // _mFeatureMatchMatrix[left][right] = prunedMatching;
 
-        auto pc = SFMUtilities::triangulateViews(left, right,
-            _mCameras[left], _mCameras[right],
-            _mImageFeatures[left], _mImageFeatures[right],
-            prunedMatching,
-            _mCameraPoses.at(left), _mCameraPoses.at(right));
 
-        // TODO: check triangulation successful
-        _pointCloud.mergePoints(pc, _mFeatureMatchMatrix);
+            auto pc = SFMUtilities::triangulateViews(left, right,
+                                                     _mCameras[left], _mCameras[right],
+                                                     _mImageFeatures[left], _mImageFeatures[right],
+                                                     prunedMatching,
+                                                     _mCameraPoses.at(left), _mCameraPoses.at(right));
+
+            // TODO: check triangulation successful
+            _pointCloud.mergePoints(pc, _mFeatureMatchMatrix);
+        } catch (std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
+        }
     }
 
     _registeredImages.insert(imageId);

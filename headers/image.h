@@ -17,6 +17,10 @@ struct Image {
     cv::Mat data;
     Image(ImageID imageId, std::string imageName, cv::Mat& imageData)
         : id(imageId), name(std::move(imageName)), data(imageData) {}
+
+    cv::Vec3b getColourAt(const cv::Point2d& point) {
+        return data.at<cv::Vec3b>(point);
+    }
 };
 
 #endif //SFM_IMAGE_H

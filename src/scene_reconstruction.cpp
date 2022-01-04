@@ -8,7 +8,6 @@
 
 #include <opencv2/calib3d.hpp>
 #include <headers/sfm_util.h>
-#include <headers/exceptions.h>
 
 SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Camera> &mCameras,
@@ -80,45 +79,53 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
     // Get a list of matches between keypoints in this image (2D points) and 3D points in the point cloud
     Image2D3DMatch match2D3D = SFMUtilities::find2D3DMatches(imageId, _mImageFeatures[imageId], _mFeatureMatchMatrix, _pointCloud);
 
-    // Recover camera pose for new image to be registered
-    Pose newCameraPose = SFMUtilities::recoverPoseFrom2D3DMatches(_mCameras[imageId], match2D3D);
+    try {
+        // Recover camera pose for new image to be registered
+        Pose newCameraPose = SFMUtilities::recoverPoseFrom2D3DMatches(_mCameras[imageId], match2D3D);
 
-    // (Check pose is found OK)
-    _mCameraPoses.emplace(imageId, newCameraPose);
+        // (Check pose is found OK)
+        _mCameraPoses.emplace(imageId, newCameraPose);
 
-    // For each image already registered
-    // Triangulate points between that and the new image
-    for (const ImageID oldId : _registeredImages) {
-        ImageID left = (oldId < imageId) ? oldId : imageId;
-        ImageID right = (oldId < imageId) ? imageId : oldId;
+        // For each image already registered
+        // Triangulate points between that and the new image
+        for (const ImageID oldId: _registeredImages) {
+            ImageID left = (oldId < imageId) ? oldId : imageId;
+            ImageID right = (oldId < imageId) ? imageId : oldId;
 
-        try {
-            Matching2 prunedMatching;
+            try {
+                Matching2 prunedMatching;
 
-            // use essential matrix recovery to prune matches
-            auto pose_right = SFMUtilities::recoverPoseFromMatches(_mCameras[left], _mCameras[right],
-                                                                   _mImageFeatures[left], _mImageFeatures[right],
-                                                                   _mFeatureMatchMatrix.getMatchingBetween(left, right),
-                                                                   prunedMatching);
-            // _mFeatureMatchMatrix[left][right] = prunedMatching;
+                // use essential matrix recovery to prune matches
+                auto pose_right = SFMUtilities::recoverPoseFromMatches(_mCameras[left], _mCameras[right],
+                                                                       _mImageFeatures[left], _mImageFeatures[right],
+                                                                       _mFeatureMatchMatrix.getMatchingBetween(left,
+                                                                                                               right),
+                                                                       prunedMatching);
+                // _mFeatureMatchMatrix[left][right] = prunedMatching;
 
 
-            auto pc = SFMUtilities::triangulateViews(left, right,
-                                                     _mCameras[left], _mCameras[right],
-                                                     _mImageFeatures[left], _mImageFeatures[right],
-                                                     prunedMatching,
-                                                     _mCameraPoses.at(left), _mCameraPoses.at(right));
+                auto pc = SFMUtilities::triangulateViews(left, right,
+                                                         _mCameras[left], _mCameras[right],
+                                                         _mImageFeatures[left], _mImageFeatures[right],
+                                                         prunedMatching,
+                                                         _mCameraPoses.at(left), _mCameraPoses.at(right));
 
-            // TODO: check triangulation successful
-            _pointCloud.mergePoints(pc, _mFeatureMatchMatrix);
-        } catch (std::runtime_error& e) {
-            std::cerr << e.what() << std::endl;
+                // TODO: check triangulation successful
+                _pointCloud.mergePoints(pc, _mFeatureMatchMatrix);
+            } catch (std::runtime_error &e) {
+                std::cout << "Cannot triangulate points between images " << left << " and " << right << " because: ";
+                std::cout << e.what() << std::endl;
+            }
         }
+
+        _registeredImages.insert(imageId);
+
+        return true;
+    } catch (std::runtime_error &e) {
+        std::cout << "Cannot register image " << imageId << " because: ";
+        std::cout << e.what() << std::endl;
+        return false;
     }
-
-    _registeredImages.insert(imageId);
-
-    return true;
 }
 
 void SceneReconstruction::toColmapFile(std::string filename) {
@@ -135,16 +142,24 @@ void SceneReconstruction::toPlyFile(std::string filename) {
     file << "property float x" << std::endl;
     file << "property float y" << std::endl;
     file << "property float z" << std::endl;
-    // file << "property uchar red" << std::endl;
-    // file << "property uchar green" << std::endl;
-    // file << "property uchar blue" << std::endl;
-    // TODO: add colour
+    file << "property uchar red" << std::endl;
+    file << "property uchar green" << std::endl;
+    file << "property uchar blue" << std::endl;
     file << "end_header" << std::endl;
 
     for (const auto& point3D : _pointCloud) {
+        auto anyOriginatingView = point3D.originatingViews.begin();
+        const ImageID viewIdx = anyOriginatingView->first;
+        const int keypointIdx = anyOriginatingView->second;
+        cv::Point2d point2D = _mImageFeatures[viewIdx].getPoint(keypointIdx);
+        cv::Vec3b pointColour = _mImages[viewIdx].getColourAt(point2D);
+
         file << static_cast<float>(point3D.pt.x) << " ";
         file << static_cast<float>(point3D.pt.y) << " ";
-        file << static_cast<float>(point3D.pt.z) << std::endl;
+        file << static_cast<float>(point3D.pt.z) << " ";
+        file << (int)pointColour(2) << " ";
+        file << (int)pointColour(1) << " ";
+        file << (int)pointColour(0) << std::endl;
     }
 
     file.close();

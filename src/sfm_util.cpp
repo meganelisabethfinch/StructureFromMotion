@@ -29,9 +29,6 @@ SFMUtilities::recoverPoseFromMatches(Camera &cam1, Camera &cam2,
     double focal = cam1.getFocalLength();
     auto pp = cam1.getCentre();
 
-    std::cout << points1.size() << std::endl;
-    std::cout << points2.size() << std::endl;
-
     if (points1.size() < POINTS_NEEDED_ESSENTIAL_MATRIX) {
         throw std::runtime_error("Not enough points to compute essential matrix.");
     }
@@ -82,8 +79,12 @@ Pose SFMUtilities::recoverPoseFrom2D3DMatches(Camera& camera, Image2D3DMatch mat
     // Check inliers ratio, reject if too small
     double inliersRatio = ((double)cv::countNonZero(inliers)) / ((double)matching.points2D.size());
     if (inliersRatio < POSE_INLIERS_MINIMAL_RATIO) {
-        std::cerr << "Inliers ratio is too small: " << cv::countNonZero(inliers) << " / " << matching.points2D.size() << std::endl;
-        throw "Inlier ratio is too small."; // TODO
+        std::string msg = "Pose inliers ratio is too small: ";
+        msg.append(std::to_string(cv::countNonZero(inliers)));
+        msg.append(" / ");
+        msg.append(std::to_string(matching.points2D.size()));
+
+        throw std::runtime_error(msg);
     }
 
     Pose pose = Pose(rvec, tvec);

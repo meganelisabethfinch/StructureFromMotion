@@ -9,6 +9,9 @@
 #include <opencv2/calib3d.hpp>
 #include <headers/sfm_util.h>
 
+#include "ceres/ceres.h"
+// #include <ceres/rotation.h>
+
 SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Camera> &mCameras,
                                          std::vector<Features> &mImageFeatures,
@@ -128,6 +131,11 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
     }
 }
 
+bool SceneReconstruction::bundleAdjust() {
+
+    return false;
+}
+
 void SceneReconstruction::toColmapFile(std::string filename) {
     // TODO
 }
@@ -164,3 +172,4 @@ void SceneReconstruction::toPlyFile(std::string filename) {
 
     file.close();
 }
+

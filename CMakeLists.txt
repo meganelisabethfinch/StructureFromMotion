@@ -62,6 +62,9 @@ target_include_directories(
         /Users/meganfinch/opencv-4.5.3/modules/flann/include
         /Users/meganfinch/opencv-4.5.3/modules/imgcodecs/include
         /Users/meganfinch/opencv-4.5.3/modules/videoio/include
+        ${EIGEN_INCLUDE_DIR}
+        /Users/meganfinch/ceres-solver/cmake-build-release
+        /Users/meganfinch/ceres-solver/include
 )
 
 
@@ -82,6 +85,7 @@ target_link_directories(
         PUBLIC
         "${CMAKE_SOURCE_DIR}"
         "/Users/meganfinch/opencv-4.5.3/cmake-build-release/lib"
+        "/Users/meganfinch/ceres-solver/cmake-build-release/lib"
 )
 
 
@@ -103,4 +107,5 @@ target_link_libraries(
         opencv_stitching
         opencv_videoio
         opencv_video
+        ceres
 )

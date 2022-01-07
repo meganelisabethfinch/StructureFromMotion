@@ -62,9 +62,12 @@ target_include_directories(
         /Users/meganfinch/opencv-4.5.3/modules/flann/include
         /Users/meganfinch/opencv-4.5.3/modules/imgcodecs/include
         /Users/meganfinch/opencv-4.5.3/modules/videoio/include
-        ${EIGEN_INCLUDE_DIR}
-        /Users/meganfinch/ceres-solver/cmake-build-release
         /Users/meganfinch/ceres-solver/include
+        /Users/meganfinch/ceres-solver/cmake-build-release/config
+        /Users/meganfinch/eigen
+        /Users/meganfinch/glog/cmake-build-release
+        /Users/meganfinch/glog/src
+        /Users/meganfinch/gflags/cmake-build-release/include
 )
 
 

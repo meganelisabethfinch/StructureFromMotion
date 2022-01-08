@@ -6,9 +6,27 @@
 #include <opencv2/core/matx.hpp>
 #include <opencv2/calib3d.hpp>
 #include <iostream>
+#include <ceres/rotation.h>
 
 
 Pose::Pose(const cv::Matx34d& mat) : _mat(mat) {}
+
+Pose::Pose(const PoseVector& pose) {
+    // Convert angle-axis back to rotation matrix
+    double rmat[9] = { 0 };
+    ceres::AngleAxisToRotationMatrix(pose.val, rmat);
+
+    for (int r = 0; r < 3; r++) {
+        for (int c = 0; c < 3; c++) {
+            _mat(c,r) = rmat[r * 3 + c]; // rmat is col-major
+        }
+    }
+
+    // Translation
+    _mat(0,3) = pose(3);
+    _mat(1,3) = pose(4);
+    _mat(2,3) = pose(5);
+}
 
 Pose::Pose(const cv::Matx31d& rvec, const cv::Matx31d& tvec) {
     cv::Matx33d rmat;

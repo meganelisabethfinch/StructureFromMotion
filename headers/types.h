@@ -18,7 +18,10 @@ enum DebugLevel { BASIC, DETAILED, EXAMPLES };
 struct Args {
     std::string inputImageDir;
     std::string outputDir;
-    // TODO: add manually specified baseline pair
+
+    ImageID baseline1;
+    ImageID baseline2;
+
     DetectorType detectorType;
     MatcherType matcherType;
 };
@@ -26,6 +29,9 @@ struct Args {
 // Matches between two images
 typedef std::vector<cv::DMatch> Matching2;
 typedef std::vector<std::vector<Matching2>> MatchMatrix;
+
+// 1x3 rotation in angle-axis form, followed by 1x3 translation
+typedef cv::Matx<double, 1, 6> PoseVector;
 
 struct Image2D3DMatch {
     std::vector<cv::Point2d> points2D;

@@ -5,13 +5,16 @@
 #include <headers/ba_util.h>
 
 #include <ceres/ceres.h>
+#include <ceres/problem.h>
 #include <ceres/rotation.h>
 
+/*
 void initLogging() {
     google::InitGoogleLogging("SFM");
 }
 
 std::once_flag initLoggingFlag;
+*/
 
 void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
                                              std::set<ImageID> &registeredImages,
@@ -19,11 +22,10 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
                                              std::vector<Camera> &cameras,
                                              std::vector<Features> &features)
 {
-    std::call_once(initLoggingFlag, initLogging);
+    // std::call_once(initLoggingFlag, initLogging);
 
-    // ceres::Problem problem;
+    ceres::Problem problem;
 
-    typedef cv::Matx<double, 1, 6> PoseVector;
     std::map<ImageID, PoseVector> poseVectors;
 
     for (const auto id : registeredImages) {
@@ -41,9 +43,10 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
                 ));
     }
 
+    std::vector<cv::Vec3d> points3d(pointCloud.size());
     /*
     for (const auto& point3d : pointCloud) {
-        auto point3dvec = cv::Vec3d(point3d.pt.x, point3d.pt.y, point3d.pt.z);
+        points3d[i] = cv::Vec3d(point3d.pt.x, point3d.pt.y, point3d.pt.z);
 
         for (const auto& kv : point3d.originatingViews) {
             ImageID imgIdx = kv.first;
@@ -59,10 +62,11 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
             ceres::CostFunction* costFunction = SimpleReprojectionError::Create(point2d.x, point2d.y);
 
             // Each residual block is loss(cost(cameraPose, point3d, focal))
+            // .val returns the matrix/vector as a double* (double array)
             problem.AddResidualBlock(costFunction,
-                                     nullptr,
+                                     nullptr, // loss function
                                      poseVectors.at(imgIdx).val,
-                                     point3dvec.val,
+                                     points3d[i].val,
                                      &focal);
         }
     }
@@ -79,7 +83,25 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
     std::cout << summary.BriefReport() << std::endl;
+
+     if (not (summary.termination_type == ceres::CONVERGENCE)) {
+        std::cerr << "Bundle adjustment failed." << std::endl;
+        return;
+     }
+
+     // TODO: update optimised focal length
+
+
+     // TODO: update optimised camera poses and 3D points
      */
+
+    // Replace with optimised camera poses
+    for (const auto id : registeredImages) {
+        auto newPose = Pose(poseVectors.at(id));
+        cameraPoses.at(id) = newPose;
+    }
+
+    // Replace with optimised points
 
 
 }

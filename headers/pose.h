@@ -7,6 +7,7 @@
 
 #include <opencv2/core/matx.hpp>
 #include <opencv2/core/types.hpp>
+#include "types.h"
 
 class Pose {
 private:
@@ -15,6 +16,8 @@ private:
 
 public:
     explicit Pose(const cv::Matx34d& mat);
+
+    explicit Pose(const PoseVector& pose);
 
     Pose(const cv::Matx31d& rvec, const cv::Matx31d& tvec);
 

@@ -4,6 +4,7 @@
 
 #include <headers/scene_reconstruction.h>
 #include <headers/pose.h>
+#include <headers/ba_util.h>
 #include <fstream>
 
 #include <opencv2/calib3d.hpp>
@@ -86,7 +87,6 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
         // Recover camera pose for new image to be registered
         Pose newCameraPose = SFMUtilities::recoverPoseFrom2D3DMatches(_mCameras[imageId], match2D3D);
 
-        // (Check pose is found OK)
         _mCameraPoses.emplace(imageId, newCameraPose);
 
         // For each image already registered
@@ -131,9 +131,14 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
     }
 }
 
-bool SceneReconstruction::bundleAdjust() {
+bool SceneReconstruction::adjustBundle() {
+    BundleAdjustmentUtilities::adjustBundle(_pointCloud,
+                                            _registeredImages,
+                                            _mCameraPoses,
+                                            _mCameras,
+                                            _mImageFeatures);
 
-    return false;
+    return true;
 }
 
 void SceneReconstruction::toColmapFile(std::string filename) {

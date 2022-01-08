@@ -42,7 +42,7 @@ message(" ")
 add_executable(
         StructureFromMotion
         src/main.cpp
-        headers/constants.h headers/point_cloud.h headers/camera.h headers/types.h headers/cli_util.h src/cli_util.cpp headers/imagecollection.h src/imagecollection.cpp headers/image.h src/camera.cpp headers/features.h headers/matches.h src/matches.cpp src/features.cpp headers/sfm_util.h src/sfm_util.cpp headers/scene_graph.h src/scene_graph.cpp headers/scene_reconstruction.h src/scene_reconstruction.cpp headers/pose.h src/pose.cpp src/point_cloud.cpp headers/exceptions.h)
+        headers/constants.h headers/point_cloud.h headers/camera.h headers/types.h headers/cli_util.h src/cli_util.cpp headers/imagecollection.h src/imagecollection.cpp headers/image.h src/camera.cpp headers/features.h headers/matches.h src/matches.cpp src/features.cpp headers/sfm_util.h src/sfm_util.cpp headers/scene_graph.h src/scene_graph.cpp headers/scene_reconstruction.h src/scene_reconstruction.cpp headers/pose.h src/pose.cpp src/point_cloud.cpp headers/exceptions.h headers/ba_util.h src/ba_util.cpp headers/cost/simple_reprojection_error.h)
 
 target_sources(
         StructureFromMotion
@@ -89,6 +89,8 @@ target_link_directories(
         "${CMAKE_SOURCE_DIR}"
         "/Users/meganfinch/opencv-4.5.3/cmake-build-release/lib"
         "/Users/meganfinch/ceres-solver/cmake-build-release/lib"
+        "/Users/meganfinch/gflags/cmake-build-release/lib"
+        "/Users/meganfinch/glog/cmake-build-release/"
 )
 
 
@@ -111,4 +113,6 @@ target_link_libraries(
         opencv_videoio
         opencv_video
         ceres
+        gflags
+        glog
 )

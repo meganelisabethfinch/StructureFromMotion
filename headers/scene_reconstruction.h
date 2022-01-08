@@ -35,7 +35,7 @@ public:
 
     bool registerImage(ImageID imageId);
 
-    bool bundleAdjust();
+    bool adjustBundle();
 
     void toColmapFile(std::string filename);
 

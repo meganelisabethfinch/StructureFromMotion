@@ -24,7 +24,8 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
 {
     // std::call_once(initLoggingFlag, initLogging);
 
-    ceres::Problem problem;
+    // Won't compile whenever I uncomment this line:
+    // ceres::Problem problem;
 
     std::map<ImageID, PoseVector> poseVectors;
 

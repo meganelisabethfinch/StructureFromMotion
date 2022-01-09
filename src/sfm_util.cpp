@@ -120,7 +120,6 @@ PointCloud SFMUtilities::triangulateViews(ImageID img1, ImageID img2,
     cv::Mat points3d;
     cv::convertPointsFromHomogeneous(points3dHomogenous.t(), points3d);
 
-    // TODO: reprojection errors
     auto reprojectionErrors1 = SFMUtilities::getReprojectionErrors(alignedPoints1, points3d, cam1, pose1);
     auto reprojectionErrors2 = SFMUtilities::getReprojectionErrors(alignedPoints2, points3d, cam2, pose2);
 
@@ -235,4 +234,41 @@ SFMUtilities::find2D3DMatches(ImageID imageId,
     }
 
     return match2D3D;
+}
+
+cv::Matx33d SFMUtilities::pruneMatchesByFundamentalMatrix(const std::vector<cv::Point2d>& source,
+                                                          const std::vector<cv::Point2d>& destination,
+                                                          const Matching2& matching,
+                                                          Matching2& prunedMatching) {
+
+    prunedMatching.clear();
+    if (matching.size() > POINTS_NEEDED_FUNDAMENTAL_MATRIX) {
+        std::vector<uchar> mask;
+        cv::Mat F = cv::findFundamentalMat(source,
+                                       destination,
+                                       cv::FM_RANSAC,
+                                       3.0,
+                                       0.99,
+                                       mask);
+
+        cv::Matx33d result;
+        if (F.rows == 3 && F.cols == 3) {
+            result = cv::Matx33d(F);
+        } else {
+            // cv::findFundamentalMat sometimes returns a 9x3 with 3 possible Fs
+            // We'll just ignore/reject this case.
+            throw std::runtime_error("Could not compute fundamental matrix with enough certainty.");
+        }
+
+        for (size_t i = 0; i < mask.size(); i++) {
+            if (mask[i]) {
+                // Classify this as a good match
+                prunedMatching.push_back(matching[i]);
+            }
+        }
+
+        return result;
+    } else {
+        throw std::runtime_error("Not enough points to compute fundamental matrix.");
+    }
 }

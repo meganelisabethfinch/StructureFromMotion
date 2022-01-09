@@ -45,6 +45,11 @@ public:
                                           Features& imageFeatures,
                                           Matches& matches,
                                           PointCloud& pointCloud);
+
+    static cv::Matx33d pruneMatchesByFundamentalMatrix(const std::vector<cv::Point2d>& source,
+                                                       const std::vector<cv::Point2d>& destination,
+                                                       const Matching2& matching,
+                                                       Matching2& prunedMatching);
 };
 
 #endif //SFM_UTIL_H

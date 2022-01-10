@@ -6,12 +6,23 @@
 #define SFM_POINTCLOUD_H
 
 #include <map>
+#include <set>
 #include "types.h"
 #include "matches.h"
 
 struct Point3DInMap {
     cv::Point3d pt;
     std::map<ImageID, int> originatingViews;
+
+    std::set<ImageID> getOriginatingViews() {
+        std::set<ImageID> views;
+
+        for (auto kv : originatingViews) {
+            views.insert(kv.first);
+        }
+
+        return views;
+    }
 };
 
 class PointCloud {

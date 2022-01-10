@@ -107,3 +107,59 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
 
 }
 
+std::set<double> BundleAdjustmentUtilities::GetPointsWithCommonViews(PointCloud &pointCloud, size_t N, size_t J) {
+    // TODO: Define type with N points and J imageIDs
+    std::set<double> tuples;
+
+    for (int i = 0; i < pointCloud.size(); i++) {
+        std::vector<int> tuple = { i };
+        std::set<ImageID> views = pointCloud[i].getOriginatingViews();
+
+        if (views.size() < J) { continue; }
+
+        _CommonViewsHelper(pointCloud,
+                           N - 1,
+                           J,
+                           views,
+                           tuple,
+                           tuples);
+    }
+
+    return std::set<double>();
+}
+
+void BundleAdjustmentUtilities::_CommonViewsHelper(PointCloud &pointCloud,
+                                                   size_t pointsNeeded,
+                                                   size_t viewsNeeded,
+                                                   std::set<ImageID> &commonViews,
+                                                   std::vector<int> &points,
+                                                   std::set<double> &tuples)
+{
+    if (pointsNeeded == 0 && commonViews.size() >= viewsNeeded) {
+        // Get all *combinations* of (viewsNeeded) views from commonViews
+        // And store in tuples
+
+    } else {
+        for (int j = points.back() + 1; j < pointCloud.size() - pointsNeeded + 1; j++) {
+            std::vector<int> new_tuple = {  }; // [ points..., j]
+            new_tuple.insert(new_tuple.end(), points.begin(), points.end());
+            new_tuple.push_back(j);
+            std::set<ImageID> new_views = pointCloud[j].getOriginatingViews();
+
+            // Filter for views which are common to all points (+ point j)
+            std::set<ImageID> intersect;
+            std::set_intersection(new_views.begin(), new_views.end(), commonViews.begin(), commonViews.end(),
+                                  std::inserter(intersect, intersect.begin()));
+
+            if (intersect.size() < viewsNeeded) { continue; }
+
+            _CommonViewsHelper(pointCloud,
+                               pointsNeeded - 1,
+                               viewsNeeded,
+                               intersect,
+                               new_tuple,
+                               tuples);
+        }
+    }
+}
+

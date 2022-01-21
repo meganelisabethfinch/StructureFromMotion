@@ -23,6 +23,8 @@ public:
     [[nodiscard]] cv::Point2d getCentre() const;
 
     cv::Mat_<double> getDistortion();
+
+    void setFocalLength(double fx, double fy);
 };
 
 #endif //SFM_CAMERA_H

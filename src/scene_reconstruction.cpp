@@ -176,5 +176,36 @@ void SceneReconstruction::toPlyFile(std::string filename) {
     }
 
     file.close();
+
+    // Save camera polygons
+    std::ofstream cameras_file("_cameras.ply");
+    cameras_file
+        << "ply" << std::endl
+        << "format ascii 1.0" << std::endl
+        << "element vertex " << (_mCameraPoses.size() * 4) << std::endl
+        << "property float x " << std::endl
+        << "property float y " << std::endl
+        << "property float z " << std::endl
+        // << "element edge " << (_mCameraPoses.size() * 3) << std::endl
+        // << "property int vertex1 " << std::endl
+        // << "property int vertex2 " << std::endl
+        << "end_header" << std::endl;
+
+    for (const auto& kv : _mCameraPoses) {
+        auto pose = kv.second;
+        auto rmat = pose.getProjectionMatrix();
+        auto tvec = pose.getTranslationVector();
+
+        auto c = cv::Point3d(tvec(0), tvec(1), tvec(2));
+        cv::Point3d cx = c + cv::Point3d(rmat(0, 0), rmat(1, 0), rmat(2, 0)) * 0.2;
+        cv::Point3d cy = c + cv::Point3d(rmat(0, 1), rmat(1, 1), rmat(2, 1)) * 0.2;
+        cv::Point3d cz = c + cv::Point3d(rmat(0, 2), rmat(1, 2), rmat(2, 2)) * 0.2;
+
+        cameras_file << c.x  << " " << c.y  << " " << c.z  << std::endl;
+        cameras_file << cx.x << " " << cx.y << " " << cx.z << std::endl;
+        cameras_file << cy.x << " " << cy.y << " " << cy.z << std::endl;
+        cameras_file << cz.x << " " << cz.y << " " << cz.z << std::endl;
+    }
+
 }
 

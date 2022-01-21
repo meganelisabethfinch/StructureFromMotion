@@ -22,6 +22,8 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+find_package(Ceres REQUIRED)
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -88,9 +90,9 @@ target_link_directories(
         PUBLIC
         "${CMAKE_SOURCE_DIR}"
         "/Users/meganfinch/opencv-4.5.3/cmake-build-release/lib"
-        "/Users/meganfinch/ceres-solver/cmake-build-release/lib"
-        "/Users/meganfinch/gflags/cmake-build-release/lib"
-        "/Users/meganfinch/glog/cmake-build-release/"
+        #"/Users/meganfinch/ceres-solver/cmake-build-release/lib"
+        #"/Users/meganfinch/gflags/cmake-build-release/lib"
+        #"/Users/meganfinch/glog/cmake-build-release/"
 )
 
 
@@ -113,6 +115,6 @@ target_link_libraries(
         opencv_videoio
         opencv_video
         ceres
-        gflags
-        glog
+        #gflags
+        #glog
 )

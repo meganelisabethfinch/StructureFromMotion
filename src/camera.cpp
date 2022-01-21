@@ -30,3 +30,8 @@ cv::Point2d Camera::getCentre() const {
 cv::Mat_<double> Camera::getDistortion() {
     return distortion;
 }
+
+void Camera::setFocalLength(double fx, double fy) {
+    K(0,0) = fx;
+    K(1,1) = fy;
+}

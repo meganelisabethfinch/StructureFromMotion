@@ -33,7 +33,6 @@ bool ZhangRBAError::operator()(const T* const points3d,
         for (size_t i = 0; i < 6; i++) {
             // auto Pi = cv::Vec3d(points3d[3*i], points3d[3*i+1], points3d[3*i+2]);
 
-            // TODO: Pi - Cj (projection centre) -- but these have different dimensions?
         }
     }
 

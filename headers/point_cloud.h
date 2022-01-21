@@ -23,6 +23,12 @@ struct Point3DInMap {
 
         return views;
     }
+
+    void setPoint(double x, double y, double z) {
+        pt.x = x;
+        pt.y = y;
+        pt.z = z;
+    }
 };
 
 class PointCloud {

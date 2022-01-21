@@ -21,18 +21,8 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
     std::map<ImageID, PoseVector> poseVectors;
 
     for (const auto id : registeredImages) {
-        // get rotation and translation vector
         auto pose = cameraPoses.at(id);
-        auto t = pose.getTranslationVector();
-        auto R = pose.getRotationVector();
-
-        double angleAxis[3];
-        ceres::RotationMatrixToAngleAxis<double>(R.t().val, angleAxis);
-
-        poseVectors.emplace(id, PoseVector(
-                angleAxis[0], angleAxis[1], angleAxis[2],
-                t(0), t(1), t(2)
-                ));
+        poseVectors.emplace(id, pose.getPoseVector());
     }
 
     std::vector<cv::Vec3d> points3d(pointCloud.size());

@@ -54,3 +54,16 @@ cv::Matx13d Pose::getTranslationVector() const {
     cv::Matx13d result(tvec.at<double>(0,0), tvec.at<double>(0,1), tvec.at<double>(0,2));
     return result;
 }
+
+PoseVector Pose::getPoseVector() const {
+    auto t = this->getTranslationVector();
+    auto R = this->getRotationVector();
+
+    double angleAxis[3];
+    ceres::RotationMatrixToAngleAxis<double>(R.t().val, angleAxis);
+
+    return {
+            angleAxis[0], angleAxis[1], angleAxis[2],
+            t(0), t(1), t(2)
+    };
+}

@@ -95,7 +95,7 @@ SceneReconstruction ImageCollection::toSceneReconstruction(ImageID baseline1, Im
     // TODO: decide order of registration based on number of inliers/matches
     for (ImageID i = 0; i < mImages.size(); i++) {
         if (recon.registerImage(i)) {
-            // recon.adjustBundle();
+            recon.adjustBundle();
         }
     }
 

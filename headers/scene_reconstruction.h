@@ -20,7 +20,6 @@ private:
     std::set<ImageID> _registeredImages;
     PointCloud _pointCloud;
 
-    // TODO: remove these?
     std::vector<Camera>& _mCameras;
     std::vector<Features>& _mImageFeatures;
     Matches& _mFeatureMatchMatrix;

@@ -133,7 +133,7 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
 
 bool SceneReconstruction::adjustBundle() {
     BundleAdjustmentUtilities::adjustBundle(_pointCloud,
-                                            _registeredImages,
+                                            _mImages,
                                             _mCameraPoses,
                                             _mCameras,
                                             _mImageFeatures);

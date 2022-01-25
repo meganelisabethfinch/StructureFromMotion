@@ -40,6 +40,8 @@ public:
 
     void addPoint(const Point3DInMap& pt);
 
+    void updatePoint(size_t i, double x, double y, double z);
+
     void mergePoints(PointCloud& pc, Matches& matches); // Merge an existing point cloud into this one
 
     Point3DInMap operator[](size_t i);

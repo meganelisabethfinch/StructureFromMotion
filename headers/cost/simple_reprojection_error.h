@@ -9,7 +9,8 @@ struct SimpleReprojectionError {
     double observed_x;
     double observed_y;
 
-    SimpleReprojectionError(double x, double y) : observed_x(x), observed_y(y) {}
+    SimpleReprojectionError(double x, double y)
+        : observed_x(x), observed_y(y) {}
 
     /*
      * @param pose
@@ -20,13 +21,13 @@ struct SimpleReprojectionError {
      */
     template<typename T>
     bool operator()(const T* const pose,
-            const T* const point3d,
+            const T* const point,
             const T* const focal,
             T* residuals) const {
         T p[3];
 
         // Rotate: pose[0,1,2] are the angle-axis rotation
-        ceres::AngleAxisRotatePoint(pose, point3d, p);
+        ceres::AngleAxisRotatePoint(pose, point, p);
 
         // Translate: pose[3,4,5] are the translation
         p[0] += pose[3];
@@ -38,8 +39,8 @@ struct SimpleReprojectionError {
         const T yp = p[1] / p[2];
 
         // Compute final projected point
-        const T predicted_x = (*focal) * xp;
-        const T predicted_y = (*focal) * yp;
+        const T predicted_x = *focal * xp;
+        const T predicted_y = *focal * yp;
 
         residuals[0] = predicted_x - T(observed_x);
         residuals[1] = predicted_y - T(observed_y);

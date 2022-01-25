@@ -9,50 +9,61 @@
 #include <ceres/rotation.h>
 #include <headers/cost/simple_reprojection_error.h>
 
+namespace BundleAdjustUtils {
+    static void initLogging() {
+        google::InitGoogleLogging("SFM");
+    }
+
+    static std::once_flag initLoggingFlag;
+}
+
+using namespace BundleAdjustUtils;
 
 void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
-                                             std::set<ImageID> &registeredImages,
+                                             std::vector<Image> images,
                                              std::map<ImageID, Pose> &cameraPoses,
                                              std::vector<Camera> &cameras,
                                              std::vector<Features> &features)
 {
+    std::call_once(initLoggingFlag, initLogging);
     ceres::Problem problem;
 
-    std::map<ImageID, PoseVector> poseVectors;
+    std::vector<PoseVector> cameraPoses6d;
+    cameraPoses6d.reserve(images.size());
+    for (ImageID i = 0; i < images.size(); i++) {
+        if (!cameraPoses.contains(i)) {
+            cameraPoses6d.push_back(PoseVector());
+            continue;
+        }
 
-    for (const auto id : registeredImages) {
-        auto pose = cameraPoses.at(id);
-        poseVectors.emplace(id, pose.getPoseVector());
+        auto pv = cameraPoses.at(i).getPoseVector();
+        cameraPoses6d.push_back(pv);
     }
 
+    double focal = cameras.at(0).getFocalLength();
+
     std::vector<cv::Vec3d> points3d(pointCloud.size());
-    std::map<ImageID, double> focals;
 
-    for (int i = 0; i < pointCloud.size(); i++) {
-        auto point3d = pointCloud[i];
-        points3d[i] = cv::Vec3d(point3d.pt.x, point3d.pt.y, point3d.pt.z);
+    for (size_t i = 0; i < pointCloud.size(); i++) {
+        // std::cout << "3D point " << i << " / " << pointCloud.size() << std::endl;
+        const Point3DInMap& p = pointCloud[i];
+        points3d[i] = cv::Vec3d(p.pt.x, p.pt.y, p.pt.z);
 
-        for (const auto& kv : point3d.originatingViews) {
-            ImageID imgIdx = kv.first;
-            int kpIdx = kv.second;
+        for (const auto& kv : p.originatingViews) {
+            // std::cout << "Originating view " << kv.first << " and point " << kv.second << std::endl;
+            cv::Point2d p2d = features.at(kv.first).getPoint(kv.second);
 
-            cv::Point2d point2d = features.at(imgIdx).getPoint(kpIdx);
+            // Subtract centre of projection, since the optimiser doesn't know what it is
+            p2d.x -= cameras.at(kv.first).getCentre().x;
+            p2d.y -= cameras.at(kv.first).getCentre().y;
 
-            // subtract centre of projection
-            point2d.x -= cameras[imgIdx].getCentre().x;
-            point2d.y -= cameras[imgIdx].getCentre().y;
-            // double focal = cameras[imgIdx].getFocalLength();
-            focals[imgIdx] = cameras[imgIdx].getFocalLength();
+            ceres::CostFunction* cost_function = SimpleReprojectionError::Create(p2d.x, p2d.y);
 
-            ceres::CostFunction* costFunction = SimpleReprojectionError::Create(point2d.x, point2d.y);
-
-            // Each residual block is loss(cost(cameraPose, point3d, focal))
-            // .val returns the matrix/vector as a double* (double array)
-            problem.AddResidualBlock(costFunction,
-                                     nullptr, // loss function
-                                     poseVectors.at(imgIdx).val,
+            problem.AddResidualBlock(cost_function,
+                                     NULL,
+                                     cameraPoses6d[kv.first].val,
                                      points3d[i].val,
-                                     &focals[imgIdx]);
+                                     &focal);
         }
     }
 
@@ -72,27 +83,26 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
         return;
      }
 
-     // Update optimised focal length
-     for (auto kv : focals) {
-         ImageID imgIdx = kv.first;
-         double focal = kv.second;
-         cameras[imgIdx].setFocalLength(focal, focal); // assuming fx = fy
+     // Update optimised focal
+     for (auto camera : cameras) {
+         camera.setFocalLength(focal, focal);
      }
 
-    // Replace with optimised camera poses
-    for (const auto id : registeredImages) {
-        auto newPose = Pose(poseVectors.at(id));
-        cameraPoses.at(id) = newPose;
-    }
+     // Update optimised camera poses
+     for (size_t i = 0; i < images.size(); i++) {
+         if (!cameraPoses.contains(i)) {
+             continue;
+         }
 
-    // Replace with optimised points
-    for (size_t i = 0; i < pointCloud.size(); i++) {
-        pointCloud[i].setPoint(points3d[i](0),
-                               points3d[i](1),
-                               points3d[i](2));
-    }
+         Pose& pose = cameraPoses.at(i);
+         auto adjustedPose = Pose(cameraPoses6d[i]);
+         cameraPoses.at(i) = adjustedPose;
+     }
 
-    std::cout << "Bundle adjustment completed." << std::endl;
+     // Update optimised 3D points
+     for (size_t i = 0; i < pointCloud.size(); i++) {
+         pointCloud.updatePoint(i, points3d[i](0), points3d[i](1), points3d[i](2));
+     }
 }
 
 std::set<double> BundleAdjustmentUtilities::GetPointsWithCommonViews(PointCloud &pointCloud, size_t N, size_t J) {

@@ -30,6 +30,12 @@ void PointCloud::addPoint(const Point3DInMap& pt) {
     map.push_back(pt);
 }
 
+void PointCloud::updatePoint(size_t i, double x, double y, double z) {
+    map[i].pt.x = x;
+    map[i].pt.y = y;
+    map[i].pt.z = z;
+}
+
 void PointCloud::mergePoints(PointCloud &pc, Matches& matches) {
     MatchMatrix mergeMatchMatrix;
     mergeMatchMatrix.resize(matches.size(), std::vector<Matching2>(matches.size()));

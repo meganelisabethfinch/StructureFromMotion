@@ -20,6 +20,7 @@ namespace BundleAdjustUtils {
 using namespace BundleAdjustUtils;
 
 void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
+                                             const std::set<ImageID>& registeredImages,
                                              const std::vector<Image>& images,
                                              std::map<ImageID, Pose> &cameraPoses,
                                              std::vector<Camera> &cameras,
@@ -28,6 +29,7 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
     std::call_once(initLoggingFlag, initLogging);
     ceres::Problem problem;
 
+    /*
     std::vector<PoseVector> cameraPoses6d;
     cameraPoses6d.reserve(images.size());
     for (ImageID i = 0; i < images.size(); i++) {
@@ -36,13 +38,23 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
             continue;
         }
 
-        auto pv = cameraPoses.at(i).getPoseVector();
+        auto pv = cameraPoses.at(i).toPoseVector();
         cameraPoses6d.push_back(pv);
+    }
+     */
+
+    std::cout << "Setting pose vectors" << std::endl;
+    std::map<ImageID, PoseVector> cameraPoses6d;
+    for (auto i : registeredImages) {
+        auto pv = cameraPoses.at(i).toPoseVector();
+        cameraPoses6d[i] = pv;
     }
 
     double focal = cameras.at(0).getFocalLength();
 
     std::vector<cv::Vec3d> points3d(pointCloud.size());
+
+    std::cout << "Adding residual blocks" << std::endl;
 
     for (size_t i = 0; i < pointCloud.size(); i++) {
         const Point3DInMap& p = pointCloud[i];
@@ -57,9 +69,11 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
 
             ceres::CostFunction* cost_function = SimpleReprojectionError::Create(p2d.x, p2d.y);
 
+            PoseVector& pose = cameraPoses6d[kv.first];
+
             problem.AddResidualBlock(cost_function,
                                      NULL,
-                                     cameraPoses6d[kv.first].val,
+                                     pose.val,
                                      points3d[i].val,
                                      &focal);
         }
@@ -81,8 +95,6 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
         return;
      }
 
-    std::cout << focal << std::endl;
-
     // Update optimised focal
     // This ampersand has ruined my life.
      for (auto& camera : cameras) {
@@ -90,14 +102,12 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
      }
 
      // Update optimised camera poses
-     for (size_t i = 0; i < images.size(); i++) {
-         if (!cameraPoses.contains(i)) {
-             continue;
-         }
+     for (auto& kv : cameraPoses6d) {
+         ImageID key = kv.first;
+         PoseVector& pv = kv.second;
 
-         Pose& pose = cameraPoses.at(i);
-         auto adjustedPose = Pose(cameraPoses6d[i]);
-         cameraPoses.at(i) = adjustedPose;
+         auto adjustedPose = Pose(pv);
+         cameraPoses.at(key) = adjustedPose;
      }
 
      // Update optimised 3D points

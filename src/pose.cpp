@@ -55,7 +55,7 @@ cv::Matx13d Pose::getTranslationVector() const {
     return result;
 }
 
-PoseVector Pose::getPoseVector() const {
+PoseVector Pose::toPoseVector() const {
     cv::Vec3d t(_mat(0,3), _mat(1,3), _mat(2,3));
     cv::Matx33d R = _mat.get_minor<3,3>(0,0);
 

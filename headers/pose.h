@@ -27,7 +27,7 @@ public:
 
     [[nodiscard]] cv::Matx13d getTranslationVector() const;
 
-    PoseVector getPoseVector() const;
+    [[nodiscard]] PoseVector toPoseVector() const;
 
     // get Rotation as Quaternion
 };

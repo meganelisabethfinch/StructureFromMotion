@@ -91,6 +91,7 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
 SceneReconstruction ImageCollection::toSceneReconstruction(ImageID baseline1, ImageID baseline2) {
     auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix);
     recon.initialise(baseline1, baseline2);
+    // recon.adjustBundle(); -- seems to make it worse?
 
     // TODO: decide order of registration based on number of inliers/matches
     for (ImageID i = 0; i < mImages.size(); i++) {

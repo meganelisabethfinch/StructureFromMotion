@@ -7,11 +7,7 @@
 #include <headers/ba_util.h>
 #include <fstream>
 
-#include <opencv2/calib3d.hpp>
 #include <headers/sfm_util.h>
-
-#include "ceres/ceres.h"
-// #include <ceres/rotation.h>
 
 SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Camera> &mCameras,
@@ -116,11 +112,12 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
                 // TODO: check triangulation successful
                 _pointCloud.mergePoints(pc, _mFeatureMatchMatrix);
             } catch (std::runtime_error &e) {
-                std::cout << "Cannot triangulate points between images " << left << " and " << right << " because: ";
+                std::cout << "Cannot triangulate points between images " << left << " and " << right << ": ";
                 std::cout << e.what() << std::endl;
             }
         }
 
+        std::cout << "PC size: " << _pointCloud.size() << std::endl;
         _registeredImages.insert(imageId);
 
         return true;

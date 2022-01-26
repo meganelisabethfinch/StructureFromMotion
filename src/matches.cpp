@@ -2,6 +2,7 @@
 // Created by Megan Finch on 28/12/2021.
 //
 
+#include <headers/constants.h>
 #include <headers/matches.h>
 #include <headers/features.h>
 #include <iostream>
@@ -11,7 +12,9 @@ Matches::Matches(const cv::Ptr<cv::DescriptorMatcher>& matcher, std::vector<Feat
 
     for (size_t i = 0; i < mFeatures.size() - 1; i++) {
         for (size_t j = i + 1; j < mFeatures.size(); j++) {
-            std::cout << "Finding matches between images " << i << " and " << j << std::endl;
+            if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {
+                std::cout << "Finding matches between images " << i << " and " << j << std::endl;
+            }
             mFeatures[i].findMatchesWith(matcher, mFeatures[j], matrix[i][j]);
         }
     }

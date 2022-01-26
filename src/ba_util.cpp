@@ -81,8 +81,11 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
         return;
      }
 
-     // Update optimised focal
-     for (auto camera : cameras) {
+    std::cout << focal << std::endl;
+
+    // Update optimised focal
+    // This ampersand has ruined my life.
+     for (auto& camera : cameras) {
          camera.setFocalLength(focal, focal);
      }
 

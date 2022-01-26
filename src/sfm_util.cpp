@@ -53,8 +53,10 @@ SFMUtilities::recoverPoseFromMatches(Camera &cam1, Camera &cam2,
         }
     }
 
-    std::cout << "Pruned matching: " << prunedMatching.size() << " of " << matching.size() << " matches kept." << std::endl;
-
+    if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {
+        std::cout << "Pruned matching: " << prunedMatching.size() << " of " << matching.size() << " matches kept."
+                  << std::endl;
+    }
     return pose2;
 }
 
@@ -180,7 +182,7 @@ SFMUtilities::getReprojectionErrors(const std::vector<cv::Point2d>& points2d, co
         reprojectionErrors[i] = error;
     }
 
-    if (DEFAULT_DEBUG >= DebugLevel::DETAILED) {
+    if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {
         for (size_t i = 0; i < points3d.rows; i++) {
             std::cout << "-----Point #" << i << "-----" << std::endl;
             std::cout << "Actual: " << points2d[i] << std::endl;

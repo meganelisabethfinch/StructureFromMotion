@@ -38,7 +38,7 @@ void Features::findMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Fe
 
     // TODO: geometric verification of matches by fundamental matrix
 
-    if (DEFAULT_DEBUG >= DebugLevel::DETAILED) {
+    if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {
         std::cout << "Initial KNN Matching: " << initialMatching.size() << " matches" << std::endl;
         std::cout << "Lowe Ratio Matching: " << loweRatioMatching.size() << " matches" << std::endl;
     }

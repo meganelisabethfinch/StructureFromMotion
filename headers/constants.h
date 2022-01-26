@@ -30,6 +30,7 @@ const int POINTS_NEEDED_FUNDAMENTAL_MATRIX = 7;
 
 const DetectorType DEFAULT_DETECTOR = DetectorType::SIFT;
 const MatcherType DEFAULT_MATCHER = MatcherType::FLANNBASED;
-const DebugLevel DEFAULT_DEBUG = DebugLevel::BASIC;
+const DebugLevel DEFAULT_DEBUG = DebugLevel::SIMPLE;
+const VisualDebugLevel DEFAULT_VISUAL_DEBUG = VisualDebugLevel::NONE;
 
 #endif //SFM_CONSTANTS_H

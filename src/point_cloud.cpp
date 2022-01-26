@@ -105,5 +105,8 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches) {
         }
     }
 
-    std::cout << "Adding: " << pc.size() << " (new: " << newPoints << ", merged: " << mergedPoints << ")" << std::endl;
+    if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {
+        std::cout << "Adding: " << pc.size() << " (new: " << newPoints << ", merged: " << mergedPoints << ")"
+                  << std::endl;
+    }
 }

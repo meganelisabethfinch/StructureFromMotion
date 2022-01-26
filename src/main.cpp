@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
     auto detector = CLIUtilities::CreateDetector(args.detectorType);
     images.ExtractFeatures(detector);
 
-    if (DEFAULT_DEBUG >= DebugLevel::EXAMPLES) {
+    if (DEFAULT_VISUAL_DEBUG >= VisualDebugLevel::SHOW_EXAMPLES) {
         images.visualiseKeyPoints(0);
     }
 
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     auto matcher = CLIUtilities::CreateMatcher(args.matcherType);
     images.FindMatches(matcher);
 
-    if (DEFAULT_DEBUG >= DebugLevel::EXAMPLES) {
+    if (DEFAULT_VISUAL_DEBUG >= VisualDebugLevel::SHOW_EXAMPLES) {
         images.visualiseMatches(0, 1);
     }
 

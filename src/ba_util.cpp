@@ -20,7 +20,7 @@ namespace BundleAdjustUtils {
 using namespace BundleAdjustUtils;
 
 void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
-                                             std::vector<Image> images,
+                                             const std::vector<Image>& images,
                                              std::map<ImageID, Pose> &cameraPoses,
                                              std::vector<Camera> &cameras,
                                              std::vector<Features> &features)
@@ -45,12 +45,10 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
     std::vector<cv::Vec3d> points3d(pointCloud.size());
 
     for (size_t i = 0; i < pointCloud.size(); i++) {
-        // std::cout << "3D point " << i << " / " << pointCloud.size() << std::endl;
         const Point3DInMap& p = pointCloud[i];
         points3d[i] = cv::Vec3d(p.pt.x, p.pt.y, p.pt.z);
 
         for (const auto& kv : p.originatingViews) {
-            // std::cout << "Originating view " << kv.first << " and point " << kv.second << std::endl;
             cv::Point2d p2d = features.at(kv.first).getPoint(kv.second);
 
             // Subtract centre of projection, since the optimiser doesn't know what it is

@@ -13,7 +13,8 @@ typedef size_t ImageID;
 
 enum class DetectorType { SIFT, ORB };
 typedef cv::DescriptorMatcher::MatcherType MatcherType;
-enum DebugLevel { BASIC, DETAILED, EXAMPLES };
+enum DebugLevel { SIMPLE, VERBOSE };
+enum VisualDebugLevel { NONE, SHOW_EXAMPLES };
 
 struct Args {
     std::string inputImageDir;

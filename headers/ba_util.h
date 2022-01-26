@@ -23,7 +23,6 @@ private:
 public:
     static void adjustBundle(PointCloud& pointCloud,
                       const std::set<ImageID>& registeredImages,
-                      const std::vector<Image>& images,
                       std::map<ImageID, Pose>& cameraPoses,
                       std::vector<Camera>& cameras,
                       std::vector<Features>& features);

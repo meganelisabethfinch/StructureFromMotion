@@ -21,27 +21,12 @@ using namespace BundleAdjustUtils;
 
 void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
                                              const std::set<ImageID>& registeredImages,
-                                             const std::vector<Image>& images,
                                              std::map<ImageID, Pose> &cameraPoses,
                                              std::vector<Camera> &cameras,
                                              std::vector<Features> &features)
 {
     std::call_once(initLoggingFlag, initLogging);
     ceres::Problem problem;
-
-    /*
-    std::vector<PoseVector> cameraPoses6d;
-    cameraPoses6d.reserve(images.size());
-    for (ImageID i = 0; i < images.size(); i++) {
-        if (!cameraPoses.contains(i)) {
-            cameraPoses6d.push_back(PoseVector());
-            continue;
-        }
-
-        auto pv = cameraPoses.at(i).toPoseVector();
-        cameraPoses6d.push_back(pv);
-    }
-     */
 
     std::cout << "Setting pose vectors" << std::endl;
     std::map<ImageID, PoseVector> cameraPoses6d;

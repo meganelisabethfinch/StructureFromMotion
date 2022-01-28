@@ -10,6 +10,7 @@
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
+#include <headers/sfm_util.h>
 
 ImageCollection::ImageCollection(std::string directory) {
     std::vector<cv::String> filenames;
@@ -93,14 +94,18 @@ SceneReconstruction ImageCollection::toSceneReconstruction(ImageID baseline1, Im
     recon.initialise(baseline1, baseline2);
     // recon.adjustBundle(); -- seems to make it worse?
 
-    // TODO: decide order of registration based on number of inliers/matches
     for (ImageID i = 0; i < mImages.size(); i++) {
-        if (recon.registerImage(i)) {
+        if (recon.registerImage(i) && i % 4 == 0) {
             recon.adjustBundle();
         }
     }
 
     return recon;
+}
+
+SceneReconstruction ImageCollection::toSceneReconstruction() {
+    auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix);
+    recon.initialise();
 }
 
 SceneGraph ImageCollection::toSceneGraph() {

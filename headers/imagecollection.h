@@ -42,6 +42,8 @@ public:
 
     SceneReconstruction toSceneReconstruction(ImageID baseline1, ImageID baseline2);
 
+    SceneReconstruction toSceneReconstruction();
+
     SceneGraph toSceneGraph();
 };
 

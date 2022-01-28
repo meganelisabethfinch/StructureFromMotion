@@ -32,6 +32,8 @@ public:
 
     bool initialise(ImageID baseline1, ImageID baseline2);
 
+    bool initialise();
+
     bool registerImage(ImageID imageId);
 
     bool adjustBundle();

@@ -5,6 +5,7 @@
 #include <headers/scene_reconstruction.h>
 #include <headers/pose.h>
 #include <headers/ba_util.h>
+#include <headers/constants.h>
 #include <fstream>
 
 #include <headers/sfm_util.h>
@@ -69,6 +70,51 @@ bool SceneReconstruction::initialise(ImageID baseline1, ImageID baseline2) {
     }
 }
 
+bool SceneReconstruction::initialise() {
+    std::map<double, ImagePair> sortedImagePairs = SFMUtilities::SortViewsForBaseline(_mImageFeatures, _mFeatureMatchMatrix);
+
+    for (auto& imagePair : sortedImagePairs) {
+        ImageID i = imagePair.second.left;
+        ImageID j = imagePair.second.right;
+        auto matching2 = _mFeatureMatchMatrix.getMatchingBetween(i,j);
+        Matching2 prunedMatching;
+
+        try {
+            Pose posei = Pose(cv::Matx34d::eye());
+            Pose posej = SFMUtilities::recoverPoseFromMatches(_mCameras.at(i),
+                                                              _mCameras.at(j),
+                                                              _mImageFeatures.at(i),
+                                                              _mImageFeatures.at(j),
+                                                              matching2,
+                                                              prunedMatching);
+            double poseInliersRatio = ((double)prunedMatching.size()) / ((double)matching2.size());
+
+            if (poseInliersRatio < POSE_INLIERS_MINIMAL_RATIO) {
+                throw std::runtime_error("Insufficient pose inliers " + std::to_string(poseInliersRatio));
+            }
+
+            // TODO: Update mFeatureMatchMatrix with prunedMatching
+
+            PointCloud pc = SFMUtilities::triangulateViews(i, j,
+                                           _mCameras.at(i), _mCameras.at(j),
+                                           _mImageFeatures.at(i), _mImageFeatures.at(j),
+                                           prunedMatching,
+                                           posei, posej);
+
+            _pointCloud = pc;
+            _mCameraPoses.emplace(i, posei);
+            _mCameraPoses.emplace(j, posej);
+            _registeredImages.insert(i);
+            _registeredImages.insert(j);
+            break;
+        } catch (std::runtime_error& e) {
+            std::cerr << "Stereo view could not be obtained from (" << i << "," << j << "): " << e.what() << std::flush;
+            continue;
+        }
+    }
+    return false;
+}
+
 bool SceneReconstruction::registerImage(ImageID imageId) {
     std::cout << "--------- Register Image " << imageId << " ---------" << std::endl;
     if (_registeredImages.contains(imageId)) {
@@ -117,7 +163,6 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
             }
         }
 
-        std::cout << "PC size: " << _pointCloud.size() << std::endl;
         _registeredImages.insert(imageId);
 
         return true;

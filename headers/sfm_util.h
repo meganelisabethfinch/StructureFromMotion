@@ -50,6 +50,12 @@ public:
                                                        const std::vector<cv::Point2d>& destination,
                                                        const Matching2& matching,
                                                        Matching2& prunedMatching);
+
+    static std::map<double, ImagePair> SortViewsForBaseline(std::vector<Features>& mImageFeatures,
+                                                            Matches& mFeatureMatchMatrix
+                                                            );
+
+    static int CountHomographyInliers(Features& left, Features& right, Matching2& matches);
 };
 
 #endif //SFM_UTIL_H

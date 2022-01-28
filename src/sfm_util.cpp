@@ -273,3 +273,50 @@ cv::Matx33d SFMUtilities::pruneMatchesByFundamentalMatrix(const std::vector<cv::
         throw std::runtime_error("Not enough points to compute fundamental matrix.");
     }
 }
+
+std::map<double, ImagePair>
+SFMUtilities::SortViewsForBaseline(std::vector<Features> &mImageFeatures, Matches &mFeatureMatchMatrix) {
+    // Sort pairs by ascending homography inliers ratio.
+    // Pairs with too few points are last.
+
+    std::map<double, ImagePair> sortedPairs;
+    size_t numImages = mImageFeatures.size();
+    for (size_t i = 0; i < numImages - 1; i++) {
+        for (size_t j = i + 1; j < numImages; j++) {
+            auto& matching2 = mFeatureMatchMatrix.getMatchingBetween(i,j);
+            if (matching2.size() < POINTS_NEEDED_HOMOGRAPHY_MATRIX) {
+                sortedPairs[1.0] = { i, j };
+                continue;
+            }
+
+            // Find ratio of homography inliers
+            const int numInliers = SFMUtilities::CountHomographyInliers(mImageFeatures[i], mImageFeatures[j], matching2);
+            const double inliersRatio = ((double) numInliers) / ((double)matching2.size());
+            sortedPairs[inliersRatio] = { i, j };
+
+            std::cout << "Pair " << i << ", " << j << ": " << inliersRatio << std::endl;
+        }
+    }
+
+    return sortedPairs;
+}
+
+int SFMUtilities::CountHomographyInliers(Features &left, Features &right, Matching2 &matches) {
+    std::vector<cv::Point2d> alignedLeft;
+    std::vector<cv::Point2d> alignedRight;
+    std::vector<int> leftBackReference;
+    std::vector<int> rightBackReference;
+    SFMUtilities::getAlignedPointsFromMatch(left, right, matches, alignedLeft, alignedRight, leftBackReference, rightBackReference);
+
+    cv::Mat inlierMask;
+    cv::Mat H;
+    if (matches.size() >= 4) {
+        H = cv::findHomography(alignedLeft, alignedRight, cv::RANSAC, RANSAC_THRESHOLD, inlierMask);
+    }
+
+    if (matches.size() < 4 || H.empty()) {
+        return 0;
+    }
+
+    return cv::countNonZero(inlierMask);
+}

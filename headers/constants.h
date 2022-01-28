@@ -25,6 +25,7 @@ const double MERGE_CLOUD_POINT_MIN_MATCH_DISTANCE = 0.01;
 const double MERGE_CLOUD_FEATURE_MIN_MATCH_DISTANCE = 20.0;
 
 // Number of matching points needed to calculate matrices
+const int POINTS_NEEDED_HOMOGRAPHY_MATRIX = 100;
 const int POINTS_NEEDED_ESSENTIAL_MATRIX = 7;
 const int POINTS_NEEDED_FUNDAMENTAL_MATRIX = 7;
 

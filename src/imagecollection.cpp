@@ -12,7 +12,7 @@
 #include <opencv2/highgui.hpp>
 #include <headers/sfm_util.h>
 
-ImageCollection::ImageCollection(std::string directory) {
+ImageCollection::ImageCollection(const std::string& directory) {
     std::vector<cv::String> filenames;
     cv::glob(directory + "/*.png", filenames, false);
 
@@ -89,9 +89,8 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
     cv::waitKey(0);
 }
 
-SceneReconstruction ImageCollection::toSceneReconstruction(ImageID baseline1, ImageID baseline2) {
-    auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix);
-    recon.initialise(baseline1, baseline2);
+SceneReconstruction ImageCollection::toSceneReconstruction(ImagePair& imagePair) {
+    auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix, imagePair);
     // recon.adjustBundle(); -- seems to make it worse?
 
     for (ImageID i = 0; i < mImages.size(); i++) {
@@ -105,11 +104,12 @@ SceneReconstruction ImageCollection::toSceneReconstruction(ImageID baseline1, Im
 
 SceneReconstruction ImageCollection::toSceneReconstruction() {
     auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix);
-    recon.initialise();
+
+    return recon;
 }
 
 SceneGraph ImageCollection::toSceneGraph() {
-    return SceneGraph(mImages, mFeatureMatchMatrix);
+    return { mImages, mFeatureMatchMatrix };
 }
 
 ImageCollection::ImageCollection() = default;

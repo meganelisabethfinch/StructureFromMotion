@@ -24,7 +24,7 @@ private:
     Matches mFeatureMatchMatrix;
 
 public:
-    explicit ImageCollection(std::string filepath);
+    explicit ImageCollection(const std::string& filepath);
 
     ImageCollection();
 
@@ -40,7 +40,7 @@ public:
 
     void visualiseMatches(ImageID i, ImageID j);
 
-    SceneReconstruction toSceneReconstruction(ImageID baseline1, ImageID baseline2);
+    SceneReconstruction toSceneReconstruction(ImagePair& imagePair);
 
     SceneReconstruction toSceneReconstruction();
 

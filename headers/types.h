@@ -34,9 +34,6 @@ typedef std::vector<std::vector<Matching2>> MatchMatrix;
 // 1x3 rotation in angle-axis form, followed by 1x3 translation
 typedef cv::Matx<double, 1, 6> PoseVector;
 
-struct ImagePair {
-    ImageID left, right;
-};
 
 struct Image2D3DMatch {
     std::vector<cv::Point2d> points2D;

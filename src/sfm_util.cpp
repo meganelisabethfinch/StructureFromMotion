@@ -5,6 +5,7 @@
 #include <headers/sfm_util.h>
 #include <opencv2/calib3d.hpp>
 #include "headers/constants.h"
+#include "headers/image_pair.h"
 
 bool SFMUtilities::PassesLoweRatioTest(const std::vector<cv::DMatch> &match) {
     return match.size() == 2 && static_cast<double>(match[0].distance) < static_cast<double>(match[1].distance) * LOWE_RATIO;
@@ -285,16 +286,14 @@ SFMUtilities::SortViewsForBaseline(std::vector<Features> &mImageFeatures, Matche
         for (size_t j = i + 1; j < numImages; j++) {
             auto& matching2 = mFeatureMatchMatrix.getMatchingBetween(i,j);
             if (matching2.size() < POINTS_NEEDED_HOMOGRAPHY_MATRIX) {
-                sortedPairs[1.0] = { i, j };
+                sortedPairs.emplace(1.0, ImagePair(i,j));
                 continue;
             }
 
             // Find ratio of homography inliers
             const int numInliers = SFMUtilities::CountHomographyInliers(mImageFeatures[i], mImageFeatures[j], matching2);
             const double inliersRatio = ((double) numInliers) / ((double)matching2.size());
-            sortedPairs[inliersRatio] = { i, j };
-
-            std::cout << "Pair " << i << ", " << j << ": " << inliersRatio << std::endl;
+            sortedPairs.emplace(inliersRatio, ImagePair( i, j ));
         }
     }
 

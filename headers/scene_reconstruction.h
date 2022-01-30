@@ -12,6 +12,7 @@
 #include "matches.h"
 #include "point_cloud.h"
 #include "pose.h"
+#include "image_pair.h"
 
 class SceneReconstruction {
 private:
@@ -30,9 +31,11 @@ public:
                         std::vector<Features>& mImageFeatures,
                         Matches& mFeatureMatchMatrix);
 
-    bool initialise(ImageID baseline1, ImageID baseline2);
-
-    bool initialise();
+    SceneReconstruction(std::vector<Image> &mImages,
+                        std::vector<Camera> &mCameras,
+                        std::vector<Features> &mImageFeatures,
+                        Matches &mFeatureMatchMatrix,
+                        ImagePair& imagePair);
 
     bool registerImage(ImageID imageId);
 

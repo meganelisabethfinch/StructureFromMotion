@@ -9,68 +9,14 @@
 #include <fstream>
 
 #include <headers/sfm_util.h>
+#include <headers/image_pair.h>
 
 SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Camera> &mCameras,
                                          std::vector<Features> &mImageFeatures,
                                          Matches &mFeatureMatchMatrix)
-                                         : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix)
+        : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix)
 {
-
-}
-
-bool SceneReconstruction::initialise(ImageID baseline1, ImageID baseline2) {
-    // Clear existing state
-    _registeredImages.clear();
-    _mCameraPoses.clear();
-
-    // Recover pose
-    if (baseline1 == baseline2) {
-        return false;
-    } else if (baseline1 > baseline2) {
-        // Swap over so that baseline1 < baseline2 always
-        ImageID tmp = baseline1;
-        baseline1 = baseline2;
-        baseline2 = tmp;
-    }
-
-    try {
-        Matching2 prunedMatching;
-
-        auto pose2 = SFMUtilities::recoverPoseFromMatches(_mCameras[baseline1], _mCameras[baseline2],
-                                                          _mImageFeatures[baseline1], _mImageFeatures[baseline2],
-                                                          _mFeatureMatchMatrix.getMatchingBetween(baseline1, baseline2),
-                                                          prunedMatching);
-
-        auto pose1 = Pose(cv::Matx34d::eye());
-
-        // _mFeatureMatchMatrix[baseline1][baseline2] = prunedMatching;
-
-        auto pc = SFMUtilities::triangulateViews(baseline1, baseline2,
-                                                 _mCameras[baseline1], _mCameras[baseline2],
-                                                 _mImageFeatures[baseline1], _mImageFeatures[baseline2],
-                                                 prunedMatching,
-                                                 pose1, pose2);
-
-        // Save recovered poses
-        _mCameraPoses.emplace(baseline1, pose1);
-        _mCameraPoses.emplace(baseline2, pose2);
-
-        // Save triangulated points
-        _pointCloud = pc;
-
-        // Register images
-        _registeredImages.insert(baseline1);
-        _registeredImages.insert(baseline2);
-
-        return true;
-    } catch (std::runtime_error& e) {
-        std::cerr << "Failed to initialise reconstruction from baseline images " << baseline1 << " and " << baseline2 << ". Please try an alternative baseline pair." << std::endl;
-        return false;
-    }
-}
-
-bool SceneReconstruction::initialise() {
     std::map<double, ImagePair> sortedImagePairs = SFMUtilities::SortViewsForBaseline(_mImageFeatures, _mFeatureMatchMatrix);
 
     for (auto& imagePair : sortedImagePairs) {
@@ -96,10 +42,10 @@ bool SceneReconstruction::initialise() {
             // TODO: Update mFeatureMatchMatrix with prunedMatching
 
             PointCloud pc = SFMUtilities::triangulateViews(i, j,
-                                           _mCameras.at(i), _mCameras.at(j),
-                                           _mImageFeatures.at(i), _mImageFeatures.at(j),
-                                           prunedMatching,
-                                           posei, posej);
+                                                           _mCameras.at(i), _mCameras.at(j),
+                                                           _mImageFeatures.at(i), _mImageFeatures.at(j),
+                                                           prunedMatching,
+                                                           posei, posej);
 
             _pointCloud = pc;
             _mCameraPoses.emplace(i, posei);
@@ -112,7 +58,54 @@ bool SceneReconstruction::initialise() {
             continue;
         }
     }
-    return false;
+}
+
+SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
+                                         std::vector<Camera> &mCameras,
+                                         std::vector<Features> &mImageFeatures,
+                                         Matches &mFeatureMatchMatrix,
+                                         ImagePair& imagePair)
+                                         : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix)
+{
+    // Clear existing state
+    _registeredImages.clear();
+    _mCameraPoses.clear();
+
+    auto baseline1 = imagePair.left;
+    auto baseline2 = imagePair.right;
+
+    try {
+        Matching2 prunedMatching;
+
+        auto pose2 = SFMUtilities::recoverPoseFromMatches(_mCameras[baseline1], _mCameras[baseline2],
+                                                          _mImageFeatures[baseline1], _mImageFeatures[baseline2],
+                                                          _mFeatureMatchMatrix.getMatchingBetween(baseline1, baseline2),
+                                                          prunedMatching);
+
+        auto pose1 = Pose(cv::Matx34d::eye());
+
+        // TODO: _mFeatureMatchMatrix[baseline1][baseline2] = prunedMatching;
+
+        auto pc = SFMUtilities::triangulateViews(baseline1, baseline2,
+                                                 _mCameras[baseline1], _mCameras[baseline2],
+                                                 _mImageFeatures[baseline1], _mImageFeatures[baseline2],
+                                                 prunedMatching,
+                                                 pose1, pose2);
+
+        // Save recovered poses
+        _mCameraPoses.emplace(baseline1, pose1);
+        _mCameraPoses.emplace(baseline2, pose2);
+
+        // Save triangulated points
+        _pointCloud = pc;
+
+        // Register images
+        _registeredImages.insert(baseline1);
+        _registeredImages.insert(baseline2);
+
+    } catch (std::runtime_error& e) {
+        std::cerr << "Failed to initialise reconstruction from baseline images " << baseline1 << " and " << baseline2 << ". Please try an alternative baseline pair." << std::endl;
+    }
 }
 
 bool SceneReconstruction::registerImage(ImageID imageId) {

@@ -12,6 +12,7 @@
 #include "pose.h"
 #include "point_cloud.h"
 #include "matches.h"
+#include "image_pair.h"
 
 class SFMUtilities {
 public:

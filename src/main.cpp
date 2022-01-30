@@ -34,7 +34,8 @@ int main(int argc, char** argv) {
     graph.toDotFile("scene_graph.dot");
 
     std::cout << "---- Find Baseline Triangulation ---" << std::endl;
-    auto recon = images.toSceneReconstruction(args.baseline1,args.baseline2);
+    auto imagePair = ImagePair(args.baseline1, args.baseline2);
+    auto recon = images.toSceneReconstruction(imagePair);
     recon.toPlyFile("point_cloud.ply");
 
     return 0;

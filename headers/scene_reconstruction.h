@@ -25,6 +25,8 @@ private:
     std::vector<Features>& _mImageFeatures;
     Matches& _mFeatureMatchMatrix;
 
+    void initialise(std::vector<ImagePair> baselines);
+
 public:
     SceneReconstruction(std::vector<Image>& mImages,
                         std::vector<Camera>& mCameras,

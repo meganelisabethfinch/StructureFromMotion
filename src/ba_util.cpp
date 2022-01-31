@@ -28,7 +28,6 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
     std::call_once(initLoggingFlag, initLogging);
     ceres::Problem problem;
 
-    std::cout << "Setting pose vectors" << std::endl;
     std::map<ImageID, PoseVector> cameraPoses6d;
     for (auto i : registeredImages) {
         auto pv = cameraPoses.at(i).toPoseVector();
@@ -38,8 +37,6 @@ void BundleAdjustmentUtilities::adjustBundle(PointCloud &pointCloud,
     double focal = cameras.at(0).getFocalLength();
 
     std::vector<cv::Vec3d> points3d(pointCloud.size());
-
-    std::cout << "Adding residual blocks" << std::endl;
 
     for (size_t i = 0; i < pointCloud.size(); i++) {
         const Point3DInMap& p = pointCloud[i];

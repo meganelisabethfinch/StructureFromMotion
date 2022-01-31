@@ -95,7 +95,7 @@ SceneReconstruction ImageCollection::toSceneReconstruction(ImagePair& imagePair)
 
     for (ImageID i = 0; i < mImages.size(); i++) {
         if (recon.registerImage(i) && i % 4 == 0) {
-            recon.adjustBundle();
+            // recon.adjustBundle();
         }
     }
 

@@ -35,7 +35,7 @@ public:
                         std::vector<Camera> &mCameras,
                         std::vector<Features> &mImageFeatures,
                         Matches &mFeatureMatchMatrix,
-                        ImagePair& imagePair);
+                        ImagePair& baselinePair);
 
     bool registerImage(ImageID imageId);
 

@@ -125,7 +125,7 @@ add_library(
         SFMLib
         STATIC
         headers/constants.h headers/point_cloud.h headers/camera.h headers/types.h headers/cli_util.h src/cli_util.cpp headers/imagecollection.h src/imagecollection.cpp headers/image.h src/camera.cpp headers/features.h headers/matches.h src/matches.cpp src/features.cpp headers/sfm_util.h src/sfm_util.cpp headers/scene_graph.h src/scene_graph.cpp headers/scene_reconstruction.h src/scene_reconstruction.cpp headers/pose.h src/pose.cpp src/point_cloud.cpp headers/ba_util.h src/ba_util.cpp headers/cost/simple_reprojection_error.h headers/cost/zhang_rba_error.h src/cost/zhang_rba_error.cpp
-        headers/image_pair.h)
+        headers/image_pair.h headers/cli_args.h)
 
 target_include_directories(
         SFMLib

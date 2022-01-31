@@ -15,7 +15,8 @@ SceneGraph::SceneGraph(const std::vector<Image>& images, Matches& matches) {
 
     for (size_t i = 0; i < nodes.size() - 1; i++) {
         for (size_t j = i + 1; j < nodes.size(); j++) {
-            Matching2& matching2 = matches.getMatchingBetween(i, j);
+            auto ip = ImagePair(i,j);
+            Matching2& matching2 = matches.get(ip);
             if (matching2.size() >= SCENE_GRAPH_EDGE_THRESHOLD) {
                 // 1 if edge exists, 0 otherwise
                 edges[i][j] = 1;

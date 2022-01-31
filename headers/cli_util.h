@@ -6,6 +6,7 @@
 #define SFM_CLI_H
 
 #include "types.h"
+#include "cli_args.h"
 
 #include <opencv2/features2d.hpp>
 

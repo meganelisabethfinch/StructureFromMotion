@@ -33,7 +33,7 @@ struct Point3DInMap {
 
 class PointCloud {
 private:
-    std::vector<Point3DInMap> map;
+    std::vector<Point3DInMap> mReconstructionCloud;
 
 public:
     PointCloud();

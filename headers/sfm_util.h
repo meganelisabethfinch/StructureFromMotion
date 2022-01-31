@@ -21,7 +21,7 @@ public:
     static Pose recoverPoseFromMatches(Camera &cam1, Camera &cam2,
                                        Features &features1, Features &features2,
                                        Matching2 &matching,
-                                       Matching2 &prunedMatching);
+                                       cv::Mat& mask);
 
     static Pose recoverPoseFrom2D3DMatches(Camera& camera,
                                            Image2D3DMatch matching);

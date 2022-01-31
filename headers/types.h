@@ -16,17 +16,6 @@ typedef cv::DescriptorMatcher::MatcherType MatcherType;
 enum DebugLevel { SIMPLE, VERBOSE };
 enum VisualDebugLevel { NONE, SHOW_EXAMPLES };
 
-struct Args {
-    std::string inputImageDir;
-    std::string outputDir;
-
-    ImageID baseline1;
-    ImageID baseline2;
-
-    DetectorType detectorType;
-    MatcherType matcherType;
-};
-
 // Matches between two images
 typedef std::vector<cv::DMatch> Matching2;
 typedef std::vector<std::vector<Matching2>> MatchMatrix;

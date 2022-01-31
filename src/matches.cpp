@@ -20,30 +20,30 @@ Matches::Matches(const cv::Ptr<cv::DescriptorMatcher>& matcher, std::vector<Feat
     }
 }
 
-Matching2& Matches::getMatchingBetween(const ImageID i, const ImageID j) {
+Matching2& Matches::get(const ImagePair imagePair) {
     // Always index by smaller number first
-    const ImageID leftID = (i < j) ? i : j;
-    const ImageID rightID = (i < j) ? j : i;
-    return matrix[leftID][rightID];
+    return matrix[imagePair.left][imagePair.right];
 }
 
-void Matches::prune(ImageID i, ImageID j, cv::Mat& mask) {
-    if (j > i) {
-        ImageID tmp = i;
-        i = j;
-        j = tmp;
-    }
+void Matches::prune(const ImagePair& imagePair, cv::Mat& mask) {
+    auto i = imagePair.left;
+    auto j = imagePair.right;
 
-    auto matching = matrix[i][j];
+    Matching2 matching = matrix[i][j];
     Matching2 prunedMatching;
 
-    for (size_t i = 0; i < mask.rows; i++) {
+    for (int i = 0; i < mask.rows; i++) {
         if (mask.at<uchar>(i)) {
-            prunedMatching.push_back(matching[i]);
+            prunedMatching.push_back(matching.at(i));
         }
     }
 
     matrix[i][j] = prunedMatching;
+
+    if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {
+        std::cout << "Pruned matching: " << prunedMatching.size() << " of " << matching.size() << " matches kept."
+                  << std::endl;
+    }
 }
 
 size_t Matches::size() {

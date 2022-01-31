@@ -83,7 +83,7 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
     cv::Mat out;
     std::vector<cv::KeyPoint> iKeypoints = mImageFeatures[i].getCVKeyPoints();
     std::vector<cv::KeyPoint> jKeypoints = mImageFeatures[j].getCVKeyPoints();
-    Matching2 matches = mFeatureMatchMatrix.getMatchingBetween(i, j);
+    Matching2 matches = mFeatureMatchMatrix.get(ImagePair(i, j));
     cv::drawMatches(mImages[i].data, iKeypoints, mImages[j].data, jKeypoints, matches, out);
     cv::imshow("Matches", out);
     cv::waitKey(0);

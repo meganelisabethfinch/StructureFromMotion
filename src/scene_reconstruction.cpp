@@ -22,24 +22,26 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
     for (auto& imagePair : sortedImagePairs) {
         ImageID i = imagePair.second.left;
         ImageID j = imagePair.second.right;
-        auto matching2 = _mFeatureMatchMatrix.getMatchingBetween(i,j);
+        std::cout << "Trying baseline " << i << " and " << j << std::endl;
+        auto matching2 = _mFeatureMatchMatrix.get(imagePair.second);
         Matching2 prunedMatching;
 
         try {
+            cv::Mat mask;
             Pose posei = Pose(cv::Matx34d::eye());
             Pose posej = SFMUtilities::recoverPoseFromMatches(_mCameras.at(i),
                                                               _mCameras.at(j),
                                                               _mImageFeatures.at(i),
                                                               _mImageFeatures.at(j),
                                                               matching2,
-                                                              prunedMatching);
-            double poseInliersRatio = ((double)prunedMatching.size()) / ((double)matching2.size());
+                                                              mask);
+            mFeatureMatchMatrix.prune(imagePair.second,mask);
 
+            double poseInliersRatio = ((double)prunedMatching.size()) / ((double)matching2.size());
             if (poseInliersRatio < POSE_INLIERS_MINIMAL_RATIO) {
                 throw std::runtime_error("Insufficient pose inliers " + std::to_string(poseInliersRatio));
             }
 
-            // TODO: Update mFeatureMatchMatrix with prunedMatching
 
             PointCloud pc = SFMUtilities::triangulateViews(i, j,
                                                            _mCameras.at(i), _mCameras.at(j),
@@ -64,32 +66,32 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Camera> &mCameras,
                                          std::vector<Features> &mImageFeatures,
                                          Matches &mFeatureMatchMatrix,
-                                         ImagePair& imagePair)
+                                         ImagePair& baselinePair)
                                          : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix)
 {
     // Clear existing state
     _registeredImages.clear();
     _mCameraPoses.clear();
 
-    auto baseline1 = imagePair.left;
-    auto baseline2 = imagePair.right;
+    auto baseline1 = baselinePair.left;
+    auto baseline2 = baselinePair.right;
 
     try {
-        Matching2 prunedMatching;
+        cv::Mat mask;
 
         auto pose2 = SFMUtilities::recoverPoseFromMatches(_mCameras[baseline1], _mCameras[baseline2],
                                                           _mImageFeatures[baseline1], _mImageFeatures[baseline2],
-                                                          _mFeatureMatchMatrix.getMatchingBetween(baseline1, baseline2),
-                                                          prunedMatching);
+                                                          _mFeatureMatchMatrix.get(baselinePair),
+                                                          mask);
+
+        _mFeatureMatchMatrix.prune(baselinePair, mask);
 
         auto pose1 = Pose(cv::Matx34d::eye());
-
-        // TODO: _mFeatureMatchMatrix[baseline1][baseline2] = prunedMatching;
 
         auto pc = SFMUtilities::triangulateViews(baseline1, baseline2,
                                                  _mCameras[baseline1], _mCameras[baseline2],
                                                  _mImageFeatures[baseline1], _mImageFeatures[baseline2],
-                                                 prunedMatching,
+                                                 _mFeatureMatchMatrix.get(baselinePair),
                                                  pose1, pose2);
 
         // Save recovered poses
@@ -127,31 +129,28 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
         // For each image already registered
         // Triangulate points between that and the new image
         for (const ImageID oldId: _registeredImages) {
-            ImageID left = (oldId < imageId) ? oldId : imageId;
-            ImageID right = (oldId < imageId) ? imageId : oldId;
+            auto ip = ImagePair(imageId, oldId);
 
             try {
-                Matching2 prunedMatching;
+                cv::Mat mask;
 
                 // use essential matrix recovery to prune matches
-                auto pose_right = SFMUtilities::recoverPoseFromMatches(_mCameras[left], _mCameras[right],
-                                                                       _mImageFeatures[left], _mImageFeatures[right],
-                                                                       _mFeatureMatchMatrix.getMatchingBetween(left,
-                                                                                                               right),
-                                                                       prunedMatching);
-                // _mFeatureMatchMatrix[left][right] = prunedMatching;
+                auto pose_right = SFMUtilities::recoverPoseFromMatches(_mCameras[ip.left], _mCameras[ip.right],
+                                                                       _mImageFeatures[ip.left], _mImageFeatures[ip.right],
+                                                                       _mFeatureMatchMatrix.get(ip),
+                                                                       mask);
+                _mFeatureMatchMatrix.prune(ip, mask);
 
-
-                auto pc = SFMUtilities::triangulateViews(left, right,
-                                                         _mCameras[left], _mCameras[right],
-                                                         _mImageFeatures[left], _mImageFeatures[right],
-                                                         prunedMatching,
-                                                         _mCameraPoses.at(left), _mCameraPoses.at(right));
+                auto pc = SFMUtilities::triangulateViews(ip.left, ip.right,
+                                                         _mCameras[ip.left], _mCameras[ip.right],
+                                                         _mImageFeatures[ip.left], _mImageFeatures[ip.right],
+                                                         _mFeatureMatchMatrix.get(ip),
+                                                         _mCameraPoses.at(ip.left), _mCameraPoses.at(ip.right));
 
                 // TODO: check triangulation successful
                 _pointCloud.mergePoints(pc, _mFeatureMatchMatrix);
             } catch (std::runtime_error &e) {
-                std::cout << "Cannot triangulate points between images " << left << " and " << right << ": ";
+                std::cout << "Cannot triangulate points between images " << ip.left << " and " << ip.right << ": ";
                 std::cout << e.what() << std::endl;
             }
         }

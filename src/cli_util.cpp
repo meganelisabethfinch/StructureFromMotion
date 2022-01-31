@@ -4,6 +4,7 @@
 
 #include <headers/cli_util.h>
 #include "headers/constants.h"
+#include "headers/image_pair.h"
 
 #include <unistd.h>
 #include <iostream>
@@ -47,12 +48,9 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     args.matcherType = DEFAULT_MATCHER;
 
     if (baselines.empty()) {
-        // Use defaults
-        args.baseline1 = 0;
-        args.baseline2 = 1;
+        // Do nothing
     } else if (baselines.size() == 2) {
-        args.baseline1 = baselines.at(0);
-        args.baseline2 = baselines.at(1);
+        ImagePair pair = ImagePair(baselines.at(0), baselines.at(1));
     } else {
         std::cerr << "Invalid number of baselines defined: " << baselines.size() << std::endl;
         return false;

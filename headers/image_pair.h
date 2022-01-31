@@ -5,6 +5,9 @@
 #ifndef SFM_IMAGE_PAIR_H
 #define SFM_IMAGE_PAIR_H
 
+#include <iostream>
+#include "types.h"
+
 struct ImagePair {
     ImageID left{}, right{};
 

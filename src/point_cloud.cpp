@@ -11,29 +11,29 @@
 PointCloud::PointCloud() {}
 
 Point3DInMap PointCloud::operator[](size_t i) {
-    return map[i];
+    return mReconstructionCloud[i];
 }
 
 std::vector<Point3DInMap>::iterator PointCloud::begin() {
-    return map.begin();
+    return mReconstructionCloud.begin();
 }
 
 std::vector<Point3DInMap>::iterator PointCloud::end() {
-    return map.end();
+    return mReconstructionCloud.end();
 }
 
 size_t PointCloud::size() const {
-    return map.size();
+    return mReconstructionCloud.size();
 }
 
 void PointCloud::addPoint(const Point3DInMap& pt) {
-    map.push_back(pt);
+    mReconstructionCloud.push_back(pt);
 }
 
 void PointCloud::updatePoint(size_t i, double x, double y, double z) {
-    map[i].pt.x = x;
-    map[i].pt.y = y;
-    map[i].pt.z = z;
+    mReconstructionCloud[i].pt.x = x;
+    mReconstructionCloud[i].pt.y = y;
+    mReconstructionCloud[i].pt.z = z;
 }
 
 void PointCloud::mergePoints(PointCloud &pc, Matches& matches) {
@@ -44,11 +44,10 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches) {
     size_t mergedPoints = 0;
 
     for (Point3DInMap& newPoint : pc) {
-
         bool foundAnyMatchingExistingViews = false;
         bool foundMatching3DPoint = false;
 
-        for (Point3DInMap& existingPoint : map) {
+        for (Point3DInMap& existingPoint : mReconstructionCloud) {
             if (cv::norm(existingPoint.pt - newPoint.pt) < MERGE_CLOUD_POINT_MIN_MATCH_DISTANCE) {
                 // New point is very close to an existing 3D cloud point
                 foundMatching3DPoint = true;
@@ -58,18 +57,19 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches) {
                     for (const auto& existingKV : existingPoint.originatingViews) {
                         bool foundMatchingFeature = false;
 
-                        const ImageID queryImageIndex = newKV.first < existingKV.first ? newKV.first : existingKV.first;
-                        const ImageID trainImageIndex = newKV.first < existingKV.first ? existingKV.first : newKV.first;
                         const int queryFeatureIndex = newKV.first < existingKV.first ? newKV.second : existingKV.second;
                         const int trainFeatureIndex = newKV.first < existingKV.first ? existingKV.second : newKV.second;
 
-                        const Matching2& matching = matches.getMatchingBetween(newKV.first, existingKV.first);
+                        if (newKV.first == existingKV.first) { continue; }
+
+                        auto ip = ImagePair(newKV.first, existingKV.first);
+                        const Matching2& matching = matches.get(ip);
                         for (const cv::DMatch& m : matching) {
                             if (m.queryIdx == queryFeatureIndex
                                 and m.trainIdx == trainFeatureIndex
                                 and m.distance < MERGE_CLOUD_FEATURE_MIN_MATCH_DISTANCE)
                             {
-                                mergeMatchMatrix[queryImageIndex][trainImageIndex].push_back(m);
+                                mergeMatchMatrix[ip.left][ip.right].push_back(m);
 
                                 // Found a 2D feature which is an originating view/point for both
                                 // the new and existing 3D points - merge.
@@ -100,7 +100,7 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches) {
         if (not foundAnyMatchingExistingViews and not foundMatching3DPoint) {
             // This point did not match any existing cloud points
             // Add it as a new point
-            map.push_back(newPoint);
+            mReconstructionCloud.push_back(newPoint);
             newPoints++;
         }
     }

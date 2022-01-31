@@ -15,7 +15,7 @@ Pose
 SFMUtilities::recoverPoseFromMatches(Camera &cam1, Camera &cam2,
                                      Features &features1, Features &features2,
                                      Matching2 &matching,
-                                     Matching2 &prunedMatching)
+                                     cv::Mat& mask)
 {
     // Get two arrays of matching points
     std::vector<int> backRef1;
@@ -35,7 +35,6 @@ SFMUtilities::recoverPoseFromMatches(Camera &cam1, Camera &cam2,
 
     // Find essential matrix
     cv::Mat E, R, t;
-    cv::Mat mask;
     E = cv::findEssentialMat(points1, points2, focal, pp, cv::RANSAC, 0.999, 1.0, mask);
 
     cv::recoverPose(E, points1, points2, R, t, focal, pp, mask);
@@ -46,18 +45,6 @@ SFMUtilities::recoverPoseFromMatches(Camera &cam1, Camera &cam2,
                         R.at<double>(1,0), R.at<double>(1,1), R.at<double>(1,2), t.at<double>(1),
                         R.at<double>(2,0), R.at<double>(2,1), R.at<double>(2,2), t.at<double>(2)));
 
-    // Populate pruned matches
-    prunedMatching.clear();
-    for (size_t i = 0; i < mask.rows; i++) {
-        if (mask.at<uchar>(i)) {
-            prunedMatching.push_back(matching[i]);
-        }
-    }
-
-    if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {
-        std::cout << "Pruned matching: " << prunedMatching.size() << " of " << matching.size() << " matches kept."
-                  << std::endl;
-    }
     return pose2;
 }
 
@@ -210,7 +197,9 @@ SFMUtilities::find2D3DMatches(ImageID imageId,
             const ImageID originatingViewIndex = origViewAndPoint.first;
             const int originatingPointIndex = origViewAndPoint.second;
 
-            for (const cv::DMatch& m : matches.getMatchingBetween(imageId, originatingViewIndex)) {
+            auto ip = ImagePair(imageId, originatingViewIndex);
+            auto list_matches = matches.get(ip);
+            for (const cv::DMatch& m : list_matches) {
                 int matched2DPointInNewView = -1;
 
                 if (originatingViewIndex < imageId) {
@@ -284,9 +273,10 @@ SFMUtilities::SortViewsForBaseline(std::vector<Features> &mImageFeatures, Matche
     size_t numImages = mImageFeatures.size();
     for (size_t i = 0; i < numImages - 1; i++) {
         for (size_t j = i + 1; j < numImages; j++) {
-            auto& matching2 = mFeatureMatchMatrix.getMatchingBetween(i,j);
+            auto ip = ImagePair(i,j);
+            auto& matching2 = mFeatureMatchMatrix.get(ip);
             if (matching2.size() < POINTS_NEEDED_HOMOGRAPHY_MATRIX) {
-                sortedPairs.emplace(1.0, ImagePair(i,j));
+                sortedPairs.emplace(1.0, ip);
                 continue;
             }
 

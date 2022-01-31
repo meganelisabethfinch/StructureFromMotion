@@ -6,6 +6,7 @@
 #define SFM_MATCHES_H
 
 #include "features.h"
+#include "image_pair.h"
 
 class Matches {
 private:
@@ -16,9 +17,9 @@ public:
 
     Matches(); // TODO: remove this while keeping the compiler happy
 
-    Matching2& getMatchingBetween(ImageID i, ImageID j);
+    Matching2& get(const ImagePair imagePair);
 
-    void prune(ImageID i, ImageID j, cv::Mat& mask);
+    void prune(const ImagePair& imagePair, cv::Mat& mask);
 
     size_t size();
 };

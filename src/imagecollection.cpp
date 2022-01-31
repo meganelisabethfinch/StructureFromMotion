@@ -91,12 +91,9 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
 
 SceneReconstruction ImageCollection::toSceneReconstruction(ImagePair& imagePair) {
     auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix, imagePair);
-    // recon.adjustBundle(); -- seems to make it worse?
 
     for (ImageID i = 0; i < mImages.size(); i++) {
-        if (recon.registerImage(i) && i % 4 == 0) {
-            // recon.adjustBundle();
-        }
+        recon.registerImage(i);
     }
 
     return recon;
@@ -104,6 +101,8 @@ SceneReconstruction ImageCollection::toSceneReconstruction(ImagePair& imagePair)
 
 SceneReconstruction ImageCollection::toSceneReconstruction() {
     auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix);
+
+    recon.registerMoreImages();
 
     return recon;
 }

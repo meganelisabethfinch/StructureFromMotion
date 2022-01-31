@@ -76,9 +76,7 @@ Pose SFMUtilities::recoverPoseFrom2D3DMatches(Camera& camera, Image2D3DMatch mat
         throw std::runtime_error(msg);
     }
 
-    Pose pose = Pose(rvec, tvec);
-
-    return pose;
+    return { rvec, tvec };
 }
 
 PointCloud SFMUtilities::triangulateViews(ImageID img1, ImageID img2,

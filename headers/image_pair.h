@@ -12,10 +12,6 @@ struct ImagePair {
     ImageID left{}, right{};
 
     ImagePair(ImageID id1, ImageID id2) {
-        if (id1 == id2) {
-            throw std::runtime_error("Images must be distinct.");
-        }
-
         if (id1 < id2) {
             left = id1;
             right = id2;

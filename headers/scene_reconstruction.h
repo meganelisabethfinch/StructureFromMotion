@@ -18,7 +18,8 @@ class SceneReconstruction {
 private:
     std::vector<Image>& _mImages;
     std::map<ImageID, Pose> _mCameraPoses;
-    std::set<ImageID> _registeredImages;
+    std::set<ImageID> _mDoneViews;
+    std::set<ImageID> _mGoodViews;
     PointCloud _pointCloud;
 
     std::vector<Camera>& _mCameras;
@@ -27,7 +28,7 @@ private:
 
     void initialise(std::vector<ImagePair> baselines);
 
-    void registerImage(ImageID imageId, Image2D3DMatch& match2D3D);
+    bool registerImage(ImageID imageId, Image2D3DMatch& match2D3D);
 
 public:
     SceneReconstruction(std::vector<Image>& mImages,
@@ -41,7 +42,7 @@ public:
                         Matches &mFeatureMatchMatrix,
                         ImagePair& baselinePair);
 
-    void registerImages();
+    void registerMoreImages();
 
     bool registerImage(ImageID imageId);
 

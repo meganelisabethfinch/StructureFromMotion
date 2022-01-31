@@ -35,8 +35,6 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
     transform(imagePairsByHomographyInliers.begin(), imagePairsByHomographyInliers.end(), back_inserter(orderedImagePairs), get_second() );
 
     initialise(orderedImagePairs);
-
-    registerImages();
 }
 
 SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
@@ -91,8 +89,12 @@ void SceneReconstruction::initialise(std::vector<ImagePair> baselines) {
             _pointCloud = pc;
 
             // Register images
-            _registeredImages.insert(i);
-            _registeredImages.insert(j);
+            _mDoneViews.insert(i);
+            _mDoneViews.insert(j);
+            _mGoodViews.insert(i);
+            _mGoodViews.insert(j);
+
+            // TODO: adjustBundle();
             break;
         } catch (std::runtime_error &e) {
             std::cerr << "Stereo view could not be obtained from (" << i << "," << j << "): " << e.what() << std::flush;
@@ -102,24 +104,30 @@ void SceneReconstruction::initialise(std::vector<ImagePair> baselines) {
 }
 
 bool SceneReconstruction::registerImage(ImageID imageId) {
-    std::cout << "--------- Register Image " << imageId << " ---------" << std::endl;
-    if (_registeredImages.contains(imageId)) {
+    // Get a list of matches between keypoints in this image (2D points) and 3D points in the point cloud
+    Image2D3DMatch match2D3D = SFMUtilities::find2D3DMatches(imageId, _mImageFeatures[imageId], _mFeatureMatchMatrix, _pointCloud);
+
+    registerImage(imageId, match2D3D);
+}
+
+bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D3D) {
+    if (_mDoneViews.contains(imageId)) {
         std::cout << "Image " << imageId << " is already registered." << std::endl;
         return false;
     }
 
-    // Get a list of matches between keypoints in this image (2D points) and 3D points in the point cloud
-    Image2D3DMatch match2D3D = SFMUtilities::find2D3DMatches(imageId, _mImageFeatures[imageId], _mFeatureMatchMatrix, _pointCloud);
+    std::cout << "--------- Register Image " << imageId << " ---------" << std::endl;
+    _mDoneViews.insert(imageId);
 
     try {
         // Recover camera pose for new image to be registered
         Pose newCameraPose = SFMUtilities::recoverPoseFrom2D3DMatches(_mCameras[imageId], match2D3D);
-
         _mCameraPoses.emplace(imageId, newCameraPose);
 
         // For each image already registered
         // Triangulate points between that and the new image
-        for (const ImageID oldId: _registeredImages) {
+        bool anyViewSuccess = false;
+        for (const ImageID oldId: _mGoodViews) {
             auto ip = ImagePair(imageId, oldId);
 
             try {
@@ -133,20 +141,24 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
                 _mFeatureMatchMatrix.prune(ip, mask);
 
                 auto pc = SFMUtilities::triangulateViews(ip.left, ip.right,
-                                                         _mCameras[ip.left], _mCameras[ip.right],
-                                                         _mImageFeatures[ip.left], _mImageFeatures[ip.right],
-                                                         _mFeatureMatchMatrix.get(ip),
-                                                         _mCameraPoses.at(ip.left), _mCameraPoses.at(ip.right));
+                                                             _mCameras[ip.left], _mCameras[ip.right],
+                                                             _mImageFeatures[ip.left], _mImageFeatures[ip.right],
+                                                             _mFeatureMatchMatrix.get(ip),
+                                                             _mCameraPoses.at(ip.left), _mCameraPoses.at(ip.right));
 
-                // TODO: check triangulation successful
+                // If we reach this point, triangulation was successful
                 _pointCloud.mergePoints(pc, _mFeatureMatchMatrix);
+                anyViewSuccess = true;
             } catch (std::runtime_error &e) {
                 std::cout << "Cannot triangulate points between images " << ip.left << " and " << ip.right << ": ";
                 std::cout << e.what() << std::endl;
             }
         }
 
-        _registeredImages.insert(imageId);
+        if (anyViewSuccess) {
+            // TODO: adjustBundle();
+        }
+        _mGoodViews.insert(imageId);
 
         return true;
     } catch (std::runtime_error &e) {
@@ -156,29 +168,19 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
     }
 }
 
-void SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D3D) {
-    // TODO: refactor to remove redundant code
-}
-
-void SceneReconstruction::registerImages() {
+void SceneReconstruction::registerMoreImages() {
     std::cout << "-------- Adding more views ---------" << std::endl;
 
-    std::set<ImageID> all;
-    for (const auto& image : _mImages) {
-        all.insert(image.id);
-    }
 
-    std::set<ImageID> unregistered;
-    std::set_difference(all.begin(), all.end(),
-                        _registeredImages.begin(), _registeredImages.end(),
-                        std::inserter(unregistered, unregistered.end()));
-
-    while (_registeredImages.size() != _mImages.size()) {
-        // TODO
-
+    while (_mDoneViews.size() != _mImages.size()) {
         // Find all 2D-3D correspondences between unregistered images and current point cloud
         std::map<ImageID, Image2D3DMatch> matches2D3D;
-        for (auto id : unregistered) {
+        for (const auto& image : _mImages) {
+            auto id = image.id;
+            if (_mDoneViews.contains(id)) {
+                continue; // skip done views
+            }
+
             matches2D3D[id] = SFMUtilities::find2D3DMatches(id,
                                           _mImageFeatures.at(id),
                                           _mFeatureMatchMatrix,
@@ -204,7 +206,7 @@ void SceneReconstruction::registerImages() {
 
 bool SceneReconstruction::adjustBundle() {
     BundleAdjustmentUtilities::adjustBundle(_pointCloud,
-                                            _registeredImages,
+                                            _mGoodViews,
                                             _mCameraPoses,
                                             _mCameras,
                                             _mImageFeatures);

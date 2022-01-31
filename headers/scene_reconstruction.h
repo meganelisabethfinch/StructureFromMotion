@@ -27,6 +27,8 @@ private:
 
     void initialise(std::vector<ImagePair> baselines);
 
+    void registerImage(ImageID imageId, Image2D3DMatch& match2D3D);
+
 public:
     SceneReconstruction(std::vector<Image>& mImages,
                         std::vector<Camera>& mCameras,
@@ -38,6 +40,8 @@ public:
                         std::vector<Features> &mImageFeatures,
                         Matches &mFeatureMatchMatrix,
                         ImagePair& baselinePair);
+
+    void registerImages();
 
     bool registerImage(ImageID imageId);
 

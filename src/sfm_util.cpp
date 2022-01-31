@@ -190,6 +190,7 @@ SFMUtilities::find2D3DMatches(ImageID imageId,
 {
     Image2D3DMatch match2D3D;
 
+    // Scan all 3D points in point cloud
     for (const Point3DInMap& cloudPoint : pointCloud) {
         bool found2DPoint = false;
 

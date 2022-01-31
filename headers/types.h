@@ -27,6 +27,11 @@ typedef cv::Matx<double, 1, 6> PoseVector;
 struct Image2D3DMatch {
     std::vector<cv::Point2d> points2D;
     std::vector<cv::Point3d> points3D;
+
+    [[nodiscard]] size_t size() const {
+        return points2D.size();
+    }
 };
+
 
 #endif //SFM_TYPES_H

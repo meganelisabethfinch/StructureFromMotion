@@ -2,6 +2,8 @@
 // Created by Megan Finch on 28/12/2021.
 //
 
+#include <algorithm>
+
 #include <headers/scene_reconstruction.h>
 #include <headers/pose.h>
 #include <headers/ba_util.h>
@@ -33,6 +35,8 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
     transform(imagePairsByHomographyInliers.begin(), imagePairsByHomographyInliers.end(), back_inserter(orderedImagePairs), get_second() );
 
     initialise(orderedImagePairs);
+
+    registerImages();
 }
 
 SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
@@ -97,7 +101,6 @@ void SceneReconstruction::initialise(std::vector<ImagePair> baselines) {
     }
 }
 
-
 bool SceneReconstruction::registerImage(ImageID imageId) {
     std::cout << "--------- Register Image " << imageId << " ---------" << std::endl;
     if (_registeredImages.contains(imageId)) {
@@ -151,6 +154,52 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
         std::cout << e.what() << std::endl;
         return false;
     }
+}
+
+void SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D3D) {
+    // TODO: refactor to remove redundant code
+}
+
+void SceneReconstruction::registerImages() {
+    std::cout << "-------- Adding more views ---------" << std::endl;
+
+    std::set<ImageID> all;
+    for (const auto& image : _mImages) {
+        all.insert(image.id);
+    }
+
+    std::set<ImageID> unregistered;
+    std::set_difference(all.begin(), all.end(),
+                        _registeredImages.begin(), _registeredImages.end(),
+                        std::inserter(unregistered, unregistered.end()));
+
+    while (_registeredImages.size() != _mImages.size()) {
+        // TODO
+
+        // Find all 2D-3D correspondences between unregistered images and current point cloud
+        std::map<ImageID, Image2D3DMatch> matches2D3D;
+        for (auto id : unregistered) {
+            matches2D3D[id] = SFMUtilities::find2D3DMatches(id,
+                                          _mImageFeatures.at(id),
+                                          _mFeatureMatchMatrix,
+                                          _pointCloud);
+        }
+
+        // Get view with highest number of correspondences
+        ImageID bestView;
+        size_t bestCount = 0;
+        for (const auto& match2D3D : matches2D3D) {
+            const size_t count = match2D3D.second.size();
+            if (count > bestCount) {
+                bestView = match2D3D.first;
+                bestCount = count;
+            }
+        }
+
+        // register best view
+        registerImage(bestView, matches2D3D.at(bestView));
+    }
+
 }
 
 bool SceneReconstruction::adjustBundle() {
@@ -230,4 +279,5 @@ void SceneReconstruction::toPlyFile(std::string filename) {
     }
 
 }
+
 

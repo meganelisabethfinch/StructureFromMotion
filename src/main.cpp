@@ -38,8 +38,8 @@ int main(int argc, char** argv) {
         auto recon = images.toSceneReconstruction(*args.baselinePair);
         recon.toPlyFile("point_cloud.ply");
     } else {
-        auto ip = ImagePair(0,1);
-        auto recon = images.toSceneReconstruction(ip);
+        // auto ip = ImagePair(0,1);
+        auto recon = images.toSceneReconstruction();
         recon.toPlyFile("point_cloud.ply");
     }
 

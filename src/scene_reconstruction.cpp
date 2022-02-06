@@ -94,7 +94,7 @@ void SceneReconstruction::initialise(std::vector<ImagePair> baselines) {
             _mGoodViews.insert(i);
             _mGoodViews.insert(j);
 
-            // TODO: adjustBundle();
+            adjustBundle();
             break;
         } catch (std::runtime_error &e) {
             std::cerr << "Stereo view could not be obtained from (" << i << "," << j << "): " << e.what() << std::flush;
@@ -156,7 +156,7 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
         }
 
         if (anyViewSuccess) {
-            // TODO: adjustBundle();
+            adjustBundle();
         }
         _mGoodViews.insert(imageId);
 

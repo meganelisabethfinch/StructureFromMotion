@@ -269,7 +269,7 @@ SFMUtilities::SortViewsForBaseline(std::vector<Features> &mImageFeatures, Matche
     // Pairs with too few points are last.
 
     std::map<double, ImagePair> sortedPairs;
-    size_t numImages = mImageFeatures.size();
+    const size_t numImages = mImageFeatures.size();
     for (size_t i = 0; i < numImages - 1; i++) {
         for (size_t j = i + 1; j < numImages; j++) {
             auto ip = ImagePair(i,j);
@@ -281,6 +281,7 @@ SFMUtilities::SortViewsForBaseline(std::vector<Features> &mImageFeatures, Matche
 
             // Find ratio of homography inliers
             const int numInliers = SFMUtilities::CountHomographyInliers(mImageFeatures[i], mImageFeatures[j], matching2);
+
             const double inliersRatio = ((double) numInliers) / ((double)matching2.size());
             sortedPairs.emplace(inliersRatio, ImagePair( i, j ));
         }

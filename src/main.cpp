@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     } else {
         // TODO: ultimately, this branch should use homography ordering
         auto ip = ImagePair(0,1);
-        auto recon = images.toSceneReconstruction(ip);
+        auto recon = images.toSceneReconstruction();
         recon.toPlyFile("point_cloud.ply");
     }
 

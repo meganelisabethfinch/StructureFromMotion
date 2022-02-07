@@ -94,7 +94,7 @@ void SceneReconstruction::initialise(std::vector<ImagePair> baselines) {
             _mGoodViews.insert(i);
             _mGoodViews.insert(j);
 
-            adjustBundle();
+            // adjustBundle();
             break;
         } catch (std::runtime_error &e) {
             std::cerr << "Stereo view could not be obtained from (" << i << "," << j << "): " << e.what() << std::flush;
@@ -108,6 +108,7 @@ bool SceneReconstruction::registerImage(ImageID imageId) {
     Image2D3DMatch match2D3D = SFMUtilities::find2D3DMatches(imageId, _mImageFeatures[imageId], _mFeatureMatchMatrix, _pointCloud);
 
     registerImage(imageId, match2D3D);
+    return true;
 }
 
 bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D3D) {
@@ -156,7 +157,7 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
         }
 
         if (anyViewSuccess) {
-            adjustBundle();
+            // adjustBundle();
         }
         _mGoodViews.insert(imageId);
 

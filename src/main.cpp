@@ -36,12 +36,12 @@ int main(int argc, char** argv) {
     std::cout << "---- Find Baseline Triangulator ---" << std::endl;
     if (args.baselinePair != nullptr) {
         auto recon = images.toSceneReconstruction(*args.baselinePair);
-        recon.toPlyFile("point_cloud.ply");
+        recon.toPlyFile("point_cloud.ply", "_cameras.ply");
     } else {
         // TODO: ultimately, this branch should use homography ordering
         auto ip = ImagePair(0,1);
         auto recon = images.toSceneReconstruction(ip);
-        recon.toPlyFile("point_cloud.ply");
+        recon.toPlyFile("point_cloud.ply", "_cameras.ply");
     }
 
     return 0;

@@ -54,8 +54,8 @@ public:
 
     bool adjustBundle();
 
-    void toColmapFile(std::string filename);
+    void toColmapFile(const std::string& filename);
 
-    void toPlyFile(std::string filename);
+    void toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile);
 };
 #endif //SFM_SCENE_RECONSTRUCTION_H

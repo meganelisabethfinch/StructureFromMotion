@@ -218,14 +218,14 @@ bool SceneReconstruction::adjustBundle() {
     return true;
 }
 
-void SceneReconstruction::toColmapFile(std::string filename) {
+void SceneReconstruction::toColmapFile(const std::string& filename) {
     // TODO
 }
 
-void SceneReconstruction::toPlyFile(std::string filename) {
+void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile) {
     std::cout << "Converting point cloud to .PLY file." << std::endl;
 
-    std::ofstream file (filename);
+    std::ofstream file (pointCloudFile);
     file << "ply" << std::endl;
     file << "format ascii 1.0" << std::endl;
     file << "element vertex " << _pointCloud.size() << std::endl;
@@ -255,7 +255,7 @@ void SceneReconstruction::toPlyFile(std::string filename) {
     file.close();
 
     // Save camera polygons
-    std::ofstream cameras_file("_cameras.ply");
+    std::ofstream cameras_file(cameraFile);
     cameras_file
         << "ply" << std::endl
         << "format ascii 1.0" << std::endl

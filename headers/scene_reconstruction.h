@@ -6,6 +6,9 @@
 #define SFM_SCENE_RECONSTRUCTION_H
 
 #include <set>
+#include <headers/triangulation/triangulator.h>
+#include <headers/bundle-adjustment/bundle_adjuster.h>
+
 #include "image.h"
 #include "features.h"
 #include "camera.h"
@@ -25,6 +28,9 @@ private:
     std::vector<Camera>& _mCameras;
     std::vector<Features>& _mImageFeatures;
     Matches& _mFeatureMatchMatrix;
+
+    cv::Ptr<Triangulator> triangulator;
+    cv::Ptr<BundleAdjuster> bundleAdjuster;
 
     void initialise(std::vector<ImagePair> baselines);
 

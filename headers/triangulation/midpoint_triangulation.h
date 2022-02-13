@@ -1,0 +1,8 @@
+//
+// Created by Megan Finch on 13/02/2022.
+//
+
+#ifndef SFM_MIDPOINT_TRIANGULATION_H
+#define SFM_MIDPOINT_TRIANGULATION_H
+
+#endif //SFM_MIDPOINT_TRIANGULATION_H

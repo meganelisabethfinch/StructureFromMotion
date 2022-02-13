@@ -33,14 +33,14 @@ int main(int argc, char** argv) {
     auto graph = images.toSceneGraph();
     graph.toDotFile("scene_graph.dot");
 
-    std::cout << "---- Find Baseline Triangulation ---" << std::endl;
+    std::cout << "---- Find Baseline Triangulator ---" << std::endl;
     if (args.baselinePair != nullptr) {
         auto recon = images.toSceneReconstruction(*args.baselinePair);
         recon.toPlyFile("point_cloud.ply");
     } else {
         // TODO: ultimately, this branch should use homography ordering
         auto ip = ImagePair(0,1);
-        auto recon = images.toSceneReconstruction();
+        auto recon = images.toSceneReconstruction(ip);
         recon.toPlyFile("point_cloud.ply");
     }
 

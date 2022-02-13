@@ -9,6 +9,7 @@
 #include <set>
 #include "types.h"
 #include "matches.h"
+#include "constants.h"
 
 struct Point3DInMap {
     cv::Point3d pt;
@@ -42,7 +43,11 @@ public:
 
     void updatePoint(size_t i, double x, double y, double z);
 
-    void mergePoints(PointCloud& pc, Matches& matches); // Merge an existing point cloud into this one
+    void mergePoints(PointCloud& pc,
+                     Matches& matches,
+                     double mergePointDistance = MERGE_CLOUD_POINT_MIN_MATCH_DISTANCE,
+                     double mergeFeatureDistance = MERGE_CLOUD_FEATURE_MIN_MATCH_DISTANCE);
+    // Merge an existing point cloud into this one
 
     Point3DInMap operator[](size_t i);
     std::vector<Point3DInMap>::iterator begin();

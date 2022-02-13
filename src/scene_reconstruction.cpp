@@ -156,10 +156,13 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
             }
         }
 
-        if (anyViewSuccess) {
-            // adjustBundle();
-        }
+        // TODO: review
         _mGoodViews.insert(imageId);
+
+        if (anyViewSuccess) {
+            adjustBundle();
+        }
+        // TODO: end review
 
         return true;
     } catch (std::runtime_error &e) {

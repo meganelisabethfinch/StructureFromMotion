@@ -36,7 +36,7 @@ void PointCloud::updatePoint(size_t i, double x, double y, double z) {
     mReconstructionCloud[i].pt.z = z;
 }
 
-void PointCloud::mergePoints(PointCloud &pc, Matches& matches) {
+void PointCloud::mergePoints(PointCloud &pc, Matches& matches, double mergePointDistance, double mergeFeatureDistance) {
     MatchMatrix mergeMatchMatrix;
     mergeMatchMatrix.resize(matches.size(), std::vector<Matching2>(matches.size()));
 
@@ -48,7 +48,7 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches) {
         bool foundMatching3DPoint = false;
 
         for (Point3DInMap& existingPoint : mReconstructionCloud) {
-            if (cv::norm(existingPoint.pt - newPoint.pt) < MERGE_CLOUD_POINT_MIN_MATCH_DISTANCE) {
+            if (cv::norm(existingPoint.pt - newPoint.pt) < mergePointDistance) {
                 // New point is very close to an existing 3D cloud point
                 foundMatching3DPoint = true;
 
@@ -67,7 +67,7 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches) {
                         for (const cv::DMatch& m : matching) {
                             if (m.queryIdx == queryFeatureIndex
                                 and m.trainIdx == trainFeatureIndex
-                                and m.distance < MERGE_CLOUD_FEATURE_MIN_MATCH_DISTANCE)
+                                and m.distance < mergeFeatureDistance)
                             {
                                 mergeMatchMatrix[ip.left][ip.right].push_back(m);
 

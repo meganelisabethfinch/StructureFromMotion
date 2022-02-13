@@ -11,10 +11,12 @@ struct Args {
     std::string inputImageDir;
     std::string outputDir;
 
-    ImagePair* baselinePair;
+    bool useHomographyOrdering;
+    ImagePair baselinePair = ImagePair(0,1);
 
     DetectorType detectorType;
     MatcherType matcherType;
+    TriangulatorType triangulatorType;
 };
 
 #endif //SFM_CLI_ARGS_H

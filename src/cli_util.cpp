@@ -10,6 +10,12 @@
 #include <iostream>
 
 bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
+    // Set defaults before parsing
+    args.useHomographyOrdering = DEFAULT_USE_HOMOGRAPHY_ORDERING;
+    args.detectorType = DEFAULT_DETECTOR;
+    args.matcherType = DEFAULT_MATCHER;
+    args.triangulatorType = DEFAULT_TRIANGULATOR;
+
     // Parse arguments
     int opt;
     std::vector<ImageID> baselines;
@@ -43,14 +49,10 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
         }
     }
 
-    // Set defaults for optional arguments
-    args.detectorType = DEFAULT_DETECTOR;
-    args.matcherType = DEFAULT_MATCHER;
-
     if (baselines.empty()) {
-        // Do nothing
+        // Do nothing / use default
     } else if (baselines.size() == 2) {
-        ImagePair pair = ImagePair(baselines.at(0), baselines.at(1));
+        args.baselinePair = ImagePair(baselines.at(0), baselines.at(1));
     } else {
         std::cerr << "Invalid number of baselines defined: " << baselines.size() << std::endl;
         return false;

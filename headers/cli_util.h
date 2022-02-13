@@ -9,6 +9,7 @@
 #include "cli_args.h"
 
 #include <opencv2/features2d.hpp>
+#include <headers/triangulation/triangulator.h>
 
 class CLIUtilities {
 public:
@@ -25,6 +26,10 @@ public:
 
     static cv::Ptr<cv::DescriptorMatcher> CreateMatcher(MatcherType type) {
         return cv::DescriptorMatcher::create(type);
+    }
+
+    static cv::Ptr<Triangulator> CreateTriangulator(TriangulatorType type) {
+        return Triangulator::create(type);
     }
 };
 

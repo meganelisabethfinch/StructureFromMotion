@@ -13,6 +13,7 @@ typedef size_t ImageID;
 
 enum class DetectorType { SIFT, ORB };
 typedef cv::DescriptorMatcher::MatcherType MatcherType;
+enum class TriangulatorType { LINEAR, MIDPOINT };
 enum DebugLevel { SIMPLE, VERBOSE };
 enum VisualDebugLevel { NONE, SHOW_EXAMPLES };
 

@@ -16,6 +16,10 @@ public:
             Features& features1, Features& features2,
             Matching2& matching,
             Pose& pose1, Pose& pose2) = 0;
+
+    virtual ~Triangulator() = default;
+
+    static cv::Ptr<Triangulator> create(const TriangulatorType& type);
 };
 
 #endif //SFM_TRIANGULATION_UTIL_H

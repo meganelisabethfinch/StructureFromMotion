@@ -89,8 +89,9 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
     cv::waitKey(0);
 }
 
-SceneReconstruction ImageCollection::toSceneReconstruction(ImagePair& imagePair) {
-    auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix, imagePair);
+SceneReconstruction ImageCollection::toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator, ImagePair& imagePair) {
+    std::cout << "Init pair: " << imagePair.left << " and " << imagePair.right << std::endl;
+    auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix, imagePair, triangulator);
 
     for (ImageID i = 0; i < mImages.size(); i++) {
         recon.registerImage(i);
@@ -99,8 +100,8 @@ SceneReconstruction ImageCollection::toSceneReconstruction(ImagePair& imagePair)
     return recon;
 }
 
-SceneReconstruction ImageCollection::toSceneReconstruction() {
-    auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix);
+SceneReconstruction ImageCollection::toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator) {
+    auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix, triangulator);
 
     recon.registerMoreImages();
 

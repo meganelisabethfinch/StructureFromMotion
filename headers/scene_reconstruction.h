@@ -29,8 +29,8 @@ private:
     std::vector<Features>& _mImageFeatures;
     Matches& _mFeatureMatchMatrix;
 
-    cv::Ptr<Triangulator> triangulator;
-    cv::Ptr<BundleAdjuster> bundleAdjuster;
+    cv::Ptr<Triangulator> _triangulator;
+    cv::Ptr<BundleAdjuster> _bundleAdjuster;
 
     void initialise(std::vector<ImagePair> baselines);
 
@@ -40,13 +40,15 @@ public:
     SceneReconstruction(std::vector<Image>& mImages,
                         std::vector<Camera>& mCameras,
                         std::vector<Features>& mImageFeatures,
-                        Matches& mFeatureMatchMatrix);
+                        Matches& mFeatureMatchMatrix,
+                        const cv::Ptr<Triangulator>& triangulator);
 
     SceneReconstruction(std::vector<Image> &mImages,
                         std::vector<Camera> &mCameras,
                         std::vector<Features> &mImageFeatures,
                         Matches &mFeatureMatchMatrix,
-                        ImagePair& baselinePair);
+                        ImagePair& baselinePair,
+                        const cv::Ptr<Triangulator>& triangulator);
 
     void registerMoreImages();
 

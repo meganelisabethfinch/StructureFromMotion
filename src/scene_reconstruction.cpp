@@ -9,6 +9,7 @@
 #include <headers/ba_util.h>
 #include <headers/constants.h>
 #include <fstream>
+#include <utility>
 
 #include <headers/sfm_util.h>
 #include <headers/image_pair.h>
@@ -26,8 +27,9 @@ struct get_second : public std::unary_function<SortedImageMap::value_type, std::
 SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Camera> &mCameras,
                                          std::vector<Features> &mImageFeatures,
-                                         Matches &mFeatureMatchMatrix)
-        : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix)
+                                         Matches &mFeatureMatchMatrix,
+                                         const cv::Ptr<Triangulator>& triangulator)
+        : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix), _triangulator(triangulator)
 {
     std::map<double, ImagePair> imagePairsByHomographyInliers = SFMUtilities::SortViewsForBaseline(_mImageFeatures, _mFeatureMatchMatrix);
 
@@ -41,10 +43,12 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Camera> &mCameras,
                                          std::vector<Features> &mImageFeatures,
                                          Matches &mFeatureMatchMatrix,
-                                         ImagePair& baselinePair)
-                                         : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix)
+                                         ImagePair& baselinePair,
+                                         const cv::Ptr<Triangulator>& triangulator)
+                                         : _mImages(mImages), _mCameras(mCameras),
+                                         _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix),
+                                         _triangulator(triangulator)
 {
-
     std::vector<ImagePair> orderedImagePairs;
     orderedImagePairs.push_back(baselinePair);
 
@@ -75,7 +79,14 @@ void SceneReconstruction::initialise(std::vector<ImagePair> baselines) {
                 throw std::runtime_error("Insufficient pose inliers " + std::to_string(poseInliersRatio));
             }
 
+            /*
             PointCloud pc = SFMUtilities::triangulateViews(i, j,
+                                                           _mCameras.at(i), _mCameras.at(j),
+                                                           _mImageFeatures.at(i), _mImageFeatures.at(j),
+                                                           _mFeatureMatchMatrix.get(pair),
+                                                           posei, posej);
+            */
+            PointCloud pc = _triangulator->triangulateImages(i, j,
                                                            _mCameras.at(i), _mCameras.at(j),
                                                            _mImageFeatures.at(i), _mImageFeatures.at(j),
                                                            _mFeatureMatchMatrix.get(pair),

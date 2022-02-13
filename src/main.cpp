@@ -34,13 +34,12 @@ int main(int argc, char** argv) {
     graph.toDotFile("scene_graph.dot");
 
     std::cout << "---- Find Baseline Triangulator ---" << std::endl;
-    if (args.baselinePair != nullptr) {
-        auto recon = images.toSceneReconstruction(*args.baselinePair);
+    auto triangulator = CLIUtilities::CreateTriangulator(args.triangulatorType);
+    if (args.useHomographyOrdering) {
+        auto recon = images.toSceneReconstruction(triangulator);
         recon.toPlyFile("point_cloud.ply", "_cameras.ply");
     } else {
-        // TODO: ultimately, this branch should use homography ordering
-        auto ip = ImagePair(0,1);
-        auto recon = images.toSceneReconstruction(ip);
+        auto recon = images.toSceneReconstruction(triangulator, args.baselinePair);
         recon.toPlyFile("point_cloud.ply", "_cameras.ply");
     }
 

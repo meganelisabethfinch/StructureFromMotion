@@ -45,14 +45,16 @@ cv::Matx34d Pose::getProjectionMatrix() {
 cv::Matx31d Pose::getRotationVector() const {
     cv::Mat rvec;
     cv::Rodrigues(_mat.get_minor<3,3>(0,0), rvec);
-    cv::Matx31d result(rvec.at<double>(0,0), rvec.at<double>(1,0), rvec.at<double>(2,0));
-    return result;
+    return { rvec };
 }
 
-cv::Matx13d Pose::getTranslationVector() const {
+cv::Matx13d Pose::getTranslationVectorAlt() const {
     cv::Mat tvec(_mat.get_minor<3,1>(0,3).t());
-    cv::Matx13d result(tvec.at<double>(0,0), tvec.at<double>(0,1), tvec.at<double>(0,2));
-    return result;
+    return { tvec };
+}
+
+cv::Matx31d Pose::getTranslationVector() const {
+    return { _mat(0, 3), _mat(1, 3), _mat(2,3) };
 }
 
 PoseVector Pose::toPoseVector() const {
@@ -66,4 +68,10 @@ PoseVector Pose::toPoseVector() const {
             angleAxis[0], angleAxis[1], angleAxis[2],
             t(0), t(1), t(2)
     };
+}
+
+cv::Matx33d Pose::getRotationMatrix() const {
+    return { _mat(0,0), _mat(0,1), _mat(0,2),
+             _mat(1,0), _mat(1,1), _mat(1,2),
+             _mat(2,0), _mat(2,1), _mat(2,2) };
 }

@@ -25,7 +25,12 @@ public:
 
     [[nodiscard]] cv::Matx31d getRotationVector() const;
 
-    [[nodiscard]] cv::Matx13d getTranslationVector() const;
+    cv::Matx33d getRotationMatrix() const;
+
+    // TODO: is this just the same as getTranslationVector()? If so, delete.
+    [[nodiscard]] cv::Matx13d getTranslationVectorAlt() const;
+
+    [[nodiscard]] cv::Matx31d getTranslationVector() const;
 
     [[nodiscard]] PoseVector toPoseVector() const;
 

@@ -154,7 +154,7 @@ void SFMUtilities::getAlignedPointsFromMatch(Features& queryFeatures, Features& 
 std::vector<double>
 SFMUtilities::getReprojectionErrors(const std::vector<cv::Point2d>& points2d, const cv::Mat& points3d, const Camera &camera, const Pose &pose) {
     cv::Matx31d rvec = pose.getRotationVector();
-    auto tvec = pose.getTranslationVector();
+    auto tvec = pose.getTranslationVectorAlt();
 
     // Reproject points
     std::vector<cv::Point2d> reprojectedPoints(points2d.size());

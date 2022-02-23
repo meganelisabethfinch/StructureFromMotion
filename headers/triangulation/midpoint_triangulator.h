@@ -86,10 +86,32 @@ public:
                                  Matching2& matching,
                                  Pose& pose1, Pose& pose2) override
     {
+        // Implements equation 6.14 from MVG in Computer Vision (Hartley & Zisserman)
+        // TODO: test rotation matrix is correct!
+        cv::Matx33d M1 = cam1.getCameraMatrix() * pose1.getRotationMatrix();
+        cv::Matx33d M2 = cam2.getCameraMatrix() * pose2.getRotationMatrix();
+        cv::Matx31d t1 = cam1.getCameraMatrix() * pose1.getTranslationVector();
+        cv::Matx31d t2 = cam1.getCameraMatrix() * pose2.getTranslationVector();
+
         PointCloud pc;
         for (auto& match : matching) {
-            // Set up - derive q1, q2, v1, v2
+            // Get q1, q2 (points on the lines L1 and L2, respectively)
+            cv::Matx31d res = - M1.inv() * t1;
+            cv::Vec4d q1 = { res(0), res(1), res(2), 1 };
+            res = - M2.inv() * t2;
+            cv::Vec4d q2 = { res(0), res(1), res(2), 1 };
 
+            // Get image points
+            cv::Point2d pt1 = features1.getPoint(match.trainIdx);
+            cv::Point2d pt2 = features2.getPoint(match.queryIdx);
+
+            cv::Vec3d pt1_hom = { pt1.x, pt1.y, 1 };
+            res = M1.inv() * pt1_hom;
+            cv::Vec4d v1 = { res(0), res(1), res(2), 0 };
+
+            cv::Vec3d pt2_hom = { pt2.x, pt2.y, 1 };
+            res = M2.inv() * pt2_hom;
+            cv::Vec4d v2 = { res(0) , res(1), res(2), 0 };
             // auto pt = triangulatePoint(q1, q2, v1, v2);
             // Make PointInMap with originating views { img1, img2 }
             // add to point cloud

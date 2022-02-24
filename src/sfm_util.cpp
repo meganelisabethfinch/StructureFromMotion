@@ -52,18 +52,22 @@ Pose SFMUtilities::recoverPoseFrom2D3DMatches(Camera& camera, Image2D3DMatch mat
     cv::Matx31d rvec, tvec;
     cv::Mat inliers;
 
-    cv::solvePnPRansac(matching.points3D,
-                       matching.points2D,
-                       camera.getCameraMatrix(),
-                       camera.getDistortion(),
-                       rvec,
-                       tvec,
-                       false,
-                       100,
-                       (float)RANSAC_THRESHOLD,
-                       0.99,
-                       inliers
-                       );
+    try {
+        cv::solvePnPRansac(matching.points3D,
+                           matching.points2D,
+                           camera.getCameraMatrix(),
+                           camera.getDistortion(),
+                           rvec,
+                           tvec,
+                           false,
+                           100,
+                           (float) RANSAC_THRESHOLD,
+                           0.99,
+                           inliers
+        );
+    } catch (cv::Exception& e) {
+        throw std::runtime_error(e.msg);
+    }
 
     // Check inliers ratio, reject if too small
     double inliersRatio = ((double)cv::countNonZero(inliers)) / ((double)matching.points2D.size());

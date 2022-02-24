@@ -154,7 +154,7 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
                                                                        mask);
                 _mFeatureMatchMatrix.prune(ip, mask);
 
-                auto pc = SFMUtilities::triangulateViews(ip.left, ip.right,
+                auto pc = _triangulator->triangulateImages(ip.left, ip.right,
                                                              _mCameras[ip.left], _mCameras[ip.right],
                                                              _mImageFeatures[ip.left], _mImageFeatures[ip.right],
                                                              _mFeatureMatchMatrix.get(ip),

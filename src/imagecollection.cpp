@@ -92,7 +92,6 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
 SceneReconstruction ImageCollection::toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator,
                                                            const cv::Ptr<BundleAdjuster>& bundleAdjuster,
                                                            ImagePair& imagePair) {
-    std::cout << "Init pair: " << imagePair.left << " and " << imagePair.right << std::endl;
     auto recon = SceneReconstruction(mImages, mCameras, mImageFeatures, mFeatureMatchMatrix, imagePair, triangulator, bundleAdjuster);
 
     for (ImageID i = 0; i < mImages.size(); i++) {

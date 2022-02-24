@@ -121,6 +121,7 @@ public:
             pt3d.pt = pt;
             pt3d.originatingViews.insert({img1, match.trainIdx});
             pt3d.originatingViews.insert({img2, match.queryIdx});
+            pc.addPoint(pt3d);
         }
         return pc;
     }

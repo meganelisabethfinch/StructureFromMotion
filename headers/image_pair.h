@@ -20,6 +20,16 @@ struct ImagePair {
             right = id1;
         }
     }
+
+    // TODO: override << for this class
+    // friend std::ostream& operator<<(std::ostream& os, ImagePair const& ip);
 };
+
+/*
+std::ostream &operator<<(std::ostream &os, const ImagePair &ip) {
+    os << "(" << ip.left << "," << ip.right << ")";
+    return os;
+}
+*/
 
 #endif //SFM_IMAGE_PAIR_H

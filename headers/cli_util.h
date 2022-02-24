@@ -16,6 +16,8 @@ class CLIUtilities {
 public:
     static bool ParseInputs(int argc, char** argv, Args& args);
 
+    static void Summary(const Args& args);
+
     static cv::Ptr<cv::FeatureDetector> CreateDetector(DetectorType type) {
         switch(type) {
             case DetectorType::SIFT:

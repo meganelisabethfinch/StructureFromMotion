@@ -90,3 +90,18 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     return true;
 }
 
+void CLIUtilities::Summary(const Args& args) {
+    // TODO: can we print names, not numbers please?
+    std::cout << "--------- Summary of Inputs ---------" << std::endl;
+    std::cout << "Detector type: " << static_cast<std::underlying_type<DetectorType>::type>(args.detectorType) << std::endl;
+    std::cout << "Matcher type: " << args.matcherType << std::endl;
+    std::cout << "Triangulator type: " << static_cast<std::underlying_type<TriangulatorType>::type>(args.triangulatorType) << std::endl;
+    std::cout << "BA type: " << static_cast<std::underlying_type<BundleAdjusterType>::type>(args.bundleAdjusterType) << std::endl;
+
+    if (args.useHomographyOrdering) {
+        std::cout << "Baseline: based on homography inlier ordering." << std::endl;
+    } else {
+        std::cout << "Baseline: (" << args.baselinePair.left << ", " << args.baselinePair.right << ")" << std::endl;
+    }
+}
+

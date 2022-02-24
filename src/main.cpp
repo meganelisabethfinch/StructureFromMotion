@@ -5,13 +5,16 @@
 #include <iostream>
 
 int main(int argc, char** argv) {
-    std::cout << "----------- Open Images ------------" << std::endl;
+    std::cout << "----------- Parse Inputs ------------" << std::endl;
     Args args;
 
     if (not CLIUtilities::ParseInputs(argc, argv, args)) {
         return -1;
     }
 
+    CLIUtilities::Summary(args);
+
+    std::cout << "----------- Open Images ------------" << std::endl;
     ImageCollection images(args.inputImageDir);
 
     std::cout << "--------- Extract Features ---------" << std::endl;

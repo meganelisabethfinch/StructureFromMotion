@@ -5,9 +5,9 @@
 #ifndef SFM_BUNDLE_ADJUSTER_H
 #define SFM_BUNDLE_ADJUSTER_H
 
-#include "./headers/point_cloud.h"
-#include "./headers/pose.h"
-#include "./headers/camera.h"
+#include "../point_cloud.h"
+#include "../pose.h"
+#include "../camera.h"
 
 class BundleAdjuster {
 public:

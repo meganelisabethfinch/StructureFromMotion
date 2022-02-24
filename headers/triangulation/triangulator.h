@@ -5,9 +5,9 @@
 #ifndef SFM_TRIANGULATION_UTIL_H
 #define SFM_TRIANGULATION_UTIL_H
 
-#include "./headers/point_cloud.h"
-#include "./headers/pose.h"
-#include "./headers/camera.h"
+#include "../point_cloud.h"
+#include "../pose.h"
+#include "../camera.h"
 
 class Triangulator {
 public:

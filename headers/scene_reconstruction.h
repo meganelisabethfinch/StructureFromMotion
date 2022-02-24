@@ -6,8 +6,8 @@
 #define SFM_SCENE_RECONSTRUCTION_H
 
 #include <set>
-#include <headers/triangulation/triangulator.h>
-#include <headers/bundle-adjustment/bundle_adjuster.h>
+#include "triangulation/triangulator.h"
+#include "bundle-adjustment/bundle_adjuster.h"
 
 #include "image.h"
 #include "features.h"

@@ -10,6 +10,7 @@
 
 #include <opencv2/features2d.hpp>
 #include <headers/triangulation/triangulator.h>
+#include <headers/bundle-adjustment/bundle_adjuster.h>
 
 class CLIUtilities {
 public:
@@ -30,6 +31,10 @@ public:
 
     static cv::Ptr<Triangulator> CreateTriangulator(TriangulatorType type) {
         return Triangulator::create(type);
+    }
+
+    static cv::Ptr<BundleAdjuster> CreateBundleAdjuster(BundleAdjusterType type) {
+        return BundleAdjuster::create(type);
     }
 };
 

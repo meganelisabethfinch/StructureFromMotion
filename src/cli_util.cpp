@@ -15,12 +15,13 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     args.detectorType = DEFAULT_DETECTOR;
     args.matcherType = DEFAULT_MATCHER;
     args.triangulatorType = DEFAULT_TRIANGULATOR;
+    args.bundleAdjusterType = DEFAULT_BUNDLE_ADJUSTER;
 
     // Parse arguments
     int opt;
     std::vector<ImageID> baselines;
 
-    while ((opt = getopt(argc, argv, "i:o:b:t:")) != -1) {
+    while ((opt = getopt(argc, argv, "i:o:b:t:a:")) != -1) {
         switch (opt) {
             case 'i': {
                 args.inputImageDir = optarg;
@@ -51,6 +52,19 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
                     args.triangulatorType = str2triangulator.at(optarg);
                 } else {
                     std::cerr << "Unrecognised triangulator type: " << optarg << ". Using default type." << std::endl;
+                }
+                break;
+            }
+            case 'a': {
+                static std::map<std::string, BundleAdjusterType> const str2ba = {
+                        {"OFF", BundleAdjusterType::OFF },
+                        {"BASIC", BundleAdjusterType::BASIC},
+                        {"ZHANG", BundleAdjusterType::ZHANG}
+                };
+                if (str2ba.contains(optarg)) {
+                    args.bundleAdjusterType = str2ba.at(optarg);
+                } else {
+                    std::cerr << "Unrecognised bundle adjuster type: " << optarg << ". Using default type." << std::endl;
                 }
                 break;
             }

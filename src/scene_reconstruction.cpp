@@ -28,8 +28,9 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Camera> &mCameras,
                                          std::vector<Features> &mImageFeatures,
                                          Matches &mFeatureMatchMatrix,
-                                         const cv::Ptr<Triangulator>& triangulator)
-        : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix), _triangulator(triangulator)
+                                         const cv::Ptr<Triangulator>& triangulator,
+                                         const cv::Ptr<BundleAdjuster>& bundleAdjuster)
+        : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix), _triangulator(triangulator), _bundleAdjuster(bundleAdjuster)
 {
     std::map<double, ImagePair> imagePairsByHomographyInliers = SFMUtilities::SortViewsForBaseline(_mImageFeatures, _mFeatureMatchMatrix);
 
@@ -44,10 +45,11 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Features> &mImageFeatures,
                                          Matches &mFeatureMatchMatrix,
                                          ImagePair& baselinePair,
-                                         const cv::Ptr<Triangulator>& triangulator)
+                                         const cv::Ptr<Triangulator>& triangulator,
+                                         const cv::Ptr<BundleAdjuster>& bundleAdjuster)
                                          : _mImages(mImages), _mCameras(mCameras),
                                          _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix),
-                                         _triangulator(triangulator)
+                                         _triangulator(triangulator), _bundleAdjuster(bundleAdjuster)
 {
     std::vector<ImagePair> orderedImagePairs;
     orderedImagePairs.push_back(baselinePair);
@@ -186,7 +188,6 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
 void SceneReconstruction::registerMoreImages() {
     std::cout << "-------- Adding more views ---------" << std::endl;
 
-
     while (_mDoneViews.size() != _mImages.size()) {
         // Find all 2D-3D correspondences between unregistered images and current point cloud
         std::map<ImageID, Image2D3DMatch> matches2D3D;
@@ -220,12 +221,11 @@ void SceneReconstruction::registerMoreImages() {
 }
 
 bool SceneReconstruction::adjustBundle() {
-    BundleAdjustmentUtilities::adjustBundle(_pointCloud,
-                                            _mGoodViews,
-                                            _mCameraPoses,
-                                            _mCameras,
-                                            _mImageFeatures);
-
+    _bundleAdjuster->adjustBundle(_pointCloud,
+        _mGoodViews,
+       _mCameraPoses,
+       _mCameras,
+       _mImageFeatures);
     return true;
 }
 

@@ -32,6 +32,7 @@ const int POINTS_NEEDED_FUNDAMENTAL_MATRIX = 7;
 const DetectorType DEFAULT_DETECTOR = DetectorType::SIFT;
 const MatcherType DEFAULT_MATCHER = MatcherType::FLANNBASED;
 const TriangulatorType DEFAULT_TRIANGULATOR = TriangulatorType::LINEAR;
+const BundleAdjusterType DEFAULT_BUNDLE_ADJUSTER = BundleAdjusterType::BASIC;
 const bool DEFAULT_USE_HOMOGRAPHY_ORDERING = false;
 
 const DebugLevel DEFAULT_DEBUG = DebugLevel::SIMPLE;

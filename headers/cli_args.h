@@ -17,6 +17,7 @@ struct Args {
     DetectorType detectorType;
     MatcherType matcherType;
     TriangulatorType triangulatorType;
+    BundleAdjusterType bundleAdjusterType;
 };
 
 #endif //SFM_CLI_ARGS_H

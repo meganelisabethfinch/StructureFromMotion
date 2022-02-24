@@ -40,9 +40,12 @@ public:
 
     void visualiseMatches(ImageID i, ImageID j);
 
-    SceneReconstruction toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator, ImagePair& imagePair);
+    SceneReconstruction toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator,
+                                              const cv::Ptr<BundleAdjuster>& bundleAdjuster,
+                                              ImagePair& imagePair);
 
-    SceneReconstruction toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator);
+    SceneReconstruction toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator,
+                                              const cv::Ptr<BundleAdjuster>& bundleAdjuster);
 
     SceneGraph toSceneGraph();
 };

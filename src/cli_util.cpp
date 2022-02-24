@@ -20,7 +20,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     int opt;
     std::vector<ImageID> baselines;
 
-    while ((opt = getopt(argc, argv, "i:o:b:")) != -1) {
+    while ((opt = getopt(argc, argv, "i:o:b:t:")) != -1) {
         switch (opt) {
             case 'i': {
                 args.inputImageDir = optarg;
@@ -40,6 +40,18 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
                 }
 
                 baselines.push_back(x);
+                break;
+            }
+            case 't': {
+                static std::map<std::string, TriangulatorType> const str2triangulator = {
+                        {"LINEAR",  TriangulatorType::LINEAR },
+                        {"MIDPOINT",TriangulatorType::MIDPOINT }
+                };
+                if (str2triangulator.contains(optarg)) {
+                    args.triangulatorType = str2triangulator.at(optarg);
+                } else {
+                    std::cerr << "Unrecognised triangulator type: " << optarg << ". Using default type." << std::endl;
+                }
                 break;
             }
             default: {

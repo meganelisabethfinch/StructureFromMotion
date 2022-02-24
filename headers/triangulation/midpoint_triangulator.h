@@ -95,7 +95,6 @@ public:
         cv::Matx31d t1 = cam1.getCameraMatrix() * pose1.getTranslationVector();
         cv::Matx31d t2 = cam1.getCameraMatrix() * pose2.getTranslationVector();
 
-        PointCloud pc;
         for (auto& match : matching) {
             // Get q1, q2 (points on the lines L1 and L2, respectively)
             cv::Matx31d res = - M1.inv() * t1;

@@ -21,7 +21,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     int opt;
     std::vector<ImageID> baselines;
 
-    while ((opt = getopt(argc, argv, "i:o:b:t:a:")) != -1) {
+    while ((opt = getopt(argc, argv, "i:o:b:t:a:d:")) != -1) {
         switch (opt) {
             case 'i': {
                 args.inputImageDir = optarg;
@@ -65,6 +65,18 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
                     args.bundleAdjusterType = str2ba.at(optarg);
                 } else {
                     std::cerr << "Unrecognised bundle adjuster type: " << optarg << ". Using default type." << std::endl;
+                }
+                break;
+            }
+            case 'd': {
+                static std::map<std::string, DetectorType> const str2det = {
+                        { "SIFT", DetectorType::SIFT },
+                        { "ORB", DetectorType::ORB }
+                };
+                if (str2det.contains(optarg)) {
+                    args.detectorType = str2det.at(optarg);
+                } else {
+                    std::cerr << "Unrecognised feature detector type: " << optarg << ". Using default type." << std::endl;
                 }
                 break;
             }

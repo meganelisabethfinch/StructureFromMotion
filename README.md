@@ -1,5 +1,7 @@
 # :japanese_castle: Structure From Motion
 
+❗**Disclaimer:** midpoint triangulation and all types of bundle adjustment are still a work in progress. Don't expect these methods to work yet!
+
 ## :keyboard: Command Line Interface
 ### Mandatory Arguments
 * `-i "/path/to/input/directory"`

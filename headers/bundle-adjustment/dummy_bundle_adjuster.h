@@ -9,11 +9,7 @@
 
 // Because sometimes less is more
 class DummyBundleAdjuster : public BundleAdjuster {
-    void adjustBundle(PointCloud& pointCloud,
-                              const std::set<ImageID>& registeredImages,
-                              std::map<ImageID, Pose>& cameraPoses,
-                              std::vector<Camera>& cameras,
-                              std::vector<Features>& features) override
+    void adjustBundle(Bundle bundle) override
     {
         // Do literally nothing.
     };

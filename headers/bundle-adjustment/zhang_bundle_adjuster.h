@@ -8,11 +8,7 @@
 #include "bundle_adjuster.h"
 
 class ZhangBundleAdjuster : public BundleAdjuster {
-    void adjustBundle(PointCloud& pointCloud,
-                              const std::set<ImageID>& registeredImages,
-                              std::map<ImageID, Pose>& cameraPoses,
-                              std::vector<Camera>& cameras,
-                              std::vector<Features>& features) override
+    void adjustBundle(Bundle bundle) override
     {
         // TODO: implement Zhang RBA (2006).
     };

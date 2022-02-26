@@ -5,17 +5,14 @@
 #ifndef SFM_BUNDLE_ADJUSTER_H
 #define SFM_BUNDLE_ADJUSTER_H
 
+#include <headers/bundle.h>
 #include "../point_cloud.h"
 #include "../pose.h"
 #include "../camera.h"
 
 class BundleAdjuster {
 public:
-    virtual void adjustBundle(PointCloud& pointCloud,
-            const std::set<ImageID>& registeredImages,
-            std::map<ImageID, Pose>& cameraPoses,
-            std::vector<Camera>& cameras,
-            std::vector<Features>& features) = 0;
+    virtual void adjustBundle(Bundle bundle) = 0;
 
     static cv::Ptr<BundleAdjuster> create(const BundleAdjusterType& type);
 };

@@ -169,7 +169,7 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
             }
         }
 
-        // TODO: review
+        // TODO: review -- do we need both goodViews and doneViews?
         _mGoodViews.insert(imageId);
 
         if (anyViewSuccess) {
@@ -221,11 +221,12 @@ void SceneReconstruction::registerMoreImages() {
 }
 
 bool SceneReconstruction::adjustBundle() {
-    _bundleAdjuster->adjustBundle(_pointCloud,
-        _mGoodViews,
-       _mCameraPoses,
-       _mCameras,
-       _mImageFeatures);
+    Bundle bundle(_pointCloud,
+                  _mGoodViews,
+                  _mCameraPoses,
+                  _mCameras,
+                  _mImageFeatures);
+    _bundleAdjuster->adjustBundle(bundle);
     return true;
 }
 

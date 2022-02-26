@@ -23,35 +23,31 @@ namespace BundleAdjustUtils {
 using namespace BundleAdjustUtils;
 
 class BasicBundleAdjuster : public BundleAdjuster {
-    void adjustBundle(PointCloud& pointCloud,
-                              const std::set<ImageID>& registeredImages,
-                              std::map<ImageID, Pose>& cameraPoses,
-                              std::vector<Camera>& cameras,
-                              std::vector<Features>& features) override
+    void adjustBundle(Bundle bundle) override
     {
         std::call_once(initLoggingFlag, initLogging);
         ceres::Problem problem;
 
         std::map<ImageID, PoseVector> cameraPoses6d;
-        for (auto i : registeredImages) {
-            auto pv = cameraPoses.at(i).toPoseVector();
+        for (auto i : bundle.registeredImages) {
+            auto pv = bundle.cameraPoses.at(i).toPoseVector();
             cameraPoses6d[i] = pv;
         }
 
-        double focal = cameras.at(0).getFocalLength();
+        double focal = bundle.cameras.at(0).getFocalLength();
 
-        std::vector<cv::Vec3d> points3d(pointCloud.size());
+        std::vector<cv::Vec3d> points3d(bundle.pointCloud.size());
 
-        for (size_t i = 0; i < pointCloud.size(); i++) {
-            const Point3DInMap& p = pointCloud[i];
+        for (size_t i = 0; i < bundle.pointCloud.size(); i++) {
+            const Point3DInMap& p = bundle.pointCloud[i];
             points3d[i] = cv::Vec3d(p.pt.x, p.pt.y, p.pt.z);
 
             for (const auto& kv : p.originatingViews) {
-                cv::Point2d p2d = features.at(kv.first).getPoint(kv.second);
+                cv::Point2d p2d = bundle.features.at(kv.first).getPoint(kv.second);
 
                 // Subtract centre of projection, since the optimiser doesn't know what it is
-                p2d.x -= cameras.at(kv.first).getCentre().x;
-                p2d.y -= cameras.at(kv.first).getCentre().y;
+                p2d.x -= bundle.cameras.at(kv.first).getCentre().x;
+                p2d.y -= bundle.cameras.at(kv.first).getCentre().y;
 
                 ceres::CostFunction* cost_function = SimpleReprojectionError::Create(p2d.x, p2d.y);
 
@@ -82,7 +78,7 @@ class BasicBundleAdjuster : public BundleAdjuster {
         }
 
         // Update optimised focal
-        for (auto& camera : cameras) {
+        for (auto& camera : bundle.cameras) {
             camera.setFocalLength(focal, focal);
         }
 
@@ -92,14 +88,16 @@ class BasicBundleAdjuster : public BundleAdjuster {
             PoseVector& pv = kv.second;
 
             auto adjustedPose = Pose(pv);
-            cameraPoses.at(key) = adjustedPose;
+            bundle.cameraPoses.at(key) = adjustedPose;
         }
 
         // Update optimised 3D points
-        for (size_t i = 0; i < pointCloud.size(); i++) {
-            pointCloud.updatePoint(i, points3d[i](0), points3d[i](1), points3d[i](2));
+        for (size_t i = 0; i < bundle.pointCloud.size(); i++) {
+            bundle.pointCloud.updatePoint(i, points3d[i](0), points3d[i](1), points3d[i](2));
         }
     };
+
+
 };
 
 #endif //SFM_BASIC_BUNDLE_ADJUSTER_H

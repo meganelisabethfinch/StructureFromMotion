@@ -8,7 +8,7 @@
 #include "bundle_adjuster.h"
 
 class ZhangBundleAdjuster : public BundleAdjuster {
-    void adjustBundle(Bundle bundle) override
+    void adjustBundle(Bundle& bundle) override
     {
         // TODO: implement Zhang RBA (2006).
     };

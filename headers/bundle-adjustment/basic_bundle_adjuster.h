@@ -23,7 +23,7 @@ namespace BundleAdjustUtils {
 using namespace BundleAdjustUtils;
 
 class BasicBundleAdjuster : public BundleAdjuster {
-    void adjustBundle(Bundle bundle) override
+    void adjustBundle(Bundle& bundle) override
     {
         std::call_once(initLoggingFlag, initLogging);
         ceres::Problem problem;
@@ -77,6 +77,17 @@ class BasicBundleAdjuster : public BundleAdjuster {
             return;
         }
 
+        // Update
+        updateBundle(bundle,
+                     points3d,
+                     cameraPoses6d,
+                     focal);
+    }
+
+    void updateBundle(Bundle& bundle,
+                      std::vector<cv::Vec3d>& points3d,
+                      std::map<ImageID, PoseVector>& cameraPoses6d,
+                      double& focal) {
         // Update optimised focal
         for (auto& camera : bundle.cameras) {
             camera.setFocalLength(focal, focal);
@@ -87,7 +98,7 @@ class BasicBundleAdjuster : public BundleAdjuster {
             ImageID key = kv.first;
             PoseVector& pv = kv.second;
 
-            auto adjustedPose = Pose(pv);
+            auto adjustedPose = Pose(pv); // TODO: ADD CAMERA CENTRE???
             bundle.cameraPoses.at(key) = adjustedPose;
         }
 
@@ -95,9 +106,7 @@ class BasicBundleAdjuster : public BundleAdjuster {
         for (size_t i = 0; i < bundle.pointCloud.size(); i++) {
             bundle.pointCloud.updatePoint(i, points3d[i](0), points3d[i](1), points3d[i](2));
         }
-    };
-
-
+    }
 };
 
 #endif //SFM_BASIC_BUNDLE_ADJUSTER_H

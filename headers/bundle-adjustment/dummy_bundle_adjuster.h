@@ -9,7 +9,7 @@
 
 // Because sometimes less is more
 class DummyBundleAdjuster : public BundleAdjuster {
-    void adjustBundle(Bundle bundle) override
+    void adjustBundle(Bundle& bundle) override
     {
         // Do literally nothing.
     };

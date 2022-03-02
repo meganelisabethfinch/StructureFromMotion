@@ -66,5 +66,6 @@ size_t Features::size() const {
 }
 
 cv::Point2d Features::getPoint(size_t i) const {
+    // TODO: add check that index is in size
     return _points2d[i];
 }

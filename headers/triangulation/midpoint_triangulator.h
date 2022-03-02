@@ -35,20 +35,32 @@ public:
         return { midpoint };
     }
 
-    static std::pair<cv::Vec3d, cv::Vec3d> backprojectPointToRay(Camera& camera,
-                                                                 Pose& pose,
-                                                                 cv::Point2d& imagePoint) {
-        cv::Matx33d M = camera.getCameraMatrix() * pose.getRotationMatrix();
-        cv::Matx31d t = camera.getCameraMatrix() * pose.getTranslationVector();
+    /*
+     * Finds the 3D point p on the virtual image plane of a camera with centre C,
+     * corresponding to a 2D image point u.
+     *
+     * @param u - a 2D image point
+     * @param K - the intrinsic camera matrix
+     * @param P - the camera pose, where P = [R|t]
+     */
+    static cv::Point3d backProjectPointToPoint(const cv::Point2d& u,
+                                               const Camera& K,
+                                               const Pose& P) {
+        cv::Vec3d u_prime = { u.x, u.y, K.getFocalLength() };
+        auto p = P.getRotationMatrix() * u_prime + P.getTranslationVector();
+        return { p(0), p(1), p(2) };
+    }
 
-        cv::Matx31d res = - M.inv() * t;
-        cv::Vec3d q = { res(0), res(1), res(2) };
+    static std::pair<cv::Vec3d, cv::Vec3d> backProjectPointToRay(const cv::Point2d& u,
+                                                                 const Camera& K,
+                                                                 const Pose& P) {
+        auto p_pt = backProjectPointToPoint(u,K,P);
+        auto C_mat = P.getTranslationVector();
 
-        // TODO: questionable?! What's going on with homogenous coords?
-        cv::Vec3d homogenousPoint = { imagePoint.x, imagePoint.y, 1 };
-        cv::Vec3d v = M.inv() * homogenousPoint;
-
-        return { q, v };
+        // Reformat as vectors
+        cv::Vec3d p = {p_pt.x, p_pt.y, p_pt.z};
+        cv::Vec3d C = { C_mat(0), C_mat(1), C_mat(2) };
+        return { C, C - p };
     }
 
     PointCloud triangulateImages(ImageID img1, ImageID img2,
@@ -59,20 +71,15 @@ public:
     {
         PointCloud pc;
 
-        // Implements equation 6.14 from MVG in Computer Vision (Hartley & Zisserman)
-        cv::Matx33d M1 = cam1.getCameraMatrix() * pose1.getRotationMatrix();
-        cv::Matx33d M2 = cam2.getCameraMatrix() * pose2.getRotationMatrix();
-        cv::Matx31d t1 = cam1.getCameraMatrix() * pose1.getTranslationVector();
-        cv::Matx31d t2 = cam1.getCameraMatrix() * pose2.getTranslationVector();
-
         for (auto& match : matching) {
             // Get image points
-            cv::Point2d pt1 = features1.getPoint(match.trainIdx);
-            cv::Point2d pt2 = features2.getPoint(match.queryIdx);
+            // TODO: double check correct ordering of query and train
+            cv::Point2d pt1 = features1.getPoint(match.queryIdx);
+            cv::Point2d pt2 = features2.getPoint(match.trainIdx);
 
             // Backprojection
-            auto L1 = backprojectPointToRay(cam1, pose1, pt1);
-            auto L2 = backprojectPointToRay(cam2, pose2, pt2);
+            auto L1 = backProjectPointToRay(pt1, cam1, pose1);
+            auto L2 = backProjectPointToRay(pt2, cam2, pose2);
 
             // Do the triangulation
             auto pt = triangulatePoint(L1.first, L2.first, L1.second, L2.second);

@@ -49,6 +49,10 @@ public:
                      double mergeFeatureDistance = MERGE_CLOUD_FEATURE_MIN_MATCH_DISTANCE);
     // Merge an existing point cloud into this one
 
+    void toPlyFile(const std::string& filename,
+                   const std::vector<Features>& features,
+                   const std::vector<Image>& images);
+
     Point3DInMap operator[](size_t i);
     std::vector<Point3DInMap>::iterator begin();
     std::vector<Point3DInMap>::iterator end();

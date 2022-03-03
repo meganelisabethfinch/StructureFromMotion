@@ -235,6 +235,8 @@ void SceneReconstruction::toColmapFile(const std::string& filename) {
 }
 
 void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile) {
+    _pointCloud.toPlyFile(pointCloudFile, _mImageFeatures, _mImages);
+    /*
     std::cout << "Converting point cloud to .PLY file." << std::endl;
 
     std::ofstream file (pointCloudFile);
@@ -265,7 +267,7 @@ void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std
     }
 
     file.close();
-
+*/
     // Save camera polygons
     std::ofstream cameras_file(cameraFile);
     cameras_file

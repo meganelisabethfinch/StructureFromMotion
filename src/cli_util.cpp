@@ -117,3 +117,23 @@ void CLIUtilities::Summary(const Args& args) {
     }
 }
 
+cv::Ptr<cv::FeatureDetector> CLIUtilities::CreateDetector(DetectorType type) {
+    switch(type) {
+        case DetectorType::SIFT:
+            return cv::SIFT::create();
+        case DetectorType::ORB:
+            return cv::ORB::create(5000);
+    }
+}
+
+cv::Ptr<cv::DescriptorMatcher> CLIUtilities::CreateMatcher(MatcherType type) {
+    return cv::DescriptorMatcher::create(type);
+}
+
+cv::Ptr<Triangulator> CLIUtilities::CreateTriangulator(TriangulatorType type) {
+    return Triangulator::create(type);
+}
+
+cv::Ptr<BundleAdjuster> CLIUtilities::CreateBundleAdjuster(BundleAdjusterType type) {
+    return BundleAdjuster::create(type);
+}

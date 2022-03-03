@@ -7,6 +7,7 @@
 #include <vector>
 #include <headers/matches.h>
 #include <iostream>
+#include <fstream>
 
 PointCloud::PointCloud() {}
 
@@ -110,3 +111,39 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches, double mergePoint
                   << std::endl;
     }
 }
+
+void PointCloud::toPlyFile(const std::string& filename,
+                           const std::vector<Features>& features,
+                           const std::vector<Image>& images) {
+    std::cout << "Converting point cloud to .PLY file." << std::endl;
+
+    std::ofstream file(filename);
+    file << "ply" << std::endl;
+    file << "format ascii 1.0" << std::endl;
+    file << "element vertex " << this->size() << std::endl;
+    file << "property float x" << std::endl;
+    file << "property float y" << std::endl;
+    file << "property float z" << std::endl;
+    file << "property uchar red" << std::endl;
+    file << "property uchar green" << std::endl;
+    file << "property uchar blue" << std::endl;
+    file << "end_header" << std::endl;
+
+    for (const auto& point3D : *this) {
+        auto anyOriginatingView = point3D.originatingViews.begin();
+        const ImageID viewIdx = anyOriginatingView->first;
+        const int keypointIdx = anyOriginatingView->second;
+        cv::Point2d point2D = features.at(viewIdx).getPoint(keypointIdx);
+        cv::Vec3b pointColour = images.at(viewIdx).getColourAt(point2D);
+
+        file << static_cast<float>(point3D.pt.x) << " ";
+        file << static_cast<float>(point3D.pt.y) << " ";
+        file << static_cast<float>(point3D.pt.z) << " ";
+        file << (int)pointColour(2) << " ";
+        file << (int)pointColour(1) << " ";
+        file << (int)pointColour(0) << std::endl;
+    }
+
+    file.close();
+}
+

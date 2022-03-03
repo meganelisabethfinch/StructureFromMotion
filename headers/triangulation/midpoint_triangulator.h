@@ -73,7 +73,7 @@ public:
 
         for (auto& match : matching) {
             // Get image points
-            // TODO: double check correct ordering of query and train
+            // Note: smaller image id always corresponds to queryIdx
             cv::Point2d pt1 = features1.getPoint(match.queryIdx);
             cv::Point2d pt2 = features2.getPoint(match.trainIdx);
 
@@ -87,8 +87,8 @@ public:
             // Add to point cloud
             Point3DInMap pt3d;
             pt3d.pt = pt;
-            pt3d.originatingViews.insert({img1, match.trainIdx});
-            pt3d.originatingViews.insert({img2, match.queryIdx});
+            pt3d.originatingViews.insert({img1, match.queryIdx});
+            pt3d.originatingViews.insert({img2, match.trainIdx});
             pc.addPoint(pt3d);
         }
         return pc;

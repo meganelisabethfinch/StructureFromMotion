@@ -124,8 +124,31 @@ target_link_libraries(
 add_library(
         SFMLib
         STATIC
-        headers/constants.h headers/point_cloud.h headers/camera.h headers/types.h headers/cli_util.h src/cli_util.cpp headers/imagecollection.h src/imagecollection.cpp headers/image.h src/camera.cpp headers/features.h headers/matches.h src/matches.cpp src/features.cpp headers/sfm_util.h src/sfm_util.cpp headers/scene_graph.h src/scene_graph.cpp headers/scene_reconstruction.h src/scene_reconstruction.cpp headers/pose.h src/pose.cpp src/point_cloud.cpp headers/ba_util.h headers/cost/simple_reprojection_error.h headers/cost/zhang_rba_error.h src/cost/zhang_rba_error.cpp
-        headers/image_pair.h headers/cli_args.h headers/triangulation/triangulator.h headers/triangulation/linear_triangulator.h headers/triangulation/midpoint_triangulator.h headers/bundle-adjustment/bundle_adjuster.h src/bundle-adjustment/bundle_adjuster.cpp headers/bundle-adjustment/dummy_bundle_adjuster.h headers/bundle-adjustment/basic_bundle_adjuster.h headers/bundle-adjustment/zhang_bundle_adjuster.h headers/bundle.h)
+        headers/constants.h
+        headers/point_cloud.h src/point_cloud.cpp
+        headers/camera.h src/camera.cpp
+        headers/types.h
+        headers/cli_util.h src/cli_util.cpp
+        headers/imagecollection.h src/imagecollection.cpp
+        headers/image.h
+        headers/features.h src/features.cpp
+        headers/matches.h src/matches.cpp
+        headers/sfm_util.h src/sfm_util.cpp
+        headers/scene_graph.h src/scene_graph.cpp
+        headers/scene_reconstruction.h src/scene_reconstruction.cpp
+        headers/pose.h src/pose.cpp
+        headers/cost/simple_reprojection_error.h
+        headers/cost/zhang_rba_error.h src/cost/zhang_rba_error.cpp
+        headers/image_pair.h
+        headers/cli_args.h
+        headers/triangulation/triangulator.h src/triangulation/triangulator.cpp
+        headers/triangulation/linear_triangulator.h
+        headers/triangulation/midpoint_triangulator.h
+        headers/bundle-adjustment/bundle_adjuster.h src/bundle-adjustment/bundle_adjuster.cpp
+        headers/bundle-adjustment/dummy_bundle_adjuster.h
+        headers/bundle-adjustment/basic_bundle_adjuster.h
+        headers/bundle-adjustment/zhang_bundle_adjuster.h
+        headers/bundle.h)
 
 target_include_directories(
         SFMLib

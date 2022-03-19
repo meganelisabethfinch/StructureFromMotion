@@ -8,7 +8,7 @@
 
 const double LOWE_RATIO = 0.6;
 // const double FOCAL_LENGTH = 2500;
-const double FOCAL_LENGTH = 1;
+const double FOCAL_LENGTH = 2;
 
 // Reject a 3d point if its re-projection error is above this threshold
 const double REPROJECTION_ERROR_THRESHOLD = 10.0;

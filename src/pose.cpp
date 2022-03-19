@@ -38,7 +38,7 @@ Pose::Pose(const cv::Matx31d& rvec, const cv::Matx31d& tvec) {
                        rmat(2,0), rmat(2,1), rmat(2,2), tvec(2,0));
 }
 
-cv::Matx34d Pose::getProjectionMatrix() {
+cv::Matx34d Pose::getProjectionMatrix() const {
     return _mat;
 }
 

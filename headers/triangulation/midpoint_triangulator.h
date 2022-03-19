@@ -46,8 +46,17 @@ public:
     static cv::Point3d backProjectPointToPoint(const cv::Point2d& u,
                                                const Camera& K,
                                                const Pose& P) {
-        cv::Vec3d u_prime = { u.x, u.y, K.getFocalLength() };
-        auto p = P.getRotationMatrix() * u_prime + P.getTranslationVector();
+        // 1.
+        // cv::Vec3d u_prime = { u.x, u.y, K.getFocalLength() };
+        // auto p = K.getCameraMatrix() * P.getRotationMatrix() * u_prime + K.getCameraMatrix() * P.getTranslationVector();
+
+        // 3.
+        cv::Vec3d u_prime = { u.x, u.y, 1 };
+        auto p = P.getRotationMatrix() * K.getCameraMatrix().inv() * u_prime + P.getTranslationVector();
+
+        // 4.
+        // cv::Vec3d u_prime = { u.x, u.y, 1 };
+        // auto p = K.getCameraMatrix() * P.getRotationMatrix() * K.getCameraMatrix().inv() * u_prime + K.getCameraMatrix() * P.getTranslationVector();
         return { p(0), p(1), p(2) };
     }
 

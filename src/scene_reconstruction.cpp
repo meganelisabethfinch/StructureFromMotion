@@ -236,38 +236,7 @@ void SceneReconstruction::toColmapFile(const std::string& filename) {
 
 void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile) {
     _pointCloud.toPlyFile(pointCloudFile, _mImageFeatures, _mImages);
-    /*
-    std::cout << "Converting point cloud to .PLY file." << std::endl;
 
-    std::ofstream file (pointCloudFile);
-    file << "ply" << std::endl;
-    file << "format ascii 1.0" << std::endl;
-    file << "element vertex " << _pointCloud.size() << std::endl;
-    file << "property float x" << std::endl;
-    file << "property float y" << std::endl;
-    file << "property float z" << std::endl;
-    file << "property uchar red" << std::endl;
-    file << "property uchar green" << std::endl;
-    file << "property uchar blue" << std::endl;
-    file << "end_header" << std::endl;
-
-    for (const auto& point3D : _pointCloud) {
-        auto anyOriginatingView = point3D.originatingViews.begin();
-        const ImageID viewIdx = anyOriginatingView->first;
-        const int keypointIdx = anyOriginatingView->second;
-        cv::Point2d point2D = _mImageFeatures[viewIdx].getPoint(keypointIdx);
-        cv::Vec3b pointColour = _mImages[viewIdx].getColourAt(point2D);
-
-        file << static_cast<float>(point3D.pt.x) << " ";
-        file << static_cast<float>(point3D.pt.y) << " ";
-        file << static_cast<float>(point3D.pt.z) << " ";
-        file << (int)pointColour(2) << " ";
-        file << (int)pointColour(1) << " ";
-        file << (int)pointColour(0) << std::endl;
-    }
-
-    file.close();
-*/
     // Save camera polygons
     std::ofstream cameras_file(cameraFile);
     cameras_file
@@ -277,9 +246,8 @@ void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std
         << "property float x " << std::endl
         << "property float y " << std::endl
         << "property float z " << std::endl
-        // << "element edge " << (_mCameraPoses.size() * 3) << std::endl
-        // << "property int vertex1 " << std::endl
-        // << "property int vertex2 " << std::endl
+        //<< "element edge " << (_mCameraPoses.size() * 3) << std::endl
+        // << "property list uchar int vertex_index" << std::endl
         << "end_header" << std::endl;
 
     for (const auto& kv : _mCameraPoses) {
@@ -298,6 +266,16 @@ void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std
         cameras_file << cz.x << " " << cz.y << " " << cz.z << std::endl;
     }
 
+    // Add edges
+    /*
+    for (int i = 0; i < _mCameraPoses.size(); i++) {
+        cameras_file << i << " " << i + 1 << std::endl; // c to cx
+        cameras_file << i << " " << i + 2 << std::endl; // c to cy
+        cameras_file << i << " " << i + 3 << std::endl; // c to cz
+    }
+     */
+
+    cameras_file.close();
 }
 
 

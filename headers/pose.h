@@ -21,7 +21,7 @@ public:
 
     Pose(const cv::Matx31d& rvec, const cv::Matx31d& tvec);
 
-    cv::Matx34d getProjectionMatrix();
+    cv::Matx34d getProjectionMatrix() const;
 
     [[nodiscard]] cv::Matx31d getRotationVector() const;
 

@@ -24,6 +24,11 @@ find_package(Threads REQUIRED)
 
 find_package(Ceres REQUIRED)
 
+find_package(PCL REQUIRED COMPONENTS common io)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -115,6 +120,7 @@ target_link_libraries(
         opencv_videoio
         opencv_video
         ceres
+        ${PCL_LIBRARIES}
         #gflags
         #glog
 )

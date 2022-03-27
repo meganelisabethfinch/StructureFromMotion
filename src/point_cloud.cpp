@@ -9,6 +9,10 @@
 #include <iostream>
 #include <fstream>
 
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
+
 PointCloud::PointCloud() {}
 
 Point3DInMap PointCloud::operator[](size_t i) {
@@ -147,3 +151,28 @@ void PointCloud::toPlyFile(const std::string& filename,
     file.close();
 }
 
+void PointCloud::toPCDFile(const std::string& filename,
+               const std::vector<Features>& features,
+               const std::vector<Image>& images)
+{
+    pcl::PointCloud<pcl::PointXYZRGB> pcl_cloud;
+
+    for (const auto& point3D : *this) {
+        auto anyOriginatingView = point3D.originatingViews.begin();
+        const ImageID viewIdx = anyOriginatingView->first;
+        const int keypointIdx = anyOriginatingView->second;
+        cv::Point2d point2D = features.at(viewIdx).getPoint(keypointIdx);
+        cv::Vec3b pointColour = images.at(viewIdx).getColourAt(point2D);
+
+
+        // point constructor: pcl_point(x,y,z,r,g,b); - all std::uint8_t
+        pcl::PointXYZRGB pcl_point(static_cast<float>(point3D.pt.x),
+                                   static_cast<float>(point3D.pt.y),
+                                   static_cast<float>(point3D.pt.z),
+                                   pointColour[0], pointColour[1], pointColour[2]);
+
+        pcl_cloud.points.emplace_back(pcl_point);
+
+    }
+    pcl::io::savePCDFileASCII(filename, pcl_cloud);
+}

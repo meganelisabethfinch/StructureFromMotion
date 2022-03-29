@@ -12,6 +12,8 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
+#include <pcl/filters/statistical_outlier_removal.h>
+#include <headers/vector_util.h>
 
 PointCloud::PointCloud() {}
 
@@ -116,6 +118,65 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches, double mergePoint
     }
 }
 
+void PointCloud::pruneStatisticalOutliers(int k, double stddev_mult) {
+    // Convert cloud to PCL point cloud
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in(new pcl::PointCloud<pcl::PointXYZ>);
+    for (const auto& point3D : *this) {
+        // point constructor: pcl_point(x,y,z); - all std::uint8_t
+        pcl::PointXYZ pcl_point(static_cast<float>(point3D.pt.x),
+                                static_cast<float>(point3D.pt.y),
+                                static_cast<float>(point3D.pt.z));
+
+        cloud_in->points.emplace_back(pcl_point);
+    }
+
+    // Set up filter
+    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sorfilter(true);
+    sorfilter.setInputCloud(cloud_in);
+    sorfilter.setMeanK(8);
+    sorfilter.setStddevMulThresh(stddev_mult);
+
+    // Apply filter and extract outliers
+    pcl::PointCloud<pcl::PointXYZ> cloud_out;
+    sorfilter.filter(cloud_out);
+    pcl::IndicesConstPtr rm = sorfilter.getRemovedIndices();
+
+    // Convert rm to std::vector<int>
+    std::vector<int> outlier_indices;
+    for (int i : *rm) {
+        outlier_indices.push_back(i);
+        std::cout << i << std::endl;
+    }
+    // TODO: need to sort?
+
+    // Prune this point cloud
+    VectorUtilities::removeIndicesFromVector(mReconstructionCloud, outlier_indices);
+}
+
+pcl::PointCloud<pcl::PointXYZRGB> PointCloud::toPCLPointCloud(const std::vector<Features>& features,
+                                                              const std::vector<Image>& images) {
+    pcl::PointCloud<pcl::PointXYZRGB> pcl_cloud;
+
+    for (const auto& point3D : *this) {
+        auto anyOriginatingView = point3D.originatingViews.begin();
+        const ImageID viewIdx = anyOriginatingView->first;
+        const int keypointIdx = anyOriginatingView->second;
+        cv::Point2d point2D = features.at(viewIdx).getPoint(keypointIdx);
+        cv::Vec3b pointColour = images.at(viewIdx).getColourAt(point2D);
+
+
+        // point constructor: pcl_point(x,y,z,r,g,b); - all std::uint8_t
+        pcl::PointXYZRGB pcl_point(static_cast<float>(point3D.pt.x),
+                                   static_cast<float>(point3D.pt.y),
+                                   static_cast<float>(point3D.pt.z),
+                                   pointColour[0], pointColour[1], pointColour[2]);
+
+        pcl_cloud.points.emplace_back(pcl_point);
+    }
+
+    return pcl_cloud;
+}
+
 void PointCloud::toPlyFile(const std::string& filename,
                            const std::vector<Features>& features,
                            const std::vector<Image>& images) {
@@ -155,24 +216,7 @@ void PointCloud::toPCDFile(const std::string& filename,
                const std::vector<Features>& features,
                const std::vector<Image>& images)
 {
-    pcl::PointCloud<pcl::PointXYZRGB> pcl_cloud;
-
-    for (const auto& point3D : *this) {
-        auto anyOriginatingView = point3D.originatingViews.begin();
-        const ImageID viewIdx = anyOriginatingView->first;
-        const int keypointIdx = anyOriginatingView->second;
-        cv::Point2d point2D = features.at(viewIdx).getPoint(keypointIdx);
-        cv::Vec3b pointColour = images.at(viewIdx).getColourAt(point2D);
-
-
-        // point constructor: pcl_point(x,y,z,r,g,b); - all std::uint8_t
-        pcl::PointXYZRGB pcl_point(static_cast<float>(point3D.pt.x),
-                                   static_cast<float>(point3D.pt.y),
-                                   static_cast<float>(point3D.pt.z),
-                                   pointColour[0], pointColour[1], pointColour[2]);
-
-        pcl_cloud.points.emplace_back(pcl_point);
-
-    }
+    pcl::PointCloud<pcl::PointXYZRGB> pcl_cloud = this->toPCLPointCloud(features, images);
     pcl::io::savePCDFileASCII(filename, pcl_cloud);
 }
+

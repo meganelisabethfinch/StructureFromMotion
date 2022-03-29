@@ -11,6 +11,9 @@
 #include "matches.h"
 #include "constants.h"
 
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+
 struct Point3DInMap {
     cv::Point3d pt;
     std::map<ImageID, int> originatingViews;
@@ -36,6 +39,9 @@ class PointCloud {
 private:
     std::vector<Point3DInMap> mReconstructionCloud;
 
+    pcl::PointCloud<pcl::PointXYZRGB> toPCLPointCloud(const std::vector<Features>& features,
+                                                      const std::vector<Image>& images);
+
 public:
     PointCloud();
 
@@ -48,6 +54,8 @@ public:
                      double mergePointDistance = MERGE_CLOUD_POINT_MIN_MATCH_DISTANCE,
                      double mergeFeatureDistance = MERGE_CLOUD_FEATURE_MIN_MATCH_DISTANCE);
     // Merge an existing point cloud into this one
+
+    void pruneStatisticalOutliers(int k = 8, double stddev_mult = 1.0);
 
     void toPlyFile(const std::string& filename,
                    const std::vector<Features>& features,

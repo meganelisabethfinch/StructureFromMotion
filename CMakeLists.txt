@@ -24,7 +24,7 @@ find_package(Threads REQUIRED)
 
 find_package(Ceres REQUIRED)
 
-find_package(PCL REQUIRED COMPONENTS common io)
+find_package(PCL REQUIRED COMPONENTS common io filters)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
@@ -49,7 +49,23 @@ message(" ")
 add_executable(
         StructureFromMotion
         src/main.cpp
-        headers/constants.h headers/point_cloud.h headers/camera.h headers/types.h headers/cli_util.h src/cli_util.cpp headers/imagecollection.h src/imagecollection.cpp headers/image.h src/camera.cpp headers/features.h headers/matches.h src/matches.cpp src/features.cpp headers/sfm_util.h src/sfm_util.cpp headers/scene_graph.h src/scene_graph.cpp headers/scene_reconstruction.h src/scene_reconstruction.cpp headers/pose.h src/pose.cpp src/point_cloud.cpp headers/ba_util.h headers/cost/simple_reprojection_error.h headers/cost/zhang_rba_error.h src/cost/zhang_rba_error.cpp headers/triangulation/triangulator.h src/triangulation/triangulator.cpp src/bundle-adjustment/bundle_adjuster.cpp)
+        headers/constants.h
+        headers/point_cloud.h
+        headers/camera.h src/camera.cpp
+        headers/types.h
+        headers/cli_util.h src/cli_util.cpp
+        headers/imagecollection.h src/imagecollection.cpp headers/image.h headers/features.h
+        headers/matches.h src/matches.cpp src/features.cpp
+        headers/sfm_util.h src/sfm_util.cpp
+        headers/scene_graph.h src/scene_graph.cpp
+        headers/scene_reconstruction.h src/scene_reconstruction.cpp
+        headers/pose.h src/pose.cpp src/point_cloud.cpp
+        headers/ba_util.h
+        headers/cost/simple_reprojection_error.h
+        headers/cost/zhang_rba_error.h src/cost/zhang_rba_error.cpp
+        headers/triangulation/triangulator.h src/triangulation/triangulator.cpp
+        src/bundle-adjustment/bundle_adjuster.cpp
+        headers/vector_util.h src/vector_util.cpp)
 
 target_sources(
         StructureFromMotion
@@ -154,7 +170,7 @@ add_library(
         headers/bundle-adjustment/dummy_bundle_adjuster.h
         headers/bundle-adjustment/basic_bundle_adjuster.h
         headers/bundle-adjustment/zhang_bundle_adjuster.h
-        headers/bundle.h)
+        headers/bundle.h headers/vector_util.h)
 
 target_include_directories(
         SFMLib

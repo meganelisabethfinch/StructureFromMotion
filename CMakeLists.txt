@@ -25,8 +25,6 @@ find_package(Threads REQUIRED)
 find_package(Ceres REQUIRED)
 
 find_package(PCL REQUIRED COMPONENTS common io filters)
-include_directories(${PCL_INCLUDE_DIRS})
-link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -91,6 +89,7 @@ target_include_directories(
         /Users/meganfinch/glog/cmake-build-release
         /Users/meganfinch/glog/src
         /Users/meganfinch/gflags/cmake-build-release/include
+        ${PCL_INCLUDE_DIRS}
 )
 
 
@@ -114,6 +113,7 @@ target_link_directories(
         #"/Users/meganfinch/ceres-solver/cmake-build-release/lib"
         #"/Users/meganfinch/gflags/cmake-build-release/lib"
         #"/Users/meganfinch/glog/cmake-build-release/"
+        ${PCL_LIBRARY_DIRS}
 )
 
 

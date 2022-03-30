@@ -30,7 +30,8 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          Matches &mFeatureMatchMatrix,
                                          const cv::Ptr<Triangulator>& triangulator,
                                          const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                                         bool removeStatisticalOutliers)
+                                         bool removeStatisticalOutliers,
+                                         bool removeRadialOutliers)
         : _mImages(mImages), _mCameras(mCameras),
         _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix),
         _triangulator(triangulator), _bundleAdjuster(bundleAdjuster),
@@ -51,11 +52,13 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          ImagePair& baselinePair,
                                          const cv::Ptr<Triangulator>& triangulator,
                                          const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                                         bool removeStatisticalOutliers)
+                                         bool removeStatisticalOutliers,
+                                         bool removeRadialOutliers)
                                          : _mImages(mImages), _mCameras(mCameras),
                                          _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix),
                                          _triangulator(triangulator), _bundleAdjuster(bundleAdjuster),
-                                        _removeStatisticalOutliers(removeStatisticalOutliers)
+                                        _removeStatisticalOutliers(removeStatisticalOutliers),
+                                        _removeRadialOutliers(removeRadialOutliers)
 {
     std::vector<ImagePair> orderedImagePairs;
     orderedImagePairs.push_back(baselinePair);
@@ -172,6 +175,9 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
         if (anyViewSuccess) {
             if (_removeStatisticalOutliers) {
                 _pointCloud.pruneStatisticalOutliers();
+            }
+            if (_removeRadialOutliers) {
+                _pointCloud.pruneRadialOutliers();
             }
             adjustBundle();
         }

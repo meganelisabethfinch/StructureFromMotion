@@ -43,11 +43,13 @@ public:
     SceneReconstruction toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator,
                                               const cv::Ptr<BundleAdjuster>& bundleAdjuster,
                                               bool removeStatisticalOutliers,
+                                              bool removeRadialOutliers,
                                               ImagePair& imagePair);
 
     SceneReconstruction toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator,
                                               const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                                              bool removeStatisticalOutliers);
+                                              bool removeStatisticalOutliers,
+                                              bool removeRadialOutliers);
 
     SceneGraph toSceneGraph();
 };

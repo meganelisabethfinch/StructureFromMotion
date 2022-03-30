@@ -92,7 +92,6 @@ target_include_directories(
         ${PCL_INCLUDE_DIRS}
 )
 
-
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 

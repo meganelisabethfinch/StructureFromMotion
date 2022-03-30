@@ -11,8 +11,8 @@
 #include "matches.h"
 #include "constants.h"
 
-#include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
 
 struct Point3DInMap {
     cv::Point3d pt;
@@ -57,7 +57,7 @@ public:
 
     void pruneStatisticalOutliers(int k = 8, double stddev_mult = 1.0);
 
-    void pruneRadialOutliers();
+    void pruneRadialOutliers(double radiusSearch = 0.1, int minNeighborsInRadius = 5);
 
     void toPlyFile(const std::string& filename,
                    const std::vector<Features>& features,

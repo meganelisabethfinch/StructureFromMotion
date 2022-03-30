@@ -92,12 +92,14 @@ void ImageCollection::visualiseMatches(ImageID i, ImageID j) {
 SceneReconstruction ImageCollection::toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator,
                                                            const cv::Ptr<BundleAdjuster>& bundleAdjuster,
                                                            bool removeStatisticalOutliers,
+                                                           bool removeRadialOutliers,
                                                            ImagePair& imagePair) {
     auto recon = SceneReconstruction(mImages, mCameras,
                                      mImageFeatures, mFeatureMatchMatrix,
                                      imagePair,
                                      triangulator, bundleAdjuster,
-                                     removeStatisticalOutliers);
+                                     removeStatisticalOutliers,
+                                     removeRadialOutliers);
 
     for (ImageID i = 0; i < mImages.size(); i++) {
         recon.registerImage(i);
@@ -108,11 +110,13 @@ SceneReconstruction ImageCollection::toSceneReconstruction(const cv::Ptr<Triangu
 
 SceneReconstruction ImageCollection::toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator,
                                                            const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                                                           bool removeStatisticalOutliers) {
+                                                           bool removeStatisticalOutliers,
+                                                           bool removeRadialOutliers) {
     auto recon = SceneReconstruction(mImages, mCameras,
                                      mImageFeatures, mFeatureMatchMatrix,
                                      triangulator, bundleAdjuster,
-                                     removeStatisticalOutliers);
+                                     removeStatisticalOutliers,
+                                     removeRadialOutliers);
 
     recon.registerMoreImages();
 

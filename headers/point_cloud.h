@@ -57,6 +57,8 @@ public:
 
     void pruneStatisticalOutliers(int k = 8, double stddev_mult = 1.0);
 
+    void pruneRadialOutliers();
+
     void toPlyFile(const std::string& filename,
                    const std::vector<Features>& features,
                    const std::vector<Image>& images);

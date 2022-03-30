@@ -7,6 +7,17 @@
 
 #include "image_pair.h"
 
+// Statistical outlier removal
+struct SORArgs {
+    int enableSOR;
+    int mean;
+    double stddev_mult;
+};
+
+struct RORArgs {
+    int enableROR;
+};
+
 struct Args {
     std::string inputImageDir;
     std::string outputDir;
@@ -18,6 +29,9 @@ struct Args {
     MatcherType matcherType;
     TriangulatorType triangulatorType;
     BundleAdjusterType bundleAdjusterType;
+
+    SORArgs sorArgs;
+    RORArgs rorArgs;
 };
 
 #endif //SFM_CLI_ARGS_H

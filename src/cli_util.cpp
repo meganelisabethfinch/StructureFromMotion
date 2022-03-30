@@ -8,20 +8,48 @@
 
 #include <unistd.h>
 #include <iostream>
+#include <getopt.h>
+
+#define no_argument 0
+#define required_argument 1
+#define optional_argument 2
 
 bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
+    static struct option long_options[] = {
+         // These options set a flag
+        {"remove_statistical_outliers", no_argument, &args.sorArgs.enableSOR, 1},
+        {"remove_radial_outliers", no_argument, &args.rorArgs.enableROR, 1},
+        // These options don't set a flag
+        {"bundle_adjuster", required_argument, 0, 'a'},
+        {"baseline", required_argument, 0, 'b'},
+        {"feature_detector", required_argument, 0, 'd'},
+        {"input", required_argument, 0, 'i'},
+        {"output", required_argument, 0, 'o'},
+        {"triangulator", required_argument, 0, 't'},
+        {0,0,0,0},
+    };
+
     // Set defaults before parsing
     args.useHomographyOrdering = DEFAULT_USE_HOMOGRAPHY_ORDERING;
     args.detectorType = DEFAULT_DETECTOR;
     args.matcherType = DEFAULT_MATCHER;
     args.triangulatorType = DEFAULT_TRIANGULATOR;
     args.bundleAdjusterType = DEFAULT_BUNDLE_ADJUSTER;
+    args.sorArgs.enableSOR = DEFAULT_ENABLE_SOR;
+    args.rorArgs.enableROR = DEFAULT_ENABLE_ROR;
+    std::vector<ImageID> baselines;
 
     // Parse arguments
     int opt;
-    std::vector<ImageID> baselines;
 
-    while ((opt = getopt(argc, argv, "i:o:b:t:a:d:")) != -1) {
+    while (1) {
+        int option_index = 0;
+        opt = getopt_long(argc, argv, "i:o:b:t:a:d:", long_options, &option_index);
+
+        // Detect end of options
+        if (opt == -1)
+            break;
+
         switch (opt) {
             case 'i': {
                 args.inputImageDir = optarg;
@@ -115,6 +143,9 @@ void CLIUtilities::Summary(const Args& args) {
     } else {
         std::cout << "Baseline: (" << args.baselinePair.left << ", " << args.baselinePair.right << ")" << std::endl;
     }
+
+    std::cout << "Enable statistical outlier removal: " << args.sorArgs.enableSOR << std::endl;
+    std::cout << "Enable radial outlier removal: " << args.rorArgs.enableROR << std::endl;
 }
 
 cv::Ptr<cv::FeatureDetector> CLIUtilities::CreateDetector(DetectorType type) {

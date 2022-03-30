@@ -51,6 +51,11 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
             break;
 
         switch (opt) {
+            case 0: {
+                // this case sets a flag
+                // do nothing else
+                break;
+            }
             case 'i': {
                 args.inputImageDir = optarg;
                 break;

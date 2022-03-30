@@ -119,6 +119,7 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches, double mergePoint
 }
 
 void PointCloud::pruneStatisticalOutliers(int k, double stddev_mult) {
+    std::cout << "--- Remove Statistical Outliers ---" << std::endl;
     // Convert cloud to PCL point cloud
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in(new pcl::PointCloud<pcl::PointXYZ>);
     for (const auto& point3D : *this) {
@@ -145,12 +146,12 @@ void PointCloud::pruneStatisticalOutliers(int k, double stddev_mult) {
     std::vector<int> outlier_indices;
     for (int i : *rm) {
         outlier_indices.push_back(i);
-        std::cout << i << std::endl;
     }
-    // TODO: need to sort?
 
     // Prune this point cloud
     VectorUtilities::removeIndicesFromVector(mReconstructionCloud, outlier_indices);
+    std::cout << "SOR Result: point cloud reduced from " << cloud_in->size() << " points -> "
+        << mReconstructionCloud.size() << " points" << std::endl;
 }
 
 pcl::PointCloud<pcl::PointXYZRGB> PointCloud::toPCLPointCloud(const std::vector<Features>& features,

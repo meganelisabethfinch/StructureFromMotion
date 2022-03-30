@@ -32,6 +32,8 @@ private:
     cv::Ptr<Triangulator> _triangulator;
     cv::Ptr<BundleAdjuster> _bundleAdjuster;
 
+    bool _removeStatisticalOutliers;
+
     void initialise(std::vector<ImagePair> baselines);
 
     bool registerImage(ImageID imageId, Image2D3DMatch& match2D3D);
@@ -42,7 +44,8 @@ public:
                         std::vector<Features>& mImageFeatures,
                         Matches& mFeatureMatchMatrix,
                         const cv::Ptr<Triangulator>& triangulator,
-                        const cv::Ptr<BundleAdjuster>& bundleAdjuster);
+                        const cv::Ptr<BundleAdjuster>& bundleAdjuster,
+                        bool removeStatisticalOutliers);
 
     SceneReconstruction(std::vector<Image> &mImages,
                         std::vector<Camera> &mCameras,
@@ -50,7 +53,8 @@ public:
                         Matches &mFeatureMatchMatrix,
                         ImagePair& baselinePair,
                         const cv::Ptr<Triangulator>& triangulator,
-                        const cv::Ptr<BundleAdjuster>& bundleAdjuster);
+                        const cv::Ptr<BundleAdjuster>& bundleAdjuster,
+                        bool removeStatisticalOutliers);
 
     void registerMoreImages();
 

@@ -39,11 +39,15 @@ int main(int argc, char** argv) {
     std::cout << "---- Find Baseline Triangulator ---" << std::endl;
     auto triangulator = CLIUtilities::CreateTriangulator(args.triangulatorType);
     auto bundleAdjuster = CLIUtilities::CreateBundleAdjuster(args.bundleAdjusterType);
+
     if (args.useHomographyOrdering) {
-        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster);
+        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster,
+                                                  args.sorArgs.enableSOR);
         recon.toPlyFile("point_cloud.ply", "_cameras.ply");
     } else {
-        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster, args.baselinePair);
+        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster,
+                                                  args.sorArgs.enableSOR,
+                                                  args.baselinePair);
         recon.toPlyFile("point_cloud.ply", "_cameras.ply");
     }
 

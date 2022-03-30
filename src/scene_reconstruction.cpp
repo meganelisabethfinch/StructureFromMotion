@@ -29,8 +29,12 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          std::vector<Features> &mImageFeatures,
                                          Matches &mFeatureMatchMatrix,
                                          const cv::Ptr<Triangulator>& triangulator,
-                                         const cv::Ptr<BundleAdjuster>& bundleAdjuster)
-        : _mImages(mImages), _mCameras(mCameras), _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix), _triangulator(triangulator), _bundleAdjuster(bundleAdjuster)
+                                         const cv::Ptr<BundleAdjuster>& bundleAdjuster,
+                                         bool removeStatisticalOutliers)
+        : _mImages(mImages), _mCameras(mCameras),
+        _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix),
+        _triangulator(triangulator), _bundleAdjuster(bundleAdjuster),
+        _removeStatisticalOutliers(removeStatisticalOutliers)
 {
     std::map<double, ImagePair> imagePairsByHomographyInliers = SFMUtilities::SortViewsForBaseline(_mImageFeatures, _mFeatureMatchMatrix);
 
@@ -46,10 +50,12 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          Matches &mFeatureMatchMatrix,
                                          ImagePair& baselinePair,
                                          const cv::Ptr<Triangulator>& triangulator,
-                                         const cv::Ptr<BundleAdjuster>& bundleAdjuster)
+                                         const cv::Ptr<BundleAdjuster>& bundleAdjuster,
+                                         bool removeStatisticalOutliers)
                                          : _mImages(mImages), _mCameras(mCameras),
                                          _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix),
-                                         _triangulator(triangulator), _bundleAdjuster(bundleAdjuster)
+                                         _triangulator(triangulator), _bundleAdjuster(bundleAdjuster),
+                                        _removeStatisticalOutliers(removeStatisticalOutliers)
 {
     std::vector<ImagePair> orderedImagePairs;
     orderedImagePairs.push_back(baselinePair);
@@ -81,13 +87,6 @@ void SceneReconstruction::initialise(std::vector<ImagePair> baselines) {
                 throw std::runtime_error("Insufficient pose inliers " + std::to_string(poseInliersRatio));
             }
 
-            /*
-            PointCloud pc = SFMUtilities::triangulateViews(i, j,
-                                                           _mCameras.at(i), _mCameras.at(j),
-                                                           _mImageFeatures.at(i), _mImageFeatures.at(j),
-                                                           _mFeatureMatchMatrix.get(pair),
-                                                           posei, posej);
-            */
             PointCloud pc = _triangulator->triangulateImages(i, j,
                                                            _mCameras.at(i), _mCameras.at(j),
                                                            _mImageFeatures.at(i), _mImageFeatures.at(j),
@@ -169,13 +168,13 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
             }
         }
 
-        // TODO: review -- do we need both goodViews and doneViews?
         _mGoodViews.insert(imageId);
-
         if (anyViewSuccess) {
+            if (_removeStatisticalOutliers) {
+                _pointCloud.pruneStatisticalOutliers();
+            }
             adjustBundle();
         }
-        // TODO: end review
 
         return true;
     } catch (std::runtime_error &e) {

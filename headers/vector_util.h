@@ -12,7 +12,7 @@ public:
     /*
      * Removes all the indices in rm from a vector v
      * @param v - the vector of data
-     * @param rm - the vector of indices to remove
+     * @param rm - the SORTED vector of indices to remove, in ascending order
      */
     template<typename INT, typename T>
     static void removeIndicesFromVector(std::vector <T> &v, std::vector <INT> &rm) {

@@ -272,6 +272,7 @@ void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std
 void SceneReconstruction::outputToFiles(const std::string& outputDirectory, std::set<OutputType> outputTypes){
     for (auto type : outputTypes) {
         std::string filename;
+        std::string filename2;
         switch (type) {
             case OutputType::PLY_POINT_CLOUD:
                 filename.append(outputDirectory).append("point_cloud.ply");
@@ -288,7 +289,8 @@ void SceneReconstruction::outputToFiles(const std::string& outputDirectory, std:
                 break;
             case OutputType::VTK_MESH:
                 filename.append(outputDirectory).append("mesh.vtk");
-                _pointCloud.toVTKFile(filename);
+                filename2.append(outputDirectory).append("cloud_with_normals.pcd");
+                _pointCloud.toVTKFile(filename, filename2);
                 break;
         }
     }

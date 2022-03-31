@@ -198,7 +198,8 @@ void PointCloud::toPCDFile(const std::string& filename,
     pcl::io::savePCDFileASCII(filename, pcl_cloud);
 }
 
-void PointCloud::toVTKFile(const std::string& filepath,
+void PointCloud::toVTKFile(const std::string& vtk_mesh_filename,
+                           const std::string& pcd_normals_filename,
                            int psn_depth,
                            int psn_solverDivide,
                            int psn_isoDivide,
@@ -259,10 +260,7 @@ void PointCloud::toVTKFile(const std::string& filepath,
     pcl::PCLPointCloud2::Ptr cwn (new pcl::PCLPointCloud2());
     pcl::toPCLPointCloud2(*cloud_with_normals, *cwn);
 
-    std::string str, str2;
-    str.append(filepath).append("mesh.vtk");
-    pcl::io::saveVTKFile(str, triangles);
-    str2.append(filepath).append("cloud_with_normals.pcd");
-    writer.write(str2, *cwn, Eigen::Vector4f::Zero(),
+    pcl::io::saveVTKFile(vtk_mesh_filename, triangles);
+    writer.write(pcd_normals_filename, *cwn, Eigen::Vector4f::Zero(),
                  Eigen::Quaternionf::Identity(), false);
 }

@@ -65,7 +65,8 @@ public:
                    const std::vector<Features>& features,
                    const std::vector<Image>& images);
 
-    void toVTKFile(const std::string& filepath,
+    void toVTKFile(const std::string& vtk_mesh_filename,
+                   const std::string& pcd_normals_filename,
                    int psn_depth = 8,
                    int psn_solverDivide = 8,
                    int psn_isoDivide = 8,

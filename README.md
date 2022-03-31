@@ -27,6 +27,11 @@
 * `--filter` or `-f "FILTER_TYPE"`. A filter to be applied upon registering each image. Each filter removes certain outliers. Allowed values are
   * `STATISTICAL`
   * `RADIAL`
+* `--loss` or `-l "LOSS_TYPE"`. Changes the loss function used during bundle adjustment. Allowed values are
+  * `NULL`. The default loss function is used. This is just the squared norm of the residuals.
+  * `HUBER`. See [Ceres Solver docs](http://ceres-solver.org/nnls_modeling.html#_CPPv4N5ceres9HuberLossE).
+  * `SOFTLONE`. See [Ceres Solver docs](http://ceres-solver.org/nnls_modeling.html#_CPPv4N5ceres12SoftLOneLossE).
+  * `CAUCHY`. See [Ceres Solver docs](http://ceres-solver.org/nnls_modeling.html#_CPPv4N5ceres10CauchyLossE).
 
 ## :books: Sources
 [1] J. Zhang, M. Boutin, and D. G. Aliaga, “Robust bundle adjustment for structure from motion,” in 2006 International Conference on Image Processing, pp. 2185–2188, IEEE, 2006.

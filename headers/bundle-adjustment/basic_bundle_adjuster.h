@@ -23,6 +23,26 @@ namespace BundleAdjustUtils {
 using namespace BundleAdjustUtils;
 
 class BasicBundleAdjuster : public BundleAdjuster {
+private:
+    LossType lossType;
+
+    /*
+     * Helper to create loss functions. Parameter a = 1.0 indicates they are in un-scaled format.
+     */
+    static ceres::LossFunction* createLossFunction(LossType lossType) {
+        switch (lossType) {
+            case LossType::NULL_LOSS:
+                return nullptr;
+            case LossType::HUBER:
+                return new ceres::HuberLoss(1.0);
+            case LossType::SOFTLONE:
+                return new ceres::SoftLOneLoss(1.0);
+            case LossType::CAUCHY:
+                return new ceres::CauchyLoss(1.0);
+        }
+    }
+
+public:
     void adjustBundle(Bundle& bundle) override
     {
         std::call_once(initLoggingFlag, initLogging);
@@ -50,6 +70,7 @@ class BasicBundleAdjuster : public BundleAdjuster {
                 p2d.y -= bundle.cameras.at(kv.first).getCentre().y;
 
                 ceres::CostFunction* cost_function = SimpleReprojectionError::Create(p2d.x, p2d.y);
+                ceres::LossFunction* loss_function = createLossFunction(lossType);
 
                 PoseVector& pose = cameraPoses6d[kv.first];
 
@@ -107,6 +128,8 @@ class BasicBundleAdjuster : public BundleAdjuster {
             bundle.pointCloud.updatePoint(i, points3d[i](0), points3d[i](1), points3d[i](2));
         }
     }
+
+    explicit BasicBundleAdjuster(LossType type) : lossType(type) {};
 };
 
 #endif //SFM_BASIC_BUNDLE_ADJUSTER_H

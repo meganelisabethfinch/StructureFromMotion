@@ -20,6 +20,7 @@ struct Args {
     MatcherType matcherType;
     TriangulatorType triangulatorType;
     BundleAdjusterType bundleAdjusterType;
+    LossType lossType;
 
     std::set<FilterType> filterTypes;
 };

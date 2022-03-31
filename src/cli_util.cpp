@@ -23,6 +23,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
         {"filter", required_argument, 0, 'f'},
         {"output_format", required_argument, 0, 'g'},
         {"input", required_argument, 0, 'i'},
+        {"loss", required_argument, 0, 'l'},
         {"output", required_argument, 0, 'o'},
         {"triangulator", required_argument, 0, 't'},
         {0,0,0,0},
@@ -35,6 +36,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     args.matcherType = DEFAULT_MATCHER;
     args.triangulatorType = DEFAULT_TRIANGULATOR;
     args.bundleAdjusterType = DEFAULT_BUNDLE_ADJUSTER;
+    args.lossType = DEFAULT_LOSS_TYPE;
     std::vector<ImageID> baselines;
     args.outputTypes = { OutputType::PLY_POINT_CLOUD, OutputType::PLY_CAMERAS };
     args.filterTypes = { };
@@ -134,6 +136,18 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
                 }
                 break;
             }
+            case 'l': {
+                static std::map<std::string, LossType> const str2loss = {
+                        {"NULL",  LossType::NULL_LOSS },
+                        {"HUBER", LossType::HUBER },
+                        {"SOFTLONE", LossType::SOFTLONE },
+                        {"CAUCHY", LossType::CAUCHY }
+                };
+                if (str2loss.contains(optarg)) {
+                    args.lossType = str2loss.at(optarg);
+                }
+                break;
+            }
             default: {
                 std::cerr << "Unrecognised input option: " << opt << std::endl;
                 return false;
@@ -163,12 +177,17 @@ void CLIUtilities::Summary(const Args& args) {
     std::cout << "Matcher type: " << args.matcherType << std::endl;
     std::cout << "Triangulator type: " << static_cast<std::underlying_type<TriangulatorType>::type>(args.triangulatorType) << std::endl;
     std::cout << "BA type: " << static_cast<std::underlying_type<BundleAdjusterType>::type>(args.bundleAdjusterType) << std::endl;
+    std::cout << "Loss type: " << static_cast<std::underlying_type<LossType>::type>(args.lossType) << std::endl;
 
     std::cout << "Filter types: ";
-    for (auto type : args.filterTypes) {
-        std::cout << static_cast<std::underlying_type<FilterType>::type>(type) << ", ";
+    if (args.filterTypes.size() == 0) {
+        std::cout << "None." << std::endl;
+    } else {
+        for (auto type: args.filterTypes) {
+            std::cout << static_cast<std::underlying_type<FilterType>::type>(type) << ", ";
+        }
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
 
     if (args.useHomographyOrdering) {
         std::cout << "Baseline: based on homography inlier ordering." << std::endl;
@@ -195,8 +214,8 @@ cv::Ptr<Triangulator> CLIUtilities::CreateTriangulator(TriangulatorType type) {
     return Triangulator::create(type);
 }
 
-cv::Ptr<BundleAdjuster> CLIUtilities::CreateBundleAdjuster(BundleAdjusterType type) {
-    return BundleAdjuster::create(type);
+cv::Ptr<BundleAdjuster> CLIUtilities::CreateBundleAdjuster(BundleAdjusterType type, LossType loss) {
+    return BundleAdjuster::create(type, loss);
 }
 
 std::vector<cv::Ptr<Filter>> CLIUtilities::CreateFilters(const std::set<FilterType> &types) {

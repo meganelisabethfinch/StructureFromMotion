@@ -34,6 +34,7 @@ const DetectorType DEFAULT_DETECTOR = DetectorType::SIFT;
 const MatcherType DEFAULT_MATCHER = MatcherType::BRUTEFORCE;
 const TriangulatorType DEFAULT_TRIANGULATOR = TriangulatorType::LINEAR;
 const BundleAdjusterType DEFAULT_BUNDLE_ADJUSTER = BundleAdjusterType::BASIC;
+const LossType DEFAULT_LOSS_TYPE = LossType::NULL_LOSS;
 const bool DEFAULT_USE_HOMOGRAPHY_ORDERING = true;
 
 const DebugLevel DEFAULT_DEBUG = DebugLevel::SIMPLE;

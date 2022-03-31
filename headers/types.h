@@ -15,6 +15,7 @@ enum class DetectorType { SIFT, ORB };
 typedef cv::DescriptorMatcher::MatcherType MatcherType;
 enum class TriangulatorType { LINEAR, MIDPOINT };
 enum class BundleAdjusterType { OFF, BASIC, ZHANG };
+enum class LossType { NULL_LOSS, HUBER, SOFTLONE, CAUCHY };
 enum class FilterType { STATISTICAL, RADIAL };
 enum class OutputType { PLY_POINT_CLOUD, PLY_CAMERAS, PCD_POINT_CLOUD, VTK_MESH };
 

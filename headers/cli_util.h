@@ -25,7 +25,7 @@ public:
 
     static cv::Ptr<Triangulator> CreateTriangulator(TriangulatorType type);
 
-    static cv::Ptr<BundleAdjuster> CreateBundleAdjuster(BundleAdjusterType type);
+    static cv::Ptr<BundleAdjuster> CreateBundleAdjuster(BundleAdjusterType type, LossType loss = LossType::NULL_LOSS);
 
     static std::vector<cv::Ptr<Filter>> CreateFilters(const std::set<FilterType>& types);
 };

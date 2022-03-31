@@ -67,6 +67,14 @@ public:
                    const std::vector<Features>& features,
                    const std::vector<Image>& images);
 
+    void toVTKFile(const std::string& filename,
+                   int psn_depth = 8,
+                   int psn_solverDivide = 8,
+                   int psn_isoDivide = 8,
+                   float psn_samplesPerNode = 3,
+                   float psn_scale = 1.25,
+                   int psn_confidence = 1);
+
     Point3DInMap operator[](size_t i);
     std::vector<Point3DInMap>::iterator begin();
     std::vector<Point3DInMap>::iterator end();

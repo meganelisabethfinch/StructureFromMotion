@@ -12,9 +12,16 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
+#include <pcl/io/vtk_io.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/radius_outlier_removal.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/surface/poisson.h>
+
 #include <headers/vector_util.h>
+
+typedef pcl::PointXYZ PointType;
+typedef pcl::PointNormal PointTypeN;
 
 PointCloud::PointCloud() {}
 
@@ -261,3 +268,71 @@ void PointCloud::toPCDFile(const std::string& filename,
     pcl::io::savePCDFileASCII(filename, pcl_cloud);
 }
 
+void PointCloud::toVTKFile(const std::string& filename,
+                           int psn_depth,
+                           int psn_solverDivide,
+                           int psn_isoDivide,
+                           float psn_samplesPerNode,
+                           float psn_scale,
+                           int psn_confidence) {
+    std::cout << "--- Converting point cloud to surface ---" << std::endl;
+    // Convert cloud to PCL point cloud
+    pcl::PointCloud<PointType>::Ptr cloud(new pcl::PointCloud<PointType>);
+    for (const auto& point3D : *this) {
+        // point constructor: pcl_point(x,y,z); - all std::uint8_t
+        pcl::PointXYZ pcl_point(static_cast<float>(point3D.pt.x),
+                                static_cast<float>(point3D.pt.y),
+                                static_cast<float>(point3D.pt.z));
+
+        cloud->points.emplace_back(pcl_point);
+    }
+
+    // Normal estimation
+    pcl::NormalEstimation<PointType, pcl::Normal> normEst;
+    pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
+
+    // Create kdtree representation of cloud,
+    // and pass it to the normal estimation object.
+    pcl::search::KdTree<PointType>::Ptr tree (new
+        pcl::search::KdTree<PointType>);
+    tree->setInputCloud(cloud);
+    normEst.setInputCloud(cloud);
+    normEst.setSearchMethod(tree);
+    // Estimate normal from 20 neighbour points
+    normEst.setKSearch(20);
+    normEst.compute(*normals);
+
+    // Concatenate XYZ and normal fields
+    pcl::PointCloud<PointTypeN>::Ptr cloud_with_normals (
+            new pcl::PointCloud<PointTypeN>);
+    pcl::concatenateFields(*cloud, *normals, *cloud_with_normals);
+
+    pcl::search::KdTree<PointTypeN>::Ptr tree2 (new
+        pcl::search::KdTree<PointTypeN>);
+    tree2->setInputCloud(cloud_with_normals);
+
+    // Set up Poisson reconstruction
+    pcl::Poisson<PointTypeN> psn;
+    pcl::PolygonMesh triangles;
+
+    psn.setInputCloud(cloud_with_normals);
+    psn.setSearchMethod(tree2);
+    psn.setDepth(psn_depth);
+    psn.setSolverDivide(psn_solverDivide);
+    psn.setIsoDivide(psn_isoDivide);
+    psn.setSamplesPerNode(psn_samplesPerNode);
+    psn.setScale(psn_scale);
+    psn.setConfidence(psn_confidence);
+    psn.reconstruct(triangles);
+
+    pcl::PCDWriter writer;
+    pcl::PCLPointCloud2::Ptr cwn (new pcl::PCLPointCloud2());
+    pcl::toPCLPointCloud2(*cloud_with_normals, *cwn);
+
+    std::string str, str2;
+    str.append(filename).append("mesh.vtk");
+    pcl::io::saveVTKFile(str, triangles);
+    str2.append(filename).append("cloud_with_normals.pcd");
+    writer.write(str2, *cwn, Eigen::Vector4f::Zero(),
+                 Eigen::Quaternionf::Identity(), false);
+}

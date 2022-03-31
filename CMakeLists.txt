@@ -24,7 +24,7 @@ find_package(Threads REQUIRED)
 
 find_package(Ceres REQUIRED)
 
-find_package(PCL REQUIRED COMPONENTS common io filters)
+find_package(PCL REQUIRED COMPONENTS common io filters features surface)
 include_directories(${PCL_INCLUDE_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 

@@ -39,18 +39,13 @@ int main(int argc, char** argv) {
     std::cout << "---- Find Baseline Triangulator ---" << std::endl;
     auto triangulator = CLIUtilities::CreateTriangulator(args.triangulatorType);
     auto bundleAdjuster = CLIUtilities::CreateBundleAdjuster(args.bundleAdjusterType);
-    bool enableSOR = args.sorArgs.enableSOR != 0;
-    bool enableROR = args.rorArgs.enableROR != 0;
-
-    std::cout << "ROR: " << enableROR << std::endl;
+    auto filters = CLIUtilities::CreateFilters(args.filterTypes);
 
     if (args.useHomographyOrdering) {
-        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster,
-                                                  enableSOR, enableROR);
+        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster, filters);
         recon.outputToFiles(args.outputDir, args.outputTypes);
     } else {
-        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster,
-                                                  enableSOR, enableROR,
+        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster, filters,
                                                   args.baselinePair);
         recon.outputToFiles(args.outputDir, args.outputTypes);
     }

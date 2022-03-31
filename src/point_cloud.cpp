@@ -51,6 +51,11 @@ void PointCloud::updatePoint(size_t i, double x, double y, double z) {
     mReconstructionCloud[i].pt.z = z;
 }
 
+void PointCloud::removePoints(std::vector<int>& indices_to_remove) {
+    VectorUtilities::removeIndicesFromVector(mReconstructionCloud, indices_to_remove);
+}
+
+
 void PointCloud::mergePoints(PointCloud &pc, Matches& matches, double mergePointDistance, double mergeFeatureDistance) {
     MatchMatrix mergeMatchMatrix;
     mergeMatchMatrix.resize(matches.size(), std::vector<Matching2>(matches.size()));
@@ -124,81 +129,6 @@ void PointCloud::mergePoints(PointCloud &pc, Matches& matches, double mergePoint
         std::cout << "Adding: " << pc.size() << " (new: " << newPoints << ", merged: " << mergedPoints << ")"
                   << std::endl;
     }
-}
-
-void PointCloud::pruneStatisticalOutliers(int k, double stddev_mult) {
-    std::cout << "--- Remove Statistical Outliers ---" << std::endl;
-    // Convert cloud to PCL point cloud
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in(new pcl::PointCloud<pcl::PointXYZ>);
-    for (const auto& point3D : *this) {
-        // point constructor: pcl_point(x,y,z); - all std::uint8_t
-        pcl::PointXYZ pcl_point(static_cast<float>(point3D.pt.x),
-                                static_cast<float>(point3D.pt.y),
-                                static_cast<float>(point3D.pt.z));
-
-        cloud_in->points.emplace_back(pcl_point);
-    }
-
-    // Set up filter
-    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sorfilter(true);
-    sorfilter.setInputCloud(cloud_in);
-    sorfilter.setMeanK(8);
-    sorfilter.setStddevMulThresh(stddev_mult);
-
-    // Apply filter and extract outliers
-    pcl::PointCloud<pcl::PointXYZ> cloud_out;
-    sorfilter.filter(cloud_out);
-    pcl::IndicesConstPtr rm = sorfilter.getRemovedIndices();
-
-    // Convert rm to std::vector<int>
-    std::vector<int> outlier_indices;
-    for (int i : *rm) {
-        outlier_indices.push_back(i);
-    }
-
-    // Prune this point cloud
-    VectorUtilities::removeIndicesFromVector(mReconstructionCloud, outlier_indices);
-    std::cout << "SOR Result: point cloud reduced from " << cloud_in->size() << " points -> "
-        << mReconstructionCloud.size() << " points" << std::endl;
-}
-
-void PointCloud::pruneRadialOutliers(double radiusSearch, int minNeighborsInRadius) {
-    std::cout << "--- Remove Radial Outliers ---" << std::endl;
-    // Convert cloud to PCL point cloud
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in(new pcl::PointCloud<pcl::PointXYZ>);
-    for (const auto& point3D : *this) {
-        // point constructor: pcl_point(x,y,z); - all std::uint8_t
-        pcl::PointXYZ pcl_point(static_cast<float>(point3D.pt.x),
-                                static_cast<float>(point3D.pt.y),
-                                static_cast<float>(point3D.pt.z));
-
-        cloud_in->points.emplace_back(pcl_point);
-    }
-
-    // Set up filter
-    pcl::RadiusOutlierRemoval<pcl::PointXYZ> rorfilter(true);
-    rorfilter.setInputCloud(cloud_in);
-    rorfilter.setRadiusSearch(radiusSearch);
-    rorfilter.setMinNeighborsInRadius(minNeighborsInRadius);
-    rorfilter.setNegative(false);
-    // When negative = true, we get points with < N neighbours in the search radius
-    // When negative = false, we get points with >= N neighbours in the search radius
-
-    // Apply filter and extract outliers
-    pcl::PointCloud<pcl::PointXYZ> cloud_out;
-    rorfilter.filter(cloud_out);
-    pcl::IndicesConstPtr rm = rorfilter.getRemovedIndices();
-
-    // Convert rm to std::vector<int>
-    std::vector<int> outlier_indices;
-    for (int i : *rm) {
-        outlier_indices.push_back(i);
-    }
-
-    // Prune this point cloud
-    VectorUtilities::removeIndicesFromVector(mReconstructionCloud, outlier_indices);
-    std::cout << "ROR Result: point cloud reduced from " << cloud_in->size() << " points -> "
-              << mReconstructionCloud.size() << " points" << std::endl;
 }
 
 pcl::PointCloud<pcl::PointXYZRGB> PointCloud::toPCLPointCloud(const std::vector<Features>& features,

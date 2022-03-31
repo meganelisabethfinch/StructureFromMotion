@@ -30,13 +30,11 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          Matches &mFeatureMatchMatrix,
                                          const cv::Ptr<Triangulator>& triangulator,
                                          const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                                         bool removeStatisticalOutliers,
-                                         bool removeRadialOutliers)
+                                         std::vector<cv::Ptr<Filter>>& filters)
         : _mImages(mImages), _mCameras(mCameras),
         _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix),
         _triangulator(triangulator), _bundleAdjuster(bundleAdjuster),
-        _removeStatisticalOutliers(removeStatisticalOutliers),
-        _removeRadialOutliers(removeRadialOutliers)
+        _filters(filters)
 {
     std::map<double, ImagePair> imagePairsByHomographyInliers = SFMUtilities::SortViewsForBaseline(_mImageFeatures, _mFeatureMatchMatrix);
 
@@ -53,13 +51,11 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
                                          ImagePair& baselinePair,
                                          const cv::Ptr<Triangulator>& triangulator,
                                          const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                                         bool removeStatisticalOutliers,
-                                         bool removeRadialOutliers)
+                                         std::vector<cv::Ptr<Filter>>& filters)
                                          : _mImages(mImages), _mCameras(mCameras),
                                          _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix),
                                          _triangulator(triangulator), _bundleAdjuster(bundleAdjuster),
-                                        _removeStatisticalOutliers(removeStatisticalOutliers),
-                                        _removeRadialOutliers(removeRadialOutliers)
+                                        _filters(filters)
 {
     std::vector<ImagePair> orderedImagePairs;
     orderedImagePairs.push_back(baselinePair);
@@ -174,12 +170,7 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
 
         _mGoodViews.insert(imageId);
         if (anyViewSuccess) {
-            if (_removeStatisticalOutliers) {
-                _pointCloud.pruneStatisticalOutliers();
-            }
-            if (_removeRadialOutliers) {
-                _pointCloud.pruneRadialOutliers();
-            }
+            applyFilters();
             adjustBundle();
         }
 
@@ -236,8 +227,11 @@ bool SceneReconstruction::adjustBundle() {
     return true;
 }
 
-void SceneReconstruction::toColmapFile(const std::string& filename) {
-    // TODO
+bool SceneReconstruction::applyFilters() {
+    for (auto& filter : _filters) {
+        filter->filterOutliers(_pointCloud);
+    }
+    return true;
 }
 
 void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile) {

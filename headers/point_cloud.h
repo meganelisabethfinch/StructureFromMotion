@@ -49,15 +49,13 @@ public:
 
     void updatePoint(size_t i, double x, double y, double z);
 
+    void removePoints(std::vector<int>& indices_to_remove);
+
     void mergePoints(PointCloud& pc,
                      Matches& matches,
                      double mergePointDistance = MERGE_CLOUD_POINT_MIN_MATCH_DISTANCE,
                      double mergeFeatureDistance = MERGE_CLOUD_FEATURE_MIN_MATCH_DISTANCE);
     // Merge an existing point cloud into this one
-
-    void pruneStatisticalOutliers(int k = 8, double stddev_mult = 1.0);
-
-    void pruneRadialOutliers(double radiusSearch = 0.1, int minNeighborsInRadius = 5);
 
     void toPlyFile(const std::string& filename,
                    const std::vector<Features>& features,

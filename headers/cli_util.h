@@ -9,6 +9,7 @@
 #include "cli_args.h"
 
 #include <opencv2/features2d.hpp>
+#include "filters/filter.h"
 #include "triangulation/triangulator.h"
 #include "bundle-adjustment/bundle_adjuster.h"
 
@@ -25,6 +26,8 @@ public:
     static cv::Ptr<Triangulator> CreateTriangulator(TriangulatorType type);
 
     static cv::Ptr<BundleAdjuster> CreateBundleAdjuster(BundleAdjusterType type);
+
+    static std::vector<cv::Ptr<Filter>> CreateFilters(std::set<FilterType> types);
 };
 
 #endif //SFM_CLI_H

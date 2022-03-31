@@ -16,14 +16,12 @@
 
 bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     static struct option long_options[] = {
-         // These options set a flag
-        {"remove_statistical_outliers", no_argument, &args.sorArgs.enableSOR, 1},
-        {"remove_radial_outliers", no_argument, &args.rorArgs.enableROR, 1},
         // These options don't set a flag
         {"bundle_adjuster", required_argument, 0, 'a'},
         {"baseline", required_argument, 0, 'b'},
         {"feature_detector", required_argument, 0, 'd'},
-        {"format", required_argument, 0, 'f'},
+        {"filter", required_argument, 0, 'f'},
+        {"output_format", required_argument, 0, 'g'},
         {"input", required_argument, 0, 'i'},
         {"output", required_argument, 0, 'o'},
         {"triangulator", required_argument, 0, 't'},
@@ -37,10 +35,9 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     args.matcherType = DEFAULT_MATCHER;
     args.triangulatorType = DEFAULT_TRIANGULATOR;
     args.bundleAdjusterType = DEFAULT_BUNDLE_ADJUSTER;
-    args.sorArgs.enableSOR = DEFAULT_ENABLE_SOR;
-    args.rorArgs.enableROR = DEFAULT_ENABLE_ROR;
     std::vector<ImageID> baselines;
     args.outputTypes = { OutputType::PLY_POINT_CLOUD, OutputType::PLY_CAMERAS };
+    args.filterTypes = { };
 
     // Parse arguments
     int opt;
@@ -117,6 +114,15 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
                 break;
             }
             case 'f': {
+                static std::map<std::string, FilterType> const str2filter = {
+                        {"STATISTICAL",  FilterType::STATISTICAL },
+                        {"RADIAL", FilterType::RADIAL }
+                };
+                if (str2filter.contains(optarg)) {
+                    args.filterTypes.insert(str2filter.at(optarg));
+                }
+            }
+            case 'g': {
                 static std::map<std::string, OutputType> const str2out = {
                         {"PLY_POINT_CLOUD",  OutputType::PLY_POINT_CLOUD },
                         {"PLY_CAMERAS", OutputType::PLY_CAMERAS },
@@ -158,14 +164,18 @@ void CLIUtilities::Summary(const Args& args) {
     std::cout << "Triangulator type: " << static_cast<std::underlying_type<TriangulatorType>::type>(args.triangulatorType) << std::endl;
     std::cout << "BA type: " << static_cast<std::underlying_type<BundleAdjusterType>::type>(args.bundleAdjusterType) << std::endl;
 
+    std::cout << "Filter types: ";
+    for (auto type : args.filterTypes) {
+        std::cout << static_cast<std::underlying_type<FilterType>::type>(type) << ", ";
+    }
+    std::cout << std::endl;
+
     if (args.useHomographyOrdering) {
         std::cout << "Baseline: based on homography inlier ordering." << std::endl;
     } else {
         std::cout << "Baseline: (" << args.baselinePair.left << ", " << args.baselinePair.right << ")" << std::endl;
     }
 
-    std::cout << "Enable statistical outlier removal: " << args.sorArgs.enableSOR << std::endl;
-    std::cout << "Enable radial outlier removal: " << args.rorArgs.enableROR << std::endl;
 }
 
 cv::Ptr<cv::FeatureDetector> CLIUtilities::CreateDetector(DetectorType type) {
@@ -187,4 +197,13 @@ cv::Ptr<Triangulator> CLIUtilities::CreateTriangulator(TriangulatorType type) {
 
 cv::Ptr<BundleAdjuster> CLIUtilities::CreateBundleAdjuster(BundleAdjusterType type) {
     return BundleAdjuster::create(type);
+}
+
+std::vector<cv::Ptr<Filter>> CreateFilters(std::set<FilterType> types) {
+    // TODO: cases depending on type of filter, allowing different parameters to be set
+    std::vector<cv::Ptr<Filter>> filters = {};
+    for (auto type : types) {
+        filters.push_back(Filter::create(type));
+    }
+    return filters;
 }

@@ -35,8 +35,6 @@ const MatcherType DEFAULT_MATCHER = MatcherType::BRUTEFORCE;
 const TriangulatorType DEFAULT_TRIANGULATOR = TriangulatorType::LINEAR;
 const BundleAdjusterType DEFAULT_BUNDLE_ADJUSTER = BundleAdjusterType::BASIC;
 const bool DEFAULT_USE_HOMOGRAPHY_ORDERING = true;
-const int DEFAULT_ENABLE_SOR = 0;
-const int DEFAULT_ENABLE_ROR = 0;
 
 const DebugLevel DEFAULT_DEBUG = DebugLevel::SIMPLE;
 const VisualDebugLevel DEFAULT_VISUAL_DEBUG = VisualDebugLevel::NONE;

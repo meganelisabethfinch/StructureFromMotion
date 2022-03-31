@@ -42,14 +42,12 @@ public:
 
     SceneReconstruction toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator,
                                               const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                                              bool removeStatisticalOutliers,
-                                              bool removeRadialOutliers,
+                                              std::vector<cv::Ptr<Filter>>& filters,
                                               ImagePair& imagePair);
 
     SceneReconstruction toSceneReconstruction(const cv::Ptr<Triangulator>& triangulator,
                                               const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                                              bool removeStatisticalOutliers,
-                                              bool removeRadialOutliers);
+                                              std::vector<cv::Ptr<Filter>>& filters);
 
     SceneGraph toSceneGraph();
 };

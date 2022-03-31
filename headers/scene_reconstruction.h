@@ -6,6 +6,7 @@
 #define SFM_SCENE_RECONSTRUCTION_H
 
 #include <set>
+#include <headers/filters/filter.h>
 #include "triangulation/triangulator.h"
 #include "bundle-adjustment/bundle_adjuster.h"
 
@@ -31,9 +32,7 @@ private:
 
     cv::Ptr<Triangulator> _triangulator;
     cv::Ptr<BundleAdjuster> _bundleAdjuster;
-
-    bool _removeStatisticalOutliers;
-    bool _removeRadialOutliers;
+    std::vector<cv::Ptr<Filter>> _filters;
 
     void initialise(std::vector<ImagePair> baselines);
 
@@ -46,8 +45,7 @@ public:
                         Matches& mFeatureMatchMatrix,
                         const cv::Ptr<Triangulator>& triangulator,
                         const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                        bool removeStatisticalOutliers,
-                        bool removeRadialOutliers);
+                        std::vector<cv::Ptr<Filter>>& filters);
 
     SceneReconstruction(std::vector<Image> &mImages,
                         std::vector<Camera> &mCameras,
@@ -56,8 +54,7 @@ public:
                         ImagePair& baselinePair,
                         const cv::Ptr<Triangulator>& triangulator,
                         const cv::Ptr<BundleAdjuster>& bundleAdjuster,
-                        bool removeStatisticalOutliers,
-                        bool removeRadialOutliers);
+                        std::vector<cv::Ptr<Filter>>& filters);
 
     void registerMoreImages();
 
@@ -65,7 +62,7 @@ public:
 
     bool adjustBundle();
 
-    void toColmapFile(const std::string& filename);
+    bool applyFilters();
 
     void toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile);
 

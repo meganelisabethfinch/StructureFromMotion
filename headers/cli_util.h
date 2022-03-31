@@ -27,7 +27,7 @@ public:
 
     static cv::Ptr<BundleAdjuster> CreateBundleAdjuster(BundleAdjusterType type);
 
-    static std::vector<cv::Ptr<Filter>> CreateFilters(std::set<FilterType> types);
+    static std::vector<cv::Ptr<Filter>> CreateFilters(const std::set<FilterType>& types);
 };
 
 #endif //SFM_CLI_H

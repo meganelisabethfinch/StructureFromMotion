@@ -199,9 +199,10 @@ cv::Ptr<BundleAdjuster> CLIUtilities::CreateBundleAdjuster(BundleAdjusterType ty
     return BundleAdjuster::create(type);
 }
 
-std::vector<cv::Ptr<Filter>> CreateFilters(std::set<FilterType> types) {
+std::vector<cv::Ptr<Filter>> CLIUtilities::CreateFilters(const std::set<FilterType> &types) {
     // TODO: cases depending on type of filter, allowing different parameters to be set
     std::vector<cv::Ptr<Filter>> filters = {};
+    filters.reserve(types.size());
     for (auto type : types) {
         filters.push_back(Filter::create(type));
     }

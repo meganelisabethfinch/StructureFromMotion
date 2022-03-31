@@ -64,6 +64,7 @@ add_executable(
         headers/cost/zhang_rba_error.h src/cost/zhang_rba_error.cpp
         headers/triangulation/triangulator.h src/triangulation/triangulator.cpp
         src/bundle-adjustment/bundle_adjuster.cpp
+        headers/filters/filter.h src/filters/filter.cpp
         headers/vector_util.h src/vector_util.cpp)
 
 target_sources(

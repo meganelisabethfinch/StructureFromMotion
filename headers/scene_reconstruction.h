@@ -68,5 +68,7 @@ public:
     void toColmapFile(const std::string& filename);
 
     void toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile);
+
+    void outputToFiles(const std::string& outputDirectory, std::set<OutputType> outputTypes);
 };
 #endif //SFM_SCENE_RECONSTRUCTION_H

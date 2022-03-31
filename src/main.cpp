@@ -42,15 +42,17 @@ int main(int argc, char** argv) {
     bool enableSOR = args.sorArgs.enableSOR != 0;
     bool enableROR = args.rorArgs.enableROR != 0;
 
+    std::cout << "ROR: " << enableROR << std::endl;
+
     if (args.useHomographyOrdering) {
         auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster,
                                                   enableSOR, enableROR);
-        recon.toPlyFile("point_cloud.ply", "_cameras.ply");
+        recon.outputToFiles(args.outputDir, args.outputTypes);
     } else {
         auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster,
                                                   enableSOR, enableROR,
                                                   args.baselinePair);
-        recon.toPlyFile("point_cloud.ply", "_cameras.ply");
+        recon.outputToFiles(args.outputDir, args.outputTypes);
     }
 
     return 0;

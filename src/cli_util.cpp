@@ -23,6 +23,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
         {"bundle_adjuster", required_argument, 0, 'a'},
         {"baseline", required_argument, 0, 'b'},
         {"feature_detector", required_argument, 0, 'd'},
+        {"format", required_argument, 0, 'f'},
         {"input", required_argument, 0, 'i'},
         {"output", required_argument, 0, 'o'},
         {"triangulator", required_argument, 0, 't'},
@@ -30,6 +31,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     };
 
     // Set defaults before parsing
+    args.outputDir = "";
     args.useHomographyOrdering = DEFAULT_USE_HOMOGRAPHY_ORDERING;
     args.detectorType = DEFAULT_DETECTOR;
     args.matcherType = DEFAULT_MATCHER;
@@ -38,6 +40,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     args.sorArgs.enableSOR = DEFAULT_ENABLE_SOR;
     args.rorArgs.enableROR = DEFAULT_ENABLE_ROR;
     std::vector<ImageID> baselines;
+    args.outputTypes = { OutputType::PLY_POINT_CLOUD, OutputType::PLY_CAMERAS };
 
     // Parse arguments
     int opt;
@@ -110,6 +113,18 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
                     args.detectorType = str2det.at(optarg);
                 } else {
                     std::cerr << "Unrecognised feature detector type: " << optarg << ". Using default type." << std::endl;
+                }
+                break;
+            }
+            case 'f': {
+                static std::map<std::string, OutputType> const str2out = {
+                        {"PLY_POINT_CLOUD",  OutputType::PLY_POINT_CLOUD },
+                        {"PLY_CAMERAS", OutputType::PLY_CAMERAS },
+                        {"PCD_POINT_CLOUD", OutputType::PCD_POINT_CLOUD },
+                        {"VTK_MESH", OutputType::VTK_MESH}
+                };
+                if (str2out.contains(optarg)) {
+                    args.outputTypes.insert(str2out.at(optarg));
                 }
                 break;
             }

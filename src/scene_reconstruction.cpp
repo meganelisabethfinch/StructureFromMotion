@@ -35,7 +35,8 @@ SceneReconstruction::SceneReconstruction(std::vector<Image> &mImages,
         : _mImages(mImages), _mCameras(mCameras),
         _mImageFeatures(mImageFeatures), _mFeatureMatchMatrix(mFeatureMatchMatrix),
         _triangulator(triangulator), _bundleAdjuster(bundleAdjuster),
-        _removeStatisticalOutliers(removeStatisticalOutliers)
+        _removeStatisticalOutliers(removeStatisticalOutliers),
+        _removeRadialOutliers(removeRadialOutliers)
 {
     std::map<double, ImagePair> imagePairsByHomographyInliers = SFMUtilities::SortViewsForBaseline(_mImageFeatures, _mFeatureMatchMatrix);
 
@@ -271,16 +272,33 @@ void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std
         cameras_file << cz.x << " " << cz.y << " " << cz.z << std::endl;
     }
 
-    // Add edges
-    /*
-    for (int i = 0; i < _mCameraPoses.size(); i++) {
-        cameras_file << i << " " << i + 1 << std::endl; // c to cx
-        cameras_file << i << " " << i + 2 << std::endl; // c to cy
-        cameras_file << i << " " << i + 3 << std::endl; // c to cz
-    }
-     */
-
     cameras_file.close();
 }
+
+void SceneReconstruction::outputToFiles(const std::string& outputDirectory, std::set<OutputType> outputTypes){
+    for (auto type : outputTypes) {
+        std::string filename;
+        switch (type) {
+            case OutputType::PLY_POINT_CLOUD:
+                filename.append(outputDirectory).append("point_cloud.ply");
+                _pointCloud.toPlyFile(filename, _mImageFeatures, _mImages);
+                break;
+            case OutputType::PLY_CAMERAS:
+                // TODO: output cameras only here
+                filename.append(outputDirectory).append("cameras.ply");
+                this->toPlyFile("point_cloud.ply", filename);
+                break;
+            case OutputType::PCD_POINT_CLOUD:
+                filename.append(outputDirectory).append("point_cloud.pcd");
+                _pointCloud.toPCDFile(filename, _mImageFeatures, _mImages);
+                break;
+            case OutputType::VTK_MESH:
+                filename.append(outputDirectory).append("mesh.vtk");
+                _pointCloud.toVTKFile(filename);
+                break;
+        }
+    }
+}
+
 
 

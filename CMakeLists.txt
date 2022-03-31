@@ -169,7 +169,7 @@ add_library(
         headers/bundle-adjustment/dummy_bundle_adjuster.h
         headers/bundle-adjustment/basic_bundle_adjuster.h
         headers/bundle-adjustment/zhang_bundle_adjuster.h
-        headers/bundle.h headers/vector_util.h)
+        headers/bundle.h headers/vector_util.h headers/filters/filter.h headers/filters/statistical_outlier_filter.h headers/filters/radial_outlier_filter.h)
 
 target_include_directories(
         SFMLib

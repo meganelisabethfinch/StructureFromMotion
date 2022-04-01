@@ -74,6 +74,11 @@ public:
         auto c = K.getCentre();
         cv::Vec3d u_prime = { u.x - c.x, u.y - c.y, K.getFocalLength() };
         auto p = P.getRotationMatrix().inv() * u_prime - P.getTranslationVector();
+
+        // 11.
+        // auto c = K.getCentre();
+        // cv::Vec3d u_prime = { u.x - c.x, u.y - c.y, K.getFocalLength() };
+        // auto p = P.getRotationMatrix() * u_prime;
         return { p(0), p(1), p(2) };
     }
 
@@ -95,6 +100,7 @@ public:
                                  Matching2& matching,
                                  Pose& pose1, Pose& pose2) override
     {
+        std::cout << "Triangulating points between images " << img1 << " and " << img2 << std::endl;
         PointCloud pc;
 
         for (auto& match : matching) {

@@ -5,7 +5,7 @@
 #ifndef SFM_FILTER_H
 #define SFM_FILTER_H
 
-#include <headers/point_cloud.h>
+#include "../point_cloud.h"
 
 class Filter {
 public:

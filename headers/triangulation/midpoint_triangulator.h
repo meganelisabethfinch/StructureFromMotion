@@ -51,8 +51,8 @@ public:
         // auto p = K.getCameraMatrix() * P.getRotationMatrix() * u_prime + K.getCameraMatrix() * P.getTranslationVector();
 
         // 3.
-        cv::Vec3d u_prime = { u.x, u.y, 1 };
-        auto p = P.getRotationMatrix() * K.getCameraMatrix().inv() * u_prime + P.getTranslationVector();
+        // cv::Vec3d u_prime = { u.x, u.y, 1 };
+        // auto p = P.getRotationMatrix() * K.getCameraMatrix().inv() * u_prime + P.getTranslationVector();
 
         // 4.
         // cv::Vec3d u_prime = { u.x, u.y, 1 };
@@ -69,6 +69,11 @@ public:
         // 9.
         // cv::Vec3d u_prime = { u.x, u.y, K.getFocalLength() };
         // auto p = P.getRotationMatrix() * u_prime + P.getTranslationVector();
+
+        // 10.
+        auto c = K.getCentre();
+        cv::Vec3d u_prime = { u.x - c.x, u.y - c.y, K.getFocalLength() };
+        auto p = P.getRotationMatrix().inv() * u_prime - P.getTranslationVector();
         return { p(0), p(1), p(2) };
     }
 

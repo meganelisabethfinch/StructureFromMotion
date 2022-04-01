@@ -6,7 +6,7 @@
 #define SFM_SCENE_RECONSTRUCTION_H
 
 #include <set>
-#include <headers/filters/filter.h>
+#include "filters/filter.h"
 #include "triangulation/triangulator.h"
 #include "bundle-adjustment/bundle_adjuster.h"
 

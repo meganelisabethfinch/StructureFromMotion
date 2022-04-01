@@ -170,7 +170,10 @@ add_library(
         headers/bundle-adjustment/dummy_bundle_adjuster.h
         headers/bundle-adjustment/basic_bundle_adjuster.h
         headers/bundle-adjustment/zhang_bundle_adjuster.h
-        headers/bundle.h headers/vector_util.h headers/filters/filter.h headers/filters/statistical_outlier_filter.h headers/filters/radial_outlier_filter.h src/filters/filter.cpp)
+        headers/bundle.h headers/vector_util.h
+        headers/filters/filter.h src/filters/filter.cpp
+        headers/filters/statistical_outlier_filter.h
+        headers/filters/radial_outlier_filter.h )
 
 target_include_directories(
         SFMLib
@@ -191,6 +194,7 @@ target_include_directories(
         /Users/meganfinch/glog/cmake-build-release
         /Users/meganfinch/glog/src
         /Users/meganfinch/gflags/cmake-build-release/include
+        ${PCL_INCLUDE_DIRS}
 )
 
 target_link_directories(
@@ -201,6 +205,7 @@ target_link_directories(
         #"/Users/meganfinch/ceres-solver/cmake-build-release/lib"
         #"/Users/meganfinch/gflags/cmake-build-release/lib"
         #"/Users/meganfinch/glog/cmake-build-release/"
+        ${PCL_LIBRARY_DIRS}
 )
 
 
@@ -225,6 +230,7 @@ target_link_libraries(
         ceres
         #gflags
         #glog
+        ${PCL_LIBRARIES}
 )
 
 set_target_properties(SFMLib PROPERTIES VERSION ${PROJECT_VERSION})

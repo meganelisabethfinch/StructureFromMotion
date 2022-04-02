@@ -78,20 +78,46 @@ public:
         // 11.
         // auto c = K.getCentre();
         // cv::Vec3d u_prime = { u.x - c.x, u.y - c.y, K.getFocalLength() };
-        // auto p = P.getRotationMatrix() * u_prime;
+        // auto p = P.getRotationMatrix() * u_prime + P.getTranslationVector();
+
         return { p(0), p(1), p(2) };
     }
 
     static std::pair<cv::Vec3d, cv::Vec3d> backProjectPointToRay(const cv::Point2d& u,
-                                                                 const Camera& K,
-                                                                 const Pose& P) {
-        auto p_pt = backProjectPointToPoint(u,K,P);
-        auto C_mat = P.getTranslationVector();
+                                                                 const Camera& camera,
+                                                                 const Pose& pose) {
+        // From MVG
+        cv::Matx34d P = camera.getCameraMatrix() * pose.getProjectionMatrix();
+        Pose k_pose = Pose(P);
 
-        // Reformat as vectors
-        cv::Vec3d p = {p_pt.x, p_pt.y, p_pt.z};
-        cv::Vec3d C = { C_mat(0), C_mat(1), C_mat(2) };
-        return { C, C - p };
+        auto R = k_pose.getRotationMatrix();
+        auto t = k_pose.getTranslationVector();
+
+        // Find camera centre - from
+        // t = -R * c => -R.inv() * t = c
+        auto c_mat = -R.inv() * t;
+        // cv::Vec4d c = { c_mat(0), c_mat(1), c_mat(2), 1 };
+
+        /*
+        // Sanity checks
+        auto P_inv = P.t() * (P * P.t()).inv();
+        auto check_pseudo_inv = P * P_inv;
+        std::cout << "Should be identity: " << std::endl;
+        std::cout << check_pseudo_inv << std::endl;
+
+        auto check2 = P * c;
+        std::cout << "Should be zero: " << std::endl;
+        std::cout << check2 << std::endl;
+         */
+
+        // Find and normalise direction vector
+        cv::Vec3d x = { u.x , u.y, 1 };
+        auto v = R.inv() * x;
+
+        // Just ignore homogenous coords for now
+        // cv::Vec4d dir4 = { dir3(0), dir3(1), dir3(2), 0 };
+
+        return {{c_mat(0), c_mat(1), c_mat(2)}, { v(0), v(1), v(2) } };
     }
 
     PointCloud triangulateImages(ImageID img1, ImageID img2,
@@ -115,13 +141,13 @@ public:
 
             // Do the triangulation
             auto pt = triangulatePoint(L1.first, L2.first, L1.second, L2.second);
-
-            // Add to point cloud
-            Point3DInMap pt3d;
-            pt3d.pt = pt;
-            pt3d.originatingViews.insert({img1, match.queryIdx});
-            pt3d.originatingViews.insert({img2, match.trainIdx});
-            pc.addPoint(pt3d);
+                // Add to point cloud
+                Point3DInMap pt3d;
+                pt3d.pt = pt;
+                pt3d.originatingViews.insert({img1, match.queryIdx});
+                pt3d.originatingViews.insert({img2, match.trainIdx});
+                pc.addPoint(pt3d);
+                // std::cout << "added point" << pt << std::endl;
         }
         return pc;
     }

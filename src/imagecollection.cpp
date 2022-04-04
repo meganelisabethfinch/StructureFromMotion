@@ -18,8 +18,12 @@ ImageCollection::ImageCollection(const std::string& directory) {
 
     std::vector<cv::String> jpgs;
     cv::glob(directory + "/*.jpg", jpgs, false);
-
     filenames.insert(filenames.end(), jpgs.begin(), jpgs.end());
+
+    cv::glob(directory + "/*.JPG", jpgs, false);
+    filenames.insert(filenames.end(), jpgs.begin(), jpgs.end());
+
+    std::cout << filenames.size() << std::endl;
 
     for (const auto& fn : filenames) {
         cv::Mat data = cv::imread(fn, cv::IMREAD_COLOR);

@@ -30,7 +30,11 @@ SFMUtilities::recoverPoseFromMatches(Camera &cam1, Camera &cam2,
     auto pp = cam1.getCentre();
 
     if (points1.size() < POINTS_NEEDED_ESSENTIAL_MATRIX) {
-        throw std::runtime_error("Not enough points to compute essential matrix.");
+        std::string err = "Not enough points to compute essential matrix: ";
+        err.append(std::to_string(points1.size()));
+        err.append(" / ");
+        err.append(std::to_string(POINTS_NEEDED_ESSENTIAL_MATRIX));
+        throw std::runtime_error(err);
     }
 
     // Find essential matrix

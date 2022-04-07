@@ -107,6 +107,7 @@ void SceneReconstruction::initialise(std::vector<ImagePair> baselines) {
             _mGoodViews.insert(j);
 
             // adjustBundle();
+            std::cout << "Initialised reconstruction with " << pc.size() << " points." << std::endl;
             break;
         } catch (std::runtime_error &e) {
             std::cerr << "Stereo view could not be obtained from (" << i << "," << j << "): " << e.what() << std::flush;
@@ -160,6 +161,7 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
                                                              _mCameraPoses.at(ip.left), _mCameraPoses.at(ip.right));
 
                 // If we reach this point, triangulation was successful
+                std::cout << "Merging in " << pc.size() << " triangulated points from images " << ip.left << " and " << ip.right << "." << std::endl;
                 _pointCloud.mergePoints(pc, _mFeatureMatchMatrix);
                 anyViewSuccess = true;
             } catch (std::runtime_error &e) {

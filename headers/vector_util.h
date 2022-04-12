@@ -30,6 +30,28 @@ public:
                 std::end(v)
         );
     }
+
+    template<typename T>
+    static std::vector<std::vector<T>> generateCombinations(std::vector<T> arr, int n, int r) {
+        std::vector<std::vector<T>> allCombos;
+
+        std::vector<bool> v(n);
+        std::fill(v.begin(), v.begin() + r, true);
+
+        do {
+            std::vector<char> combo(r);
+            int pos = 0;
+            for (int i = 0; i < n; ++i) {
+                if (v[i]) {
+                    combo[pos] = arr[i];
+                    pos++;
+                }
+            }
+            allCombos.push_back(combo);
+        } while (std::prev_permutation(v.begin(), v.end()));
+
+        return allCombos;
+    }
 };
 
 #endif //SFM_VECTOR_UTIL_H

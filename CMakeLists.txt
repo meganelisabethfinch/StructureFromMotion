@@ -174,7 +174,7 @@ add_library(
         headers/bundle.h headers/vector_util.h
         headers/filters/filter.h src/filters/filter.cpp
         headers/filters/statistical_outlier_filter.h
-        headers/filters/radial_outlier_filter.h )
+        headers/filters/radial_outlier_filter.h headers/map_util.h)
 
 target_include_directories(
         SFMLib

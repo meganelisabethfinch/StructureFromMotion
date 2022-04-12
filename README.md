@@ -1,6 +1,6 @@
 # :japanese_castle: Structure From Motion
 
-❗**Disclaimer:** midpoint triangulation and Zhang bundle adjustment are still a work in progress. Don't expect these methods to work yet!
+❗**Disclaimer:** Zhang bundle adjustment is still a work in progress. Don't expect these methods to work yet!
 
 ## :keyboard: Command Line Interface
 ### Mandatory Arguments

@@ -29,8 +29,8 @@ public:
 
         cv::Mat normalisedPoints1;
         cv::Mat normalisedPoints2;
-        cv::undistortPoints(alignedPoints1, normalisedPoints1, cam1.getCameraMatrix(), cv::Mat());
-        cv::undistortPoints(alignedPoints2, normalisedPoints2, cam2.getCameraMatrix(), cv::Mat());
+        cv::undistortPoints(alignedPoints1, normalisedPoints1, cam1.getCameraMatrix(), cam1.getDistortion());
+        cv::undistortPoints(alignedPoints2, normalisedPoints2, cam2.getCameraMatrix(), cam2.getDistortion());
 
         cv::Mat points3dHomogenous;
         cv::triangulatePoints(pose1.getProjectionMatrix(), pose2.getProjectionMatrix(), normalisedPoints1,

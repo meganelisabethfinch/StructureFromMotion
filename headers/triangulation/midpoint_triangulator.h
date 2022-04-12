@@ -129,6 +129,45 @@ public:
         std::cout << "Triangulating points between images " << img1 << " and " << img2 << std::endl;
         PointCloud pc;
 
+        /*
+         // VERSION WITH ANTI-DISTORTION / NORMALISATION FIRST
+        // Get two arrays of matching points
+        std::vector<cv::Point2d> alignedPoints1;
+        std::vector<cv::Point2d> alignedPoints2;
+        std::vector<int> backReference1;
+        std::vector<int> backReference2;
+
+        SFMUtilities::getAlignedPointsFromMatch(features1, features2,
+                                                matching,
+                                                alignedPoints1, alignedPoints2,
+                                                backReference1, backReference2);
+
+        cv::Mat normalisedPoints1;
+        cv::Mat normalisedPoints2;
+        cv::undistortPoints(alignedPoints1, normalisedPoints1, cam1.getCameraMatrix(), cam1.getDistortion());
+        cv::undistortPoints(alignedPoints2, normalisedPoints2, cam2.getCameraMatrix(), cam2.getDistortion());
+
+
+        for (int i = 0; i < normalisedPoints1.rows; i++) {
+            cv::Point2d pt1 = { normalisedPoints1.at<double>(i,0), normalisedPoints1.at<double>(i, 1) };
+            cv::Point2d pt2 = { normalisedPoints2.at<double>(i,0), normalisedPoints2.at<double>(i,1) };
+
+            // Backprojection
+            auto L1 = backProjectPointToRay(pt1, cam1, pose1);
+            auto L2 = backProjectPointToRay(pt2, cam2, pose2);
+
+            // Do the triangulation
+            auto pt = triangulatePoint(L1.first, L2.first, L1.second, L2.second);
+
+            // Add to point cloud
+            Point3DInMap pt3d;
+            pt3d.pt = pt;
+            pt3d.originatingViews.insert({img1, matching.at(i).queryIdx});
+            pt3d.originatingViews.insert({img2, matching.at(i).trainIdx});
+            pc.addPoint(pt3d);
+        }
+        */
+
         for (auto& match : matching) {
             // Get image points
             // Note: smaller image id always corresponds to queryIdx
@@ -141,14 +180,15 @@ public:
 
             // Do the triangulation
             auto pt = triangulatePoint(L1.first, L2.first, L1.second, L2.second);
-                // Add to point cloud
-                Point3DInMap pt3d;
-                pt3d.pt = pt;
-                pt3d.originatingViews.insert({img1, match.queryIdx});
-                pt3d.originatingViews.insert({img2, match.trainIdx});
-                pc.addPoint(pt3d);
-                // std::cout << "added point" << pt << std::endl;
+
+            // Add to point cloud
+            Point3DInMap pt3d;
+            pt3d.pt = pt;
+            pt3d.originatingViews.insert({img1, match.queryIdx});
+            pt3d.originatingViews.insert({img2, match.trainIdx});
+            pc.addPoint(pt3d);
         }
+
         return pc;
     }
 };

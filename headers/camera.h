@@ -10,6 +10,7 @@
 
 class Camera {
 private:
+    // distortion coefficients of 4, 5, 8, 12 or 14 elements.
     cv::Mat_<double> distortion;
     cv::Matx33d K;
 

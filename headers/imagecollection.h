@@ -26,7 +26,7 @@ private:
 public:
     explicit ImageCollection(const std::string& directory);
 
-    ImageCollection();
+    ImageCollection(const std::string& directory, const std::string& calibrationDir);
 
     void ExtractFeatures(const cv::Ptr<cv::FeatureDetector>& detector);
 

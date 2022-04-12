@@ -38,6 +38,39 @@ ImageCollection::ImageCollection(const std::string& directory) {
     mFeatureMatchMatrix = Matches();
 }
 
+ImageCollection::ImageCollection(const std::string& directory, const std::string& calibrationDir) {
+    std::vector<cv::String> filenames;
+    CLIUtilities::FindImageFilenames(directory, filenames);
+
+    for (const auto& fn : filenames) {
+        cv::Mat data = cv::imread(fn, cv::IMREAD_COLOR);
+
+        if (data.empty()) {
+            std::cout << "Unable to read image from file: " << fn << std::endl;
+            continue;
+        }
+
+        std::string name = std::filesystem::path(fn).filename();
+        ImageID id = mImages.size();
+        Image image = Image(id, name, data);
+        mImages.push_back(image);
+
+        // Initialise intrinsic/camera matrix
+        if (mImages.size() == 1) {
+            // Calibrate the first time *only*
+            auto calibrated = Camera::Create(mImages.at(0),
+                                             calibrationDir,
+                                             9, 6, 32.5);
+            mCameras.push_back(calibrated);
+        } else {
+            // Shallow copy camera
+            mCameras.push_back(mCameras.at(0));
+        }
+    }
+
+    mFeatureMatchMatrix = Matches();
+}
+
 void ImageCollection::ExtractFeatures(const cv::Ptr<cv::FeatureDetector>& detector) {
     mImageFeatures.clear();
 
@@ -124,4 +157,3 @@ SceneGraph ImageCollection::toSceneGraph() {
     return { mImages, mFeatureMatchMatrix };
 }
 
-ImageCollection::ImageCollection() = default;

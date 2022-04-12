@@ -15,31 +15,32 @@ int main(int argc, char** argv) {
     CLIUtilities::Summary(args);
 
     std::cout << "----------- Open Images ------------" << std::endl;
-    ImageCollection images(args.inputImageDir);
+    ImageCollection* images;
+    if (args.calibrationOn) {
+        std::cout << "----------- Calibrate Camera ------------" << std::endl;
+        images = new ImageCollection(args.inputImageDir, args.calibrationDir);
+
+    } else {
+        images = new ImageCollection(args.inputImageDir);
+    }
 
     std::cout << "--------- Extract Features ---------" << std::endl;
     auto detector = CLIUtilities::CreateDetector(args.detectorType);
-    images.ExtractFeatures(detector);
+    images->ExtractFeatures(detector);
 
     if (DEFAULT_VISUAL_DEBUG >= VisualDebugLevel::SHOW_EXAMPLES) {
-        images.visualiseKeyPoints(0);
+        images->visualiseKeyPoints(0);
     }
 
     std::cout << "----------- Find Matches -----------" << std::endl;
     auto matcher = CLIUtilities::CreateMatcher(args.matcherType);
-    images.FindMatches(matcher);
+    images->FindMatches(matcher);
 
     if (DEFAULT_VISUAL_DEBUG >= VisualDebugLevel::SHOW_EXAMPLES) {
-        images.visualiseMatches(0, 1);
+        images->visualiseMatches(0, 1);
     }
 
-    ImageCollection calibrationImages;
-    if (args.calibrationOn) {
-        std::cout << "----------- Calibrate Camera ------------" << std::endl;
-        calibrationImages = ImageCollection(args.calibrationDir);
-    }
-
-    auto graph = images.toSceneGraph();
+    auto graph = images->toSceneGraph();
     graph.toDotFile("scene_graph.dot");
 
     std::cout << "---- Find Baseline Triangulator ---" << std::endl;
@@ -48,10 +49,10 @@ int main(int argc, char** argv) {
     auto filters = CLIUtilities::CreateFilters(args.filterTypes);
 
     if (args.useHomographyOrdering) {
-        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster, filters);
+        auto recon = images->toSceneReconstruction(triangulator, bundleAdjuster, filters);
         recon.outputToFiles(args.outputDir, args.outputTypes);
     } else {
-        auto recon = images.toSceneReconstruction(triangulator, bundleAdjuster, filters,
+        auto recon = images->toSceneReconstruction(triangulator, bundleAdjuster, filters,
                                                   args.baselinePair);
         recon.outputToFiles(args.outputDir, args.outputTypes);
     }

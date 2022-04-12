@@ -16,6 +16,8 @@ private:
 public:
     explicit Camera(const Image& image);
 
+    Camera(cv::Mat intrinsic, cv::Mat distCoeffs);
+
     [[nodiscard]] cv::Matx33d getCameraMatrix() const;
 
     [[nodiscard]] double getFocalLength() const;
@@ -25,6 +27,12 @@ public:
     cv::Mat_<double> getDistortion();
 
     void setFocalLength(double fx, double fy);
+
+    // static Camera Create(const Image& image);
+
+    static Camera Create(const Image& image, const std::string& calibrationDir,
+                         int boardWidth, int boardHeight,
+                         double squareSize);
 };
 
 #endif //SFM_CAMERA_H

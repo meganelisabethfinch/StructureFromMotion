@@ -83,6 +83,7 @@ target_include_directories(
         /Users/meganfinch/opencv-4.5.3/modules/features2d/include
         /Users/meganfinch/opencv-4.5.3/modules/highgui/include
         /Users/meganfinch/opencv-4.5.3/modules/flann/include
+        /Users/meganfinch/opencv-4.5.3/modules/imgproc/include
         /Users/meganfinch/opencv-4.5.3/modules/imgcodecs/include
         /Users/meganfinch/opencv-4.5.3/modules/videoio/include
         /Users/meganfinch/ceres-solver/include
@@ -187,6 +188,7 @@ target_include_directories(
         /Users/meganfinch/opencv-4.5.3/modules/highgui/include
         /Users/meganfinch/opencv-4.5.3/modules/flann/include
         /Users/meganfinch/opencv-4.5.3/modules/imgcodecs/include
+        /Users/meganfinch/opencv-4.5.3/modules/imgproc/include
         /Users/meganfinch/opencv-4.5.3/modules/videoio/include
         /Users/meganfinch/ceres-solver/include
         /Users/meganfinch/ceres-solver/cmake-build-release/config

@@ -24,7 +24,7 @@ private:
     Matches mFeatureMatchMatrix;
 
 public:
-    explicit ImageCollection(const std::string& filepath);
+    explicit ImageCollection(const std::string& directory);
 
     ImageCollection();
 

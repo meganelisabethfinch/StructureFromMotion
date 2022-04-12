@@ -11,19 +11,11 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <headers/sfm_util.h>
+#include <headers/cli_util.h>
 
 ImageCollection::ImageCollection(const std::string& directory) {
     std::vector<cv::String> filenames;
-    cv::glob(directory + "/*.png", filenames, false);
-
-    std::vector<cv::String> jpgs;
-    cv::glob(directory + "/*.jpg", jpgs, false);
-    filenames.insert(filenames.end(), jpgs.begin(), jpgs.end());
-
-    cv::glob(directory + "/*.JPG", jpgs, false);
-    filenames.insert(filenames.end(), jpgs.begin(), jpgs.end());
-
-    std::cout << filenames.size() << std::endl;
+    CLIUtilities::FindImageFilenames(directory, filenames);
 
     for (const auto& fn : filenames) {
         cv::Mat data = cv::imread(fn, cv::IMREAD_COLOR);

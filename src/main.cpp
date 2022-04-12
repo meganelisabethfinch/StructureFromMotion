@@ -33,6 +33,12 @@ int main(int argc, char** argv) {
         images.visualiseMatches(0, 1);
     }
 
+    ImageCollection calibrationImages;
+    if (args.calibrationOn) {
+        std::cout << "----------- Calibrate Camera ------------" << std::endl;
+        calibrationImages = ImageCollection(args.calibrationDir);
+    }
+
     auto graph = images.toSceneGraph();
     graph.toDotFile("scene_graph.dot");
 

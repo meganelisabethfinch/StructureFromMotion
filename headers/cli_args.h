@@ -13,6 +13,9 @@ struct Args {
     std::string outputDir;
     std::set<OutputType> outputTypes;
 
+    bool calibrationOn;
+    std::string calibrationDir;
+
     bool useHomographyOrdering;
     ImagePair baselinePair = ImagePair(0,1);
 

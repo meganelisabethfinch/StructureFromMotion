@@ -19,6 +19,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
         // These options don't set a flag
         {"bundle_adjuster", required_argument, 0, 'a'},
         {"baseline", required_argument, 0, 'b'},
+        {"calibration", required_argument, 0, 'c'},
         {"feature_detector", required_argument, 0, 'd'},
         {"filter", required_argument, 0, 'f'},
         {"output_format", required_argument, 0, 'g'},
@@ -31,6 +32,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
 
     // Set defaults before parsing
     args.outputDir = "";
+    args.calibrationOn = false;
     args.useHomographyOrdering = DEFAULT_USE_HOMOGRAPHY_ORDERING;
     args.detectorType = DEFAULT_DETECTOR;
     args.matcherType = DEFAULT_MATCHER;
@@ -148,6 +150,11 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
                 }
                 break;
             }
+            case 'c': {
+                args.calibrationOn = true;
+                args.calibrationDir = optarg;
+                break;
+            }
             default: {
                 std::cerr << "Unrecognised input option: " << opt << std::endl;
                 return false;
@@ -173,6 +180,17 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
 void CLIUtilities::Summary(const Args& args) {
     // TODO: can we print names, not numbers please?
     std::cout << "--------- Summary of Inputs ---------" << std::endl;
+    std::cout << "Images will be read from: " << args.inputImageDir << std::endl;
+    std::cout << "Outputs will be written to: " << args.outputDir << std::endl;
+    std::cout << "Camera calibration: ";
+    if (args.calibrationOn) {
+        std::cout << args.calibrationDir << std::endl;
+    } else {
+        std::cout << "Off." << std::endl;
+    }
+
+    std::cout << std::endl;
+
     std::cout << "Detector type: " << static_cast<std::underlying_type<DetectorType>::type>(args.detectorType) << std::endl;
     std::cout << "Matcher type: " << args.matcherType << std::endl;
     std::cout << "Triangulator type: " << static_cast<std::underlying_type<TriangulatorType>::type>(args.triangulatorType) << std::endl;
@@ -194,8 +212,21 @@ void CLIUtilities::Summary(const Args& args) {
     } else {
         std::cout << "Baseline: (" << args.baselinePair.left << ", " << args.baselinePair.right << ")" << std::endl;
     }
-
 }
+
+void CLIUtilities::FindImageFilenames(const std::string& directory, std::vector<cv::String>& filenames) {
+    cv::glob(directory + "/*.png", filenames, false);
+
+    std::vector<cv::String> jpgs;
+    cv::glob(directory + "/*.jpg", jpgs, false);
+    filenames.insert(filenames.end(), jpgs.begin(), jpgs.end());
+
+    cv::glob(directory + "/*.JPG", jpgs, false);
+    filenames.insert(filenames.end(), jpgs.begin(), jpgs.end());
+
+    std::cout << "Read " << filenames.size() << " files from " << directory << std::endl;
+}
+
 
 cv::Ptr<cv::FeatureDetector> CLIUtilities::CreateDetector(DetectorType type) {
     switch(type) {

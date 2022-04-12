@@ -19,6 +19,8 @@ public:
 
     static void Summary(const Args& args);
 
+    static void FindImageFilenames(const std::string& directory, std::vector<cv::String>& filenames);
+
     static cv::Ptr<cv::FeatureDetector> CreateDetector(DetectorType type);
 
     static cv::Ptr<cv::DescriptorMatcher> CreateMatcher(MatcherType type);

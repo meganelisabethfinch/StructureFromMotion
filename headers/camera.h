@@ -32,7 +32,7 @@ public:
 
     static Camera Create(const Image& image, const std::string& calibrationDir,
                          int boardWidth, int boardHeight,
-                         double squareSize);
+                         float squareSize);
 };
 
 #endif //SFM_CAMERA_H

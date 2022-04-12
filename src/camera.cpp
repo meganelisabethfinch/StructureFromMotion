@@ -48,13 +48,13 @@ void Camera::setFocalLength(double fx, double fy) {
 Camera Camera::Create(const Image& image,
                       const std::string& calibrationDir,
                       int boardWidth, int boardHeight,
-                      double squareSize) {
+                      float squareSize) {
     std::vector<cv::String> calibrationFn;
     CLIUtilities::FindImageFilenames(calibrationDir, calibrationFn);
 
-    std::vector<std::vector<cv::Point3d>> objectPoints;
-    std::vector<std::vector<cv::Point2d>> imagePoints;
-    std::vector<cv::Point2d> corners;
+    std::vector<std::vector<cv::Point3f>> objectPoints;
+    std::vector<std::vector<cv::Point2f>> imagePoints;
+    std::vector<cv::Point2f> corners;
 
     // boardSize is interior number of corners
     // NOT number of squares in the chessboard
@@ -71,6 +71,7 @@ Camera Camera::Create(const Image& image,
                                           cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FILTER_QUADS);
 
         if (found) {
+
             // Setup termination criteria for the following
             auto crit = cv::TermCriteria(cv::TermCriteria::EPS | cv::TermCriteria::COUNT, 30, 0.1);
 
@@ -83,18 +84,17 @@ Camera Camera::Create(const Image& image,
             if (DEFAULT_VISUAL_DEBUG > VisualDebugLevel::SHOW_EXAMPLES) {
                 cv::drawChessboardCorners(gray, boardSize, corners, found);
             }
-        }
 
-        std::vector<cv::Point3d> obj;
-        for (int i = 0; i < boardHeight; i++) {
-            for (int j = 0; j < boardWidth; j++) {
-                obj.emplace_back((double)j * squareSize, (double)i * squareSize, 0);
+
+            std::vector<cv::Point3f> obj;
+            for (int i = 0; i < boardHeight; i++) {
+                for (int j = 0; j < boardWidth; j++) {
+                    obj.emplace_back((double)j * squareSize, (double)i * squareSize, 0);
+                }
             }
-        }
 
-        if (found) {
             std::cout << "Found corners for calibration image "
-                    << k << " / " << calibrationFn.size() << std::endl;
+                    << (k+1) << " / " << calibrationFn.size() << std::endl;
             imagePoints.push_back(corners);
             objectPoints.push_back(obj);
         }
@@ -109,6 +109,9 @@ Camera Camera::Create(const Image& image,
                         image.data.size(),
                         K, D,
                         rvecs, tvecs);
+
+    std::cout << K << std::endl;
+    std::cout << D << std::endl;
 
     // Create calibrated camera
     return {K, D};

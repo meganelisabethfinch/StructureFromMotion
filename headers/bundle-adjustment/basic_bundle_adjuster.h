@@ -75,7 +75,7 @@ public:
                 PoseVector& pose = cameraPoses6d[kv.first];
 
                 problem.AddResidualBlock(cost_function,
-                                         NULL,
+                                         loss_function,
                                          pose.val,
                                          points3d[i].val,
                                          &focal);

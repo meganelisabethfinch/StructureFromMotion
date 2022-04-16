@@ -39,7 +39,7 @@ public:
         std::fill(v.begin(), v.begin() + r, true);
 
         do {
-            std::vector<char> combo(r);
+            std::vector<T> combo(r);
             int pos = 0;
             for (int i = 0; i < n; ++i) {
                 if (v[i]) {

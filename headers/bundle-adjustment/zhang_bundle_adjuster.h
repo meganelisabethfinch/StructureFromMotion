@@ -6,6 +6,7 @@
 #define SFM_ZHANG_BUNDLE_ADJUSTER_H
 
 #include <headers/map_util.h>
+#include <headers/vector_util.h>
 #include "bundle_adjuster.h"
 
 class ZhangBundleAdjuster : public BundleAdjuster {
@@ -34,13 +35,19 @@ private:
      *                      i.e. points[pointIdx]
      * @param startIdx - start searching the pointCloud from startIdx up to
      *                      pointCloud.size() - pointsSize + pointIdx
+     * @return returns a nested vector [[P1, P2, P3, ..., C1, C2, C3], [...]].
+     *         The first |pointsDesired| elements of each subvector are PointIDs (size_t).
+     *         The remaining |viewsDesired| are ImageIDs (also size_t).
      */
-    void createPointCameraTuples(size_t pointsDesired, size_t viewsDesired, PointCloud& pointCloud,
-                                std::vector<cv::Point3d> points, const std::set<ImageID>& sharedViews,
+    std::vector<std::vector<size_t>> createPointCameraTuples(size_t pointsDesired, size_t viewsDesired,
+                                                             PointCloud& pointCloud,
+                                std::vector<size_t> points, const std::set<ImageID>& sharedViews,
                                 size_t pointIdx, size_t startIdx)
     {
+        std::vector<std::vector<size_t>> result;
+
         for (size_t i = startIdx; i < pointCloud.size() - pointsDesired + 1; i++) {
-            points[pointIdx] = pointCloud[i].pt;
+            points[pointIdx] = i; // Only need to record ID, not point itself
             auto views = MapUtilities::ExtractKeys(pointCloud[i].originatingViews);
             std::set<ImageID> intersect;
             std::set_intersection(sharedViews.begin(), sharedViews.end(),
@@ -56,15 +63,30 @@ private:
             if (pointIdx + 1 == pointsDesired) {
                 // BASE CASE: Found enough points.
 
+                // Convert views to vector and find all combinations
+                std::vector<ImageID> views_vec(intersect.begin(), intersect.end());
+                auto views_combinations = VectorUtilities::generateCombinations<ImageID>
+                        (views_vec, views_vec.size(), viewsDesired);
 
+                for (auto& combo : views_combinations) {
+                    std::vector<size_t> tuple;
+                    // Add points
+                    tuple.insert(tuple.end(), points.begin(), points.end());
+                    // Add views
+                    tuple.insert(tuple.end(), combo.begin(), combo.end());
+                    // Add to result
+                    result.push_back(tuple);
+                }
             } else {
                 // RECURSIVE CASE: Need more points.
-                createPointCameraTuples(pointsDesired, viewsDesired, pointCloud,
+                auto sub = createPointCameraTuples(pointsDesired, viewsDesired, pointCloud,
                                         points, intersect,
                                         pointIdx + 1, i + 1);
+                result.insert(result.end(), sub.begin(), sub.end());
             }
-
         }
+
+        return result;
     }
 
 };

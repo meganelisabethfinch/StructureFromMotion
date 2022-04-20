@@ -61,7 +61,7 @@ add_executable(
         headers/pose.h src/pose.cpp src/point_cloud.cpp
         headers/ba_util.h
         headers/cost/simple_reprojection_error.h
-        headers/cost/zhang_rba_error.h src/cost/zhang_rba_error.cpp
+        headers/cost/rotation_free_error.h src/cost/rotation_free_error.cpp
         headers/triangulation/triangulator.h src/triangulation/triangulator.cpp
         src/bundle-adjustment/bundle_adjuster.cpp
         headers/filters/filter.h src/filters/filter.cpp
@@ -161,7 +161,7 @@ add_library(
         headers/scene_reconstruction.h src/scene_reconstruction.cpp
         headers/pose.h src/pose.cpp
         headers/cost/simple_reprojection_error.h
-        headers/cost/zhang_rba_error.h src/cost/zhang_rba_error.cpp
+        headers/cost/rotation_free_error.h src/cost/rotation_free_error.cpp
         headers/image_pair.h
         headers/cli_args.h
         headers/triangulation/triangulator.h src/triangulation/triangulator.cpp
@@ -174,7 +174,7 @@ add_library(
         headers/bundle.h headers/vector_util.h
         headers/filters/filter.h src/filters/filter.cpp
         headers/filters/statistical_outlier_filter.h
-        headers/filters/radial_outlier_filter.h headers/map_util.h)
+        headers/filters/radial_outlier_filter.h headers/map_util.h headers/cost/faster_rotation_free_error.h src/cost/faster_rotation_free_error.cpp)
 
 target_include_directories(
         SFMLib

@@ -13,14 +13,37 @@ class ZhangBundleAdjuster : public BundleAdjuster {
     void adjustBundle(Bundle& bundle) override
     {
         // TODO: implement Zhang RBA (2006).
+        // Call to formatPoints to get tuples
+
+        // Format all poses into 6D vectors
+        std::map<ImageID, PoseVector> cameraPoses6d;
+        for (auto i : bundle.registeredImages) {
+            auto pv = bundle.cameraPoses.at(i).toPoseVector();
+            cameraPoses6d[i] = pv;
+        }
+
+        // Format all scene points into 3D vectors
+        std::vector<cv::Vec3d> points3d(bundle.pointCloud.size());
+        for (auto i = 0; i < bundle.pointCloud.size(); i++) {
+            const Point3DInMap& p = bundle.pointCloud[i];
+            points3d[i] = cv::Vec3d(p.pt.x, p.pt.y, p.pt.z);
+        }
+
+
     }
 
 private:
-    void FormatPoints(PointCloud& pointCloud) {
+    void formatPoints(PointCloud& pointCloud, size_t pointsDesired, size_t viewsDesired) {
         // Find all combinations of 6 points seen by 3 cameras
-        size_t pointsNeeded = 6;
-        size_t sharedCameras = 3;
-        std::vector<cv::Point3d> points(pointsNeeded);
+
+        std::vector<size_t> points(pointsDesired);
+        std::set<ImageID> sharedViews;
+        std::vector<std::vector<size_t>> result = createPointCameraTuples(
+                pointsDesired, viewsDesired,
+                pointCloud,
+                points, sharedViews,
+                0, 0);
+
 
     }
 
@@ -50,9 +73,16 @@ private:
             points[pointIdx] = i; // Only need to record ID, not point itself
             auto views = MapUtilities::ExtractKeys(pointCloud[i].originatingViews);
             std::set<ImageID> intersect;
-            std::set_intersection(sharedViews.begin(), sharedViews.end(),
-                                  views.begin(), views.end(),
-                                  std::inserter(intersect, intersect.begin()));
+
+            if (pointIdx == 0) {
+                // slightly different behaviour for first point
+                // set sharedViews rather than intersecting
+                intersect = views;
+            } else {
+                std::set_intersection(sharedViews.begin(), sharedViews.end(),
+                                      views.begin(), views.end(),
+                                      std::inserter(intersect, intersect.begin()));
+            }
 
             if (intersect.size() < viewsDesired) {
                 // Early exit if not enough views.

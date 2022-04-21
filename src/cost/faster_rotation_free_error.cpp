@@ -27,6 +27,7 @@ bool FasterRotationFreeError::operator()(const T* const points3d,
                                    const T* const gammas,
                                    T* residuals) const {
     // See equation (4) of Zhang et al. RBA
+    /*
     T total = 0;
 
     auto P1 = cv::Vec3d(points3d[0], points3d[1], points3d[2]);
@@ -48,6 +49,7 @@ bool FasterRotationFreeError::operator()(const T* const points3d,
     }
 
     residuals[0] = total;
+     */
     return true;
 }
 

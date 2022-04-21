@@ -52,6 +52,45 @@ public:
 
         return allCombos;
     }
+
+    /*
+     * Computes v1 . v2 for n-dimensional vectors v1, v2
+     */
+    template <typename T>
+    static bool dot(const T* const v1, const T* const v2, size_t n, T* out) {
+        T result = v1[0] * v2[0];
+        for (size_t i = 1; i < n; i++) {
+            result += v1[i] * v2[i];
+        }
+        out[0] = result;
+        return true;
+    }
+
+    /*
+     * Computes v1 x v2 for 3-vectors v1, v2
+     */
+    template <typename T>
+    static bool cross(const T* const v1, const T* const v2, T* out) {
+        // v1 = [x1,y1,z1] and v2 = [x2,y2,z2]
+        // i: y1 z2 - y2 z1
+        out[0] = v1[1] * v2[2] - v2[1] * v1[2];
+        // j: x2 z1 - x1 z2
+        out[1] = v2[0] * v1[2] - v1[0] * v2[2];
+        // k: x1 y2 - y1 x2
+        out[2] = v1[0] * v2[1] - v1[1] * v2[0];
+        return true;
+    }
+
+    /*
+     * Computes v1 - v2 for n-dimensional vectors v1, v2
+     */
+    template <typename T>
+    static bool subtract(const T* const v1, const T* const v2, size_t n, T* out) {
+        for (size_t i = 0; i < n; i++) {
+            out[i] = v1[i] - v2[i];
+        }
+        return true;
+    }
 };
 
 #endif //SFM_VECTOR_UTIL_H

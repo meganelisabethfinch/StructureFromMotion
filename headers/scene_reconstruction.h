@@ -38,6 +38,9 @@ private:
 
     bool registerImage(ImageID imageId, Image2D3DMatch& match2D3D);
 
+    void camerasToPlyFile(const std::string& cameraFile, bool showRotation);
+
+
 public:
     SceneReconstruction(std::vector<Image>& mImages,
                         std::vector<Camera>& mCameras,

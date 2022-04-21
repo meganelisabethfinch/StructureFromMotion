@@ -236,21 +236,19 @@ bool SceneReconstruction::applyFilters() {
     return true;
 }
 
-void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile) {
-    _pointCloud.toPlyFile(pointCloudFile, _mImageFeatures, _mImages);
-
+void SceneReconstruction::camerasToPlyFile(const std::string& cameraFile, bool showRotation) {
     // Save camera polygons
     std::ofstream cameras_file(cameraFile);
     cameras_file
-        << "ply" << std::endl
-        << "format ascii 1.0" << std::endl
-        << "element vertex " << (_mCameraPoses.size() * 4) << std::endl
-        << "property float x " << std::endl
-        << "property float y " << std::endl
-        << "property float z " << std::endl
-        //<< "element edge " << (_mCameraPoses.size() * 3) << std::endl
-        // << "property list uchar int vertex_index" << std::endl
-        << "end_header" << std::endl;
+            << "ply" << std::endl
+            << "format ascii 1.0" << std::endl
+            << "element vertex " << (showRotation ? _mCameraPoses.size() * 4 : _mCameraPoses.size()) << std::endl
+            << "property float x " << std::endl
+            << "property float y " << std::endl
+            << "property float z " << std::endl
+            // << "element edge " << (_mCameraPoses.size() * 3) << std::endl
+            // << "property list uchar int vertex_index" << std::endl
+            << "end_header" << std::endl;
 
     for (const auto& kv : _mCameraPoses) {
         auto pose = kv.second;
@@ -263,12 +261,20 @@ void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std
         cv::Point3d cz = c + cv::Point3d(rmat(0, 2), rmat(1, 2), rmat(2, 2)) * 0.2;
 
         cameras_file << c.x  << " " << c.y  << " " << c.z  << std::endl;
-        cameras_file << cx.x << " " << cx.y << " " << cx.z << std::endl;
-        cameras_file << cy.x << " " << cy.y << " " << cy.z << std::endl;
-        cameras_file << cz.x << " " << cz.y << " " << cz.z << std::endl;
+        if (showRotation) {
+            cameras_file << cx.x << " " << cx.y << " " << cx.z << std::endl;
+            cameras_file << cy.x << " " << cy.y << " " << cy.z << std::endl;
+            cameras_file << cz.x << " " << cz.y << " " << cz.z << std::endl;
+        }
     }
 
     cameras_file.close();
+}
+
+void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile) {
+    _pointCloud.toPlyFile(pointCloudFile, _mImageFeatures, _mImages);
+
+    camerasToPlyFile(cameraFile, true);
 }
 
 void SceneReconstruction::outputToFiles(const std::string& outputDirectory, std::set<OutputType> outputTypes){
@@ -281,9 +287,8 @@ void SceneReconstruction::outputToFiles(const std::string& outputDirectory, std:
                 _pointCloud.toPlyFile(filename, _mImageFeatures, _mImages);
                 break;
             case OutputType::PLY_CAMERAS:
-                // TODO: output cameras only here
                 filename.append(outputDirectory).append("cameras.ply");
-                this->toPlyFile("point_cloud.ply", filename);
+                this->camerasToPlyFile(filename, false);
                 break;
             case OutputType::PCD_POINT_CLOUD:
                 filename.append(outputDirectory).append("point_cloud.pcd");

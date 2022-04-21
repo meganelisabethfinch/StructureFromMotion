@@ -46,7 +46,7 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
     // Parse arguments
     int opt;
 
-    while (1) {
+    while (true) {
         int option_index = 0;
         opt = getopt_long(argc, argv, "i:o:b:t:a:d:", long_options, &option_index);
 
@@ -125,13 +125,15 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
                 if (str2filter.contains(optarg)) {
                     args.filterTypes.insert(str2filter.at(optarg));
                 }
+                break;
             }
             case 'g': {
                 static std::map<std::string, OutputType> const str2out = {
                         {"PLY_POINT_CLOUD",  OutputType::PLY_POINT_CLOUD },
                         {"PLY_CAMERAS", OutputType::PLY_CAMERAS },
                         {"PCD_POINT_CLOUD", OutputType::PCD_POINT_CLOUD },
-                        {"VTK_MESH", OutputType::VTK_MESH}
+                        {"VTK_MESH", OutputType::VTK_MESH},
+                        {"TXT_REPORT", OutputType::TXT_REPORT}
                 };
                 if (str2out.contains(optarg)) {
                     args.outputTypes.insert(str2out.at(optarg));
@@ -170,14 +172,10 @@ bool CLIUtilities::ParseInputs(int argc, char** argv, Args& args) {
         std::cerr << "Invalid number of baselines defined: " << baselines.size() << std::endl;
         return false;
     }
-
-    // TODO: Check all mandatory arguments are defined
-
-
     return true;
 }
 
-void CLIUtilities::Summary(const Args& args) {
+void CLIUtilities::InputSummary(const Args& args) {
     // TODO: can we print names, not numbers please?
     std::cout << "--------- Summary of Inputs ---------" << std::endl;
     std::cout << "Images will be read from: " << args.inputImageDir << std::endl;

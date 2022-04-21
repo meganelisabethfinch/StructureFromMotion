@@ -15,11 +15,11 @@ private:
 public:
     explicit StatisticalOutlierFilter(int k = 8, double stddev_mult = 1.0) :
             _k(k), _stddev_mult(stddev_mult)
-    {};
+    {}
 
     static cv::Ptr<StatisticalOutlierFilter> create(int k = 8, double stddev_mult = 1.0) {
         return cv::makePtr<StatisticalOutlierFilter>(k, stddev_mult);
-    };
+    }
 
     void filterOutliers(PointCloud& pointCloud) override {
         std::cout << "--- Remove Statistical Outliers ---" << std::endl;

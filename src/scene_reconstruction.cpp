@@ -237,6 +237,7 @@ bool SceneReconstruction::applyFilters() {
 }
 
 void SceneReconstruction::camerasToPlyFile(const std::string& cameraFile, bool showRotation) {
+    std::cout << "Writing cameras to " << cameraFile << std::endl;
     // Save camera polygons
     std::ofstream cameras_file(cameraFile);
     cameras_file
@@ -277,7 +278,7 @@ void SceneReconstruction::toPlyFile(const std::string& pointCloudFile, const std
     camerasToPlyFile(cameraFile, true);
 }
 
-void SceneReconstruction::outputToFiles(const std::string& outputDirectory, std::set<OutputType> outputTypes){
+void SceneReconstruction::outputToFiles(const std::string& outputDirectory, const std::set<OutputType>& outputTypes){
     for (auto type : outputTypes) {
         std::string filename;
         std::string filename2;
@@ -299,9 +300,30 @@ void SceneReconstruction::outputToFiles(const std::string& outputDirectory, std:
                 filename2.append(outputDirectory).append("cloud_with_normals.pcd");
                 _pointCloud.toVTKFile(filename, filename2);
                 break;
+            case OutputType::TXT_REPORT:
+                filename.append(outputDirectory).append("report.txt");
+                this->report(filename);
+                break;
         }
     }
 }
 
+void SceneReconstruction::report(const std::string& filename) {
+    std::cout << "Writing report to " << filename << std::endl;
+    std::ofstream file(filename);
+    file << "#registrations: " << _mGoodViews.size() << std::endl;
+    file << "#points: " << _pointCloud.size() << std::endl;
+    // #outliers
 
+    file << "registrations: ";
+    for (auto id : _mGoodViews) {
+        file << _mImages[id].name << " ";
+    }
+    file << std::endl;
 
+    // reprojection error
+    double total_reproj_error = SFMUtilities::globalReprojectionError(_pointCloud, _mGoodViews, _mCameraPoses, _mCameras, _mImageFeatures, _bundleAdjuster->lossType);
+    file << "Total reprojection error: " << total_reproj_error << std::endl;
+
+    file.close();
+}

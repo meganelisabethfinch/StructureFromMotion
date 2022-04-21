@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    CLIUtilities::Summary(args);
+    CLIUtilities::InputSummary(args);
 
     std::cout << "----------- Open Images ------------" << std::endl;
     ImageCollection* images;

@@ -12,12 +12,13 @@
 #include "filters/filter.h"
 #include "triangulation/triangulator.h"
 #include "bundle-adjustment/bundle_adjuster.h"
+#include "scene_reconstruction.h"
 
 class CLIUtilities {
 public:
     static bool ParseInputs(int argc, char** argv, Args& args);
 
-    static void Summary(const Args& args);
+    static void InputSummary(const Args& args);
 
     static void FindImageFilenames(const std::string& directory, std::vector<cv::String>& filenames);
 

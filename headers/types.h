@@ -17,7 +17,7 @@ enum class TriangulatorType { LINEAR, MIDPOINT };
 enum class BundleAdjusterType { OFF, BASIC, ZHANG };
 enum class LossType { NULL_LOSS, HUBER, SOFTLONE, CAUCHY };
 enum class FilterType { STATISTICAL, RADIAL };
-enum class OutputType { PLY_POINT_CLOUD, PLY_CAMERAS, PCD_POINT_CLOUD, VTK_MESH };
+enum class OutputType { PLY_POINT_CLOUD, PLY_CAMERAS, PCD_POINT_CLOUD, VTK_MESH, TXT_REPORT };
 
 enum DebugLevel { SIMPLE, VERBOSE };
 enum VisualDebugLevel { NONE, SHOW_EXAMPLES };

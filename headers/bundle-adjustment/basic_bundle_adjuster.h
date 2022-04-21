@@ -23,24 +23,6 @@ namespace BundleAdjustUtils {
 using namespace BundleAdjustUtils;
 
 class BasicBundleAdjuster : public BundleAdjuster {
-private:
-    LossType lossType;
-
-    /*
-     * Helper to create loss functions. Parameter a = 1.0 indicates they are in un-scaled format.
-     */
-    static ceres::LossFunction* createLossFunction(LossType lossType) {
-        switch (lossType) {
-            case LossType::NULL_LOSS:
-                return nullptr;
-            case LossType::HUBER:
-                return new ceres::HuberLoss(1.0);
-            case LossType::SOFTLONE:
-                return new ceres::SoftLOneLoss(1.0);
-            case LossType::CAUCHY:
-                return new ceres::CauchyLoss(1.0);
-        }
-    }
 
 public:
     void adjustBundle(Bundle& bundle) override
@@ -129,7 +111,9 @@ public:
         }
     }
 
-    explicit BasicBundleAdjuster(LossType type) : lossType(type) {};
+    explicit BasicBundleAdjuster(LossType type) {
+        lossType = type;
+    }
 };
 
 #endif //SFM_BASIC_BUNDLE_ADJUSTER_H

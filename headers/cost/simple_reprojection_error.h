@@ -5,6 +5,8 @@
 #ifndef SFM_SIMPLE_REPROJECTION_ERROR_H
 #define SFM_SIMPLE_REPROJECTION_ERROR_H
 
+#include <ceres/rotation.h>
+
 struct SimpleReprojectionError {
     double observed_x;
     double observed_y;

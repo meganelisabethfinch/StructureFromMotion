@@ -13,6 +13,7 @@
   * `PLY_CAMERAS`
   * `PCD_POINT_CLOUD`
   * `VTK_MESH`
+  * `TXT_REPORT`
 * `--calibration` or `-c "/path/to/calibration/directory"`. If used, the camera is calibrated from images in this directory, and the following assumptions are made: the images in the input and calibration directories were all taken with the same camera, and thus have the same dimensions, focal length and distortion. If not used, the intrinsic camera matrix is initialised with a default focal length and the camera centre adjusted to the size of each image.
 * `--baseline` or `-b "IMAGE_INDEX"`. The pair of images to be used as the baseline of the reconstruction.
 * `--detector` or `-d "DETECTOR_TYPE"`. The type of feature detector used. Allowed values are

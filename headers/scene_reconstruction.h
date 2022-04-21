@@ -69,6 +69,8 @@ public:
 
     void toPlyFile(const std::string& pointCloudFile, const std::string& cameraFile);
 
-    void outputToFiles(const std::string& outputDirectory, std::set<OutputType> outputTypes);
+    void outputToFiles(const std::string& outputDirectory, const std::set<OutputType>& outputTypes);
+
+    void report(const std::string& report);
 };
 #endif //SFM_SCENE_RECONSTRUCTION_H

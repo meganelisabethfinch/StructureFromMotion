@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <opencv2/core/types.hpp>
+
 #include "camera.h"
 #include "features.h"
 #include "pose.h"
@@ -41,6 +42,17 @@ public:
                                                      const cv::Mat& points3d,
                                                      const Camera& camera,
                                                      const Pose& pose);
+
+    /*
+     * Quick and hacky way to compute total reprojection error using ceres solver.
+     * Copy of the code from BasicBundleAdjuster, with the max iterations set to 0.
+     */
+    static double globalReprojectionError(PointCloud& pc,
+        const std::set<ImageID>& registeredImages,
+        std::map<ImageID, Pose>& cameraPoses,
+        std::vector<Camera>& cameras,
+        std::vector<Features>& features,
+        LossType lossType);
 
     static Image2D3DMatch find2D3DMatches(ImageID imageId,
                                           Features& imageFeatures,

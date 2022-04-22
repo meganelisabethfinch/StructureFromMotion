@@ -110,8 +110,8 @@ Camera Camera::Create(const Image& image,
                         K, D,
                         rvecs, tvecs);
 
-    std::cout << K << std::endl;
-    std::cout << D << std::endl;
+    std::cout << "Intrinsic matrix: " << K << std::endl;
+    std::cout << "Distortion coeffs: " << D << std::endl;
 
     // Create calibrated camera
     return {K, D};

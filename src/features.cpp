@@ -7,6 +7,7 @@
 #include <headers/sfm_util.h>
 #include <headers/constants.h>
 #include <iostream>
+#include <opencv2/calib3d.hpp>
 
 Features::Features(const cv::Ptr<cv::FeatureDetector>& detector, const Image& image) {
     detector->detectAndCompute(image.data, cv::noArray(), _keypoints, _descriptors);
@@ -30,20 +31,45 @@ void Features::findMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Fe
     matcher->knnMatch(_descriptors, other.getCVDescriptors(), initialMatching, 2);
 
     Matching2 loweRatioMatching;
+    std::vector<cv::Point2d> source, destination;
+
     for (auto& match : initialMatching) {
         if (SFMUtilities::PassesLoweRatioTest(match)) {
             loweRatioMatching.push_back(match[0]);
+
+            // Track coordinates of keypoints involved in good matches
+            // this = i, other = j, i < j. Smaller image id corresponds to queryIdx.
+            source.push_back(_points2d[match[0].queryIdx]);
+            destination.push_back(other.getPoint(match[0].trainIdx));
         }
     }
 
-    // TODO: geometric verification of matches by fundamental matrix
+    Matching2 verifiedMatching;
+    // Geometric verification by fundamental matrix
+    if (loweRatioMatching.size() > POINTS_NEEDED_FUNDAMENTAL_MATRIX) {
+        std::vector<uchar> mask;
+        cv::Mat F = findFundamentalMat(source, destination, cv::FM_RANSAC, 3.0, 0.99, mask);
+
+        // Store fundamental matrix - should one be F.inverse?
+        // images[i].setFundamentalMatrix(images[j].getId(), F);
+        // images[j].setFundamentalMatrix(images[i].getId(), F);
+
+        for (int k = 0; k < mask.size(); k++) {
+            if (mask[k]) {
+                // Classify this as a good match
+                verifiedMatching.push_back(loweRatioMatching[k]);
+            }
+        }
+    }
 
     if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {
         std::cout << "Initial KNN Matching: " << initialMatching.size() << " matches" << std::endl;
         std::cout << "Lowe Ratio Matching: " << loweRatioMatching.size() << " matches" << std::endl;
+        std::cout << "Geometrically verified Matching: " << verifiedMatching.size() << " matches" << std::endl;
     }
 
-    out = loweRatioMatching;
+    // out = loweRatioMatching;
+    out = verifiedMatching;
 }
 
 std::vector<cv::Point2d> Features::GetPointsFromMatches(Matching2 &matching, bool query, std::vector<int>& backReference) {

@@ -33,9 +33,9 @@ bool FasterRotationFreeError::operator()(const T* const points3d,
     for (size_t j = 0; j < 6; j++) {
         T v1[3], v2[3];
         // v1 = P1 - Cj
-        VectorUtilities::subtract(points3d, centres[3*j], 3, v1);
+        VectorUtilities::subtract(points3d, centres + 3*j, 3, v1);
         // v2 = P2 - Cj
-        VectorUtilities::subtract(points3d + 3, centres * 3*j, 3, v2);
+        VectorUtilities::subtract(points3d + 3, centres + 3*j, 3, v2);
 
         // Calculate dot products
         T d1[1], d2[1], d3[1];

@@ -26,7 +26,6 @@ public:
                                                 matching,
                                                 alignedPoints1, alignedPoints2,
                                                 backReference1, backReference2);
-
         cv::Mat normalisedPoints1;
         cv::Mat normalisedPoints2;
         cv::undistortPoints(alignedPoints1, normalisedPoints1, cam1.getCameraMatrix(), cam1.getDistortion());

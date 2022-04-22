@@ -38,6 +38,6 @@ const LossType DEFAULT_LOSS_TYPE = LossType::NULL_LOSS;
 const bool DEFAULT_USE_HOMOGRAPHY_ORDERING = true;
 
 const DebugLevel DEFAULT_DEBUG = DebugLevel::SIMPLE;
-const VisualDebugLevel DEFAULT_VISUAL_DEBUG = VisualDebugLevel::NONE;
+const VisualDebugLevel DEFAULT_VISUAL_DEBUG = VisualDebugLevel::SHOW_EXAMPLES;
 
 #endif //SFM_CONSTANTS_H

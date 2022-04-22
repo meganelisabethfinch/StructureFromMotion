@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 
     std::cout << "---- Find Baseline Triangulator ---" << std::endl;
     auto triangulator = CLIUtilities::CreateTriangulator(args.triangulatorType);
-    auto bundleAdjuster = CLIUtilities::CreateBundleAdjuster(args.bundleAdjusterType);
+    auto bundleAdjuster = CLIUtilities::CreateBundleAdjuster(args.bundleAdjusterType, args.lossType);
     auto filters = CLIUtilities::CreateFilters(args.filterTypes);
 
     if (args.useHomographyOrdering) {

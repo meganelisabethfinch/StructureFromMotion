@@ -68,9 +68,9 @@ Pose SFMUtilities::recoverPoseFrom2D3DMatches(Camera& camera, Image2D3DMatch mat
                            rvec,
                            tvec,
                            false,
-                           100,
+                           PNP_RANSAC_MAX_ITERATIONS,
                            (float) RANSAC_THRESHOLD,
-                           0.99,
+                           PNP_RANSAC_CONFIDENCE,
                            inliers
         );
     } catch (cv::Exception& e) {
@@ -319,8 +319,8 @@ cv::Matx33d SFMUtilities::pruneMatchesByFundamentalMatrix(const std::vector<cv::
         cv::Mat F = cv::findFundamentalMat(source,
                                        destination,
                                        cv::FM_RANSAC,
-                                       3.0,
-                                       0.99,
+                                       FM_RANSAC_THRESHOLD,
+                                       FM_RANSAC_CONFIDENCE,
                                        mask);
 
         cv::Matx33d result;

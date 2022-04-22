@@ -68,7 +68,7 @@ public:
         options.linear_solver_type = ceres::DENSE_SCHUR;
         options.minimizer_progress_to_stdout = true;
         options.max_num_iterations = 500;
-        options.eta = 1e-2;
+        options.eta = BA_ETA;
         options.max_solver_time_in_seconds = 10;
         options.logging_type = ceres::LoggingType::SILENT;
         ceres::Solver::Summary summary;

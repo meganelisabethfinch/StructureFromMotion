@@ -46,20 +46,14 @@ void Features::findMatchesWith(const cv::Ptr<cv::DescriptorMatcher> &matcher, Fe
 
     Matching2 verifiedMatching;
     // Geometric verification by fundamental matrix
-    if (loweRatioMatching.size() > POINTS_NEEDED_FUNDAMENTAL_MATRIX) {
-        std::vector<uchar> mask;
-        cv::Mat F = findFundamentalMat(source, destination, cv::FM_RANSAC, 3.0, 0.99, mask);
 
-        // Store fundamental matrix - should one be F.inverse?
-        // images[i].setFundamentalMatrix(images[j].getId(), F);
-        // images[j].setFundamentalMatrix(images[i].getId(), F);
-
-        for (int k = 0; k < mask.size(); k++) {
-            if (mask[k]) {
-                // Classify this as a good match
-                verifiedMatching.push_back(loweRatioMatching[k]);
-            }
+    try {
+        SFMUtilities::pruneMatchesByFundamentalMatrix(source, destination, loweRatioMatching, verifiedMatching);
+    } catch (std::runtime_error& e) {
+        if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {
+            std::cout << "Could not compute fundamental matrix: " << e.what() << std::endl;
         }
+        verifiedMatching = loweRatioMatching;
     }
 
     if (DEFAULT_DEBUG >= DebugLevel::VERBOSE) {

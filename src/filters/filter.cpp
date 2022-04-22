@@ -14,6 +14,6 @@ cv::Ptr<Filter> Filter::create(const FilterType& type) {
         case FilterType::STATISTICAL:
             return cv::makePtr<StatisticalOutlierFilter>(SOR_K, SOR_STDDEV_MULT);
         case FilterType::RADIAL:
-            return cv::makePtr<RadialOutlierFilter>();
+            return cv::makePtr<RadialOutlierFilter>(ROR_RADIUS, ROR_MIN_NEIGHBOURS);
     }
 }

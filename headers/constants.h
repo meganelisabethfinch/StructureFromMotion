@@ -42,6 +42,10 @@ const int POINTS_NEEDED_FUNDAMENTAL_MATRIX = 10;
 const int SOR_K = 6;
 const double SOR_STDDEV_MULT = 2.0;
 
+// ROR - searches for k neighbours in radius
+const double ROR_RADIUS = 0.1;
+const int ROR_MIN_NEIGHBOURS = 5;
+
 const DetectorType DEFAULT_DETECTOR = DetectorType::SIFT;
 const MatcherType DEFAULT_MATCHER = MatcherType::BRUTEFORCE;
 const TriangulatorType DEFAULT_TRIANGULATOR = TriangulatorType::LINEAR;

@@ -54,6 +54,18 @@ public:
         std::vector<Features>& features,
         LossType lossType);
 
+    /*
+     * Quick and hacky way to count radial outliers for evaluation.
+     * Copy of code from ROR filter, without updating the point cloud.
+     */
+    static size_t countRadialOutliers(PointCloud& pc, double radiusSearch, int minNeighborsInRadius);
+
+    /*
+     * Quick and hacky way to count statistical outliers for evaluation.
+     * Copy of code from SOR filter, without updating the point cloud.
+     */
+    static size_t countStatisticalOutliers(PointCloud& pc, int k, double stddev_mult);
+
     static Image2D3DMatch find2D3DMatches(ImageID imageId,
                                           Features& imageFeatures,
                                           Matches& matches,

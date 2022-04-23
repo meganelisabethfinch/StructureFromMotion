@@ -152,6 +152,10 @@ pcl::PointCloud<pcl::PointXYZRGB> PointCloud::toPCLPointCloud(const std::vector<
         pcl_cloud.points.emplace_back(pcl_point);
     }
 
+    // Stupid that this doesn't auto-update as you add points!
+    pcl_cloud.width = pcl_cloud.size();
+    pcl_cloud.height = 1;
+
     return pcl_cloud;
 }
 

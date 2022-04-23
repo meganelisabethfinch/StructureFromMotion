@@ -313,7 +313,12 @@ void SceneReconstruction::report(const std::string& filename) {
     std::ofstream file(filename);
     file << "#registrations: " << _mGoodViews.size() << std::endl;
     file << "#points: " << _pointCloud.size() << std::endl;
-    // #outliers
+
+    size_t radial_outliers = SFMUtilities::countRadialOutliers(_pointCloud, ROR_RADIUS, ROR_MIN_NEIGHBOURS);
+    file << "#radial outliers: " << radial_outliers << std::endl;
+
+    size_t stat_outliers = SFMUtilities::countStatisticalOutliers(_pointCloud, SOR_K, SOR_STDDEV_MULT);
+    file << "#statistical outliers: " << stat_outliers << std::endl;
 
     file << "registrations: ";
     for (auto id : _mGoodViews) {

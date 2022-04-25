@@ -11,15 +11,20 @@
 
 #include <set>
 
-class BundleAdjustmentUtilities {
+class BAUtilities {
 private:
 
 public:
-    static void adjustBundle(PointCloud& pointCloud,
-                      const std::set<ImageID>& registeredImages,
-                      std::map<ImageID, Pose>& cameraPoses,
-                      std::vector<Camera>& cameras,
-                      std::vector<Features>& features);
+    /*
+     * Quick and hacky way to compute total reprojection error using ceres solver.
+     * Copy of the code from BasicBundleAdjuster, with the max iterations set to 0.
+     */
+    static double globalReprojectionError(PointCloud& pc,
+                                          const std::set<ImageID>& registeredImages,
+                                          std::map<ImageID, Pose>& cameraPoses,
+                                          std::vector<Camera>& cameras,
+                                          std::vector<Features>& features,
+                                          LossType lossType);
 
 };
 

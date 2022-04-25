@@ -65,7 +65,7 @@ add_executable(
         headers/triangulation/triangulator.h src/triangulation/triangulator.cpp
         src/bundle-adjustment/bundle_adjuster.cpp
         headers/filters/filter.h src/filters/filter.cpp
-        headers/vector_util.h src/vector_util.cpp)
+        headers/vector_util.h src/vector_util.cpp src/ba_util.cpp)
 
 target_sources(
         StructureFromMotion

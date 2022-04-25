@@ -27,12 +27,6 @@ public:
     static Pose recoverPoseFrom2D3DMatches(Camera& camera,
                                            Image2D3DMatch matching);
 
-    static PointCloud triangulateViews(ImageID img1, ImageID img2,
-            Camera& cam1, Camera& cam2,
-            Features& features1, Features& features2,
-            Matching2& matching,
-            Pose& pose1, Pose& pose2);
-
     static void getAlignedPointsFromMatch(Features& queryFeatures, Features& trainFeatures,
                                           Matching2& matching,
                                           std::vector<cv::Point2d>& queryAlignedPoints, std::vector<cv::Point2d>& trainAlignedPoints,
@@ -42,17 +36,6 @@ public:
                                                      const cv::Mat& points3d,
                                                      const Camera& camera,
                                                      const Pose& pose);
-
-    /*
-     * Quick and hacky way to compute total reprojection error using ceres solver.
-     * Copy of the code from BasicBundleAdjuster, with the max iterations set to 0.
-     */
-    static double globalReprojectionError(PointCloud& pc,
-        const std::set<ImageID>& registeredImages,
-        std::map<ImageID, Pose>& cameraPoses,
-        std::vector<Camera>& cameras,
-        std::vector<Features>& features,
-        LossType lossType);
 
     /*
      * Quick and hacky way to count radial outliers for evaluation.

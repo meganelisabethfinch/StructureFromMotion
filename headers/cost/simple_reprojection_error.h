@@ -6,6 +6,8 @@
 #define SFM_SIMPLE_REPROJECTION_ERROR_H
 
 #include <ceres/rotation.h>
+#include <ceres/cost_function.h>
+#include <ceres/autodiff_cost_function.h>
 
 struct SimpleReprojectionError {
     double observed_x;

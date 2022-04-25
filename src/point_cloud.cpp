@@ -7,14 +7,11 @@
 #include <vector>
 #include <headers/matches.h>
 #include <iostream>
-#include <fstream>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/vtk_io.h>
-#include <pcl/filters/statistical_outlier_removal.h>
-#include <pcl/filters/radius_outlier_removal.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/surface/poisson.h>
 

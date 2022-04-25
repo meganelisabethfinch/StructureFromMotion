@@ -327,7 +327,7 @@ void SceneReconstruction::report(const std::string& filename) {
     file << std::endl;
 
     // reprojection error
-    double total_reproj_error = SFMUtilities::globalReprojectionError(_pointCloud, _mGoodViews, _mCameraPoses, _mCameras, _mImageFeatures, _bundleAdjuster->lossType);
+    double total_reproj_error = BAUtilities::globalReprojectionError(_pointCloud, _mGoodViews, _mCameraPoses, _mCameras, _mImageFeatures, _bundleAdjuster->lossType);
     file << "Total reprojection error: " << total_reproj_error << std::endl;
 
     file.close();

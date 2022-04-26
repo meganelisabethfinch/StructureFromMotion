@@ -24,10 +24,6 @@ find_package(Threads REQUIRED)
 
 find_package(Ceres REQUIRED)
 
-find_package(PCL REQUIRED COMPONENTS common io filters features surface)
-include_directories(${PCL_INCLUDE_DIRS})
-add_definitions(${PCL_DEFINITIONS})
-
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -92,6 +88,7 @@ target_include_directories(
         /Users/meganfinch/glog/cmake-build-release
         /Users/meganfinch/glog/src
         /Users/meganfinch/gflags/cmake-build-release/include
+        #/Users/meganfinch/CLionProjects/Pickle/headers
 )
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
@@ -106,6 +103,7 @@ if (CMAKE_COMPILER_IS_CLANGXX)
     target_compile_options(StructureFromMotion PRIVATE "-Wno-padded")
 endif()
 
+# Where linker should search for libraries
 target_link_directories(
         StructureFromMotion
         PUBLIC
@@ -114,7 +112,7 @@ target_link_directories(
         #"/Users/meganfinch/ceres-solver/cmake-build-release/lib"
         #"/Users/meganfinch/gflags/cmake-build-release/lib"
         #"/Users/meganfinch/glog/cmake-build-release/"
-        ${PCL_LIBRARY_DIRS}
+        #/Users/meganfinch/CLionProjects/Pickle/cmake-build-release/
 )
 
 
@@ -137,102 +135,101 @@ target_link_libraries(
         opencv_videoio
         opencv_video
         ceres
-        ${PCL_LIBRARIES}
+        #Pickle
         #gflags
         #glog
 )
 
 # ------- BUILDING LIBRARY -------
 
-add_library(
-        SFMLib
-        STATIC
-        headers/constants.h
-        headers/point_cloud.h src/point_cloud.cpp
-        headers/camera.h src/camera.cpp
-        headers/types.h
-        headers/cli_util.h src/cli_util.cpp
-        headers/imagecollection.h src/imagecollection.cpp
-        headers/image.h
-        headers/features.h src/features.cpp
-        headers/matches.h src/matches.cpp
-        headers/sfm_util.h src/sfm_util.cpp
-        headers/scene_graph.h src/scene_graph.cpp
-        headers/scene_reconstruction.h src/scene_reconstruction.cpp
-        headers/pose.h src/pose.cpp
-        headers/cost/simple_reprojection_error.h
-        headers/cost/rotation_free_error.h src/cost/rotation_free_error.cpp
-        headers/image_pair.h
-        headers/cli_args.h
-        headers/triangulation/triangulator.h src/triangulation/triangulator.cpp
-        headers/triangulation/linear_triangulator.h
-        headers/triangulation/midpoint_triangulator.h
-        headers/bundle-adjustment/bundle_adjuster.h src/bundle-adjustment/bundle_adjuster.cpp
-        headers/bundle-adjustment/dummy_bundle_adjuster.h
-        headers/bundle-adjustment/basic_bundle_adjuster.h
-        headers/bundle-adjustment/zhang_bundle_adjuster.h
-        headers/bundle.h headers/vector_util.h
-        headers/filters/filter.h src/filters/filter.cpp
-        headers/filters/statistical_outlier_filter.h
-        headers/filters/radial_outlier_filter.h headers/map_util.h headers/cost/faster_rotation_free_error.h src/cost/faster_rotation_free_error.cpp)
-
-target_include_directories(
-        SFMLib
-        PUBLIC
-        ${CMAKE_SOURCE_DIR}
-        /Users/meganfinch/opencv-4.5.3/include
-        /Users/meganfinch/opencv-4.5.3/cmake-build-release
-        /Users/meganfinch/opencv-4.5.3/modules/calib3d/include
-        /Users/meganfinch/opencv-4.5.3/modules/core/include
-        /Users/meganfinch/opencv-4.5.3/modules/features2d/include
-        /Users/meganfinch/opencv-4.5.3/modules/highgui/include
-        /Users/meganfinch/opencv-4.5.3/modules/flann/include
-        /Users/meganfinch/opencv-4.5.3/modules/imgcodecs/include
-        /Users/meganfinch/opencv-4.5.3/modules/imgproc/include
-        /Users/meganfinch/opencv-4.5.3/modules/videoio/include
-        /Users/meganfinch/ceres-solver/include
-        /Users/meganfinch/ceres-solver/cmake-build-release/config
-        /Users/meganfinch/eigen
-        /Users/meganfinch/glog/cmake-build-release
-        /Users/meganfinch/glog/src
-        /Users/meganfinch/gflags/cmake-build-release/include
-        ${PCL_INCLUDE_DIRS}
-)
-
-target_link_directories(
-        SFMLib
-        PUBLIC
-        "${CMAKE_SOURCE_DIR}"
-        "/Users/meganfinch/opencv-4.5.3/cmake-build-release/lib"
-        #"/Users/meganfinch/ceres-solver/cmake-build-release/lib"
-        #"/Users/meganfinch/gflags/cmake-build-release/lib"
-        #"/Users/meganfinch/glog/cmake-build-release/"
-        ${PCL_LIBRARY_DIRS}
-)
-
-
-target_link_libraries(
-        SFMLib
-        Threads::Threads
-        opencv_calib3d
-        opencv_core
-        opencv_dnn
-        opencv_features2d
-        opencv_flann
-        opencv_gapi
-        opencv_highgui
-        opencv_imgcodecs
-        opencv_imgproc
-        opencv_ml
-        opencv_objdetect
-        opencv_photo
-        opencv_stitching
-        opencv_videoio
-        opencv_video
-        ceres
-        #gflags
-        #glog
-        ${PCL_LIBRARIES}
-)
-
-set_target_properties(SFMLib PROPERTIES VERSION ${PROJECT_VERSION})
+# add_library(
+#         SFMLib
+#         STATIC
+#         headers/constants.h
+#         headers/point_cloud.h src/point_cloud.cpp
+#         headers/camera.h src/camera.cpp
+#         headers/types.h
+#         headers/cli_util.h src/cli_util.cpp
+#         headers/imagecollection.h src/imagecollection.cpp
+#         headers/image.h
+#         headers/features.h src/features.cpp
+#         headers/matches.h src/matches.cpp
+#         headers/sfm_util.h src/sfm_util.cpp
+#         headers/scene_graph.h src/scene_graph.cpp
+#         headers/scene_reconstruction.h src/scene_reconstruction.cpp
+#         headers/pose.h src/pose.cpp
+#         headers/cost/simple_reprojection_error.h
+#         headers/cost/rotation_free_error.h src/cost/rotation_free_error.cpp
+#         headers/image_pair.h
+#         headers/cli_args.h
+#         headers/triangulation/triangulator.h src/triangulation/triangulator.cpp
+#         headers/triangulation/linear_triangulator.h
+#         headers/triangulation/midpoint_triangulator.h
+#         headers/bundle-adjustment/bundle_adjuster.h src/bundle-adjustment/bundle_adjuster.cpp
+#         headers/bundle-adjustment/dummy_bundle_adjuster.h
+#         headers/bundle-adjustment/basic_bundle_adjuster.h
+#         headers/bundle-adjustment/zhang_bundle_adjuster.h
+#         headers/bundle.h headers/vector_util.h
+#         headers/filters/filter.h src/filters/filter.cpp
+#         headers/filters/statistical_outlier_filter.h
+#         headers/filters/radial_outlier_filter.h headers/map_util.h headers/cost/faster_rotation_free_error.h src/cost/faster_rotation_free_error.cpp)
+#
+# target_include_directories(
+#         SFMLib
+#         PUBLIC
+#         ${CMAKE_SOURCE_DIR}
+#         /Users/meganfinch/opencv-4.5.3/include
+#         /Users/meganfinch/opencv-4.5.3/cmake-build-release
+#         /Users/meganfinch/opencv-4.5.3/modules/calib3d/include
+#         /Users/meganfinch/opencv-4.5.3/modules/core/include
+#         /Users/meganfinch/opencv-4.5.3/modules/features2d/include
+#         /Users/meganfinch/opencv-4.5.3/modules/highgui/include
+#         /Users/meganfinch/opencv-4.5.3/modules/flann/include
+#         /Users/meganfinch/opencv-4.5.3/modules/imgcodecs/include
+#         /Users/meganfinch/opencv-4.5.3/modules/imgproc/include
+#         /Users/meganfinch/opencv-4.5.3/modules/videoio/include
+#         /Users/meganfinch/ceres-solver/include
+#         /Users/meganfinch/ceres-solver/cmake-build-release/config
+#         /Users/meganfinch/eigen
+#         /Users/meganfinch/glog/cmake-build-release
+#         /Users/meganfinch/glog/src
+#         /Users/meganfinch/gflags/cmake-build-release/include
+# )
+#
+# # Where linker should search for libraries
+# target_link_directories(
+#         SFMLib
+#         PUBLIC
+#         "${CMAKE_SOURCE_DIR}"
+#         "/Users/meganfinch/opencv-4.5.3/cmake-build-release/lib"
+#         #"/Users/meganfinch/ceres-solver/cmake-build-release/lib"
+#         #"/Users/meganfinch/gflags/cmake-build-release/lib"
+#         #"/Users/meganfinch/glog/cmake-build-release/"
+# )
+#
+#
+# target_link_libraries(
+#         SFMLib
+#         Threads::Threads
+#         opencv_calib3d
+#         opencv_core
+#         opencv_dnn
+#         opencv_features2d
+#         opencv_flann
+#         opencv_gapi
+#         opencv_highgui
+#         opencv_imgcodecs
+#         opencv_imgproc
+#         opencv_ml
+#         opencv_objdetect
+#         opencv_photo
+#         opencv_stitching
+#         opencv_videoio
+#         opencv_video
+#         ceres
+#         #gflags
+#         #glog
+#         #Pickle
+# )
+#
+# set_target_properties(SFMLib PROPERTIES VERSION ${PROJECT_VERSION})

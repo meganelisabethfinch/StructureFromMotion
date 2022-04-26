@@ -11,8 +11,6 @@
 #include "matches.h"
 #include "constants.h"
 
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
 
 struct Point3DInMap {
     cv::Point3d pt;
@@ -38,9 +36,6 @@ struct Point3DInMap {
 class PointCloud {
 private:
     std::vector<Point3DInMap> mReconstructionCloud;
-
-    pcl::PointCloud<pcl::PointXYZRGB> toPCLPointCloud(const std::vector<Features>& features,
-                                                      const std::vector<Image>& images);
 
 public:
     PointCloud();

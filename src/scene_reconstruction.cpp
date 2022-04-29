@@ -172,8 +172,8 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
 
         _mGoodViews.insert(imageId);
         if (anyViewSuccess) {
-            applyFilters();
             adjustBundle();
+            applyFilters();
         }
 
         return true;

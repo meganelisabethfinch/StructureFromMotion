@@ -16,7 +16,7 @@ const double REPROJECTION_ERROR_THRESHOLD = 3.0;
 const double RANSAC_THRESHOLD = 10.0;
 
 // Reject a camera pose if the ratio of inliers is below this threshold
-const double POSE_INLIERS_MINIMAL_RATIO = 0.5;
+const double POSE_INLIERS_MINIMAL_RATIO = 0.3; // 0.3
 
 // Number of matches needed for an edge between two images
 const int SCENE_GRAPH_EDGE_THRESHOLD = 25;

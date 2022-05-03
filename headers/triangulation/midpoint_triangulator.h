@@ -35,87 +35,20 @@ public:
         return { midpoint };
     }
 
-    /*
-     * Finds the 3D point p on the virtual image plane of a camera with centre C,
-     * corresponding to a 2D image point u.
-     *
-     * @param u - a 2D image point
-     * @param K - the intrinsic camera matrix
-     * @param P - the camera pose, where P = [R|t]
-     */
-    static cv::Point3d backProjectPointToPoint(const cv::Point2d& u,
-                                               const Camera& K,
-                                               const Pose& P) {
-        // 1.
-        // cv::Vec3d u_prime = { u.x, u.y, K.getFocalLength() };
-        // auto p = K.getCameraMatrix() * P.getRotationMatrix() * u_prime + K.getCameraMatrix() * P.getTranslationVector();
-
-        // 3.
-        // cv::Vec3d u_prime = { u.x, u.y, 1 };
-        // auto p = P.getRotationMatrix() * K.getCameraMatrix().inv() * u_prime + P.getTranslationVector();
-
-        // 4.
-        // cv::Vec3d u_prime = { u.x, u.y, 1 };
-        // auto p = K.getCameraMatrix() * P.getRotationMatrix() * K.getCameraMatrix().inv() * u_prime + K.getCameraMatrix() * P.getTranslationVector();
-
-        // 5.
-        // cv::Vec3d u_prime = { u.x, u.y, K.getFocalLength() };
-        // auto p = P.getRotationMatrix() * K.getCameraMatrix().inv() * u_prime + P.getTranslationVector();
-
-        // 8.
-        // cv::Vec3d u_prime = { u.x, u.y, K.getFocalLength() };
-        // auto p = P.getRotationMatrix().inv() * K.getCameraMatrix().inv() * u_prime - P.getTranslationVector();
-
-        // 9.
-        // cv::Vec3d u_prime = { u.x, u.y, K.getFocalLength() };
-        // auto p = P.getRotationMatrix() * u_prime + P.getTranslationVector();
-
-        // 10.
-        auto c = K.getCentre();
-        cv::Vec3d u_prime = { u.x - c.x, u.y - c.y, K.getFocalLength() };
-        auto p = P.getRotationMatrix().inv() * u_prime - P.getTranslationVector();
-
-        // 11.
-        // auto c = K.getCentre();
-        // cv::Vec3d u_prime = { u.x - c.x, u.y - c.y, K.getFocalLength() };
-        // auto p = P.getRotationMatrix() * u_prime + P.getTranslationVector();
-
-        return { p(0), p(1), p(2) };
-    }
-
     static std::pair<cv::Vec3d, cv::Vec3d> backProjectPointToRay(const cv::Point2d& u,
                                                                  const Camera& camera,
                                                                  const Pose& pose) {
-        // From MVG
-        cv::Matx34d P = camera.getCameraMatrix() * pose.getProjectionMatrix();
-        Pose k_pose = Pose(P);
+        // From Szeliski.
+        auto R = pose.getRotationMatrix();
+        auto t = pose.getTranslationVector();
+        auto K = camera.getCameraMatrix();
 
-        auto R = k_pose.getRotationMatrix();
-        auto t = k_pose.getTranslationVector();
-
-        // Find camera centre - from
-        // t = -R * c => -R.inv() * t = c
+        // Find camera centre
         auto c_mat = -R.inv() * t;
-        // cv::Vec4d c = { c_mat(0), c_mat(1), c_mat(2), 1 };
-
-        /*
-        // Sanity checks
-        auto P_inv = P.t() * (P * P.t()).inv();
-        auto check_pseudo_inv = P * P_inv;
-        std::cout << "Should be identity: " << std::endl;
-        std::cout << check_pseudo_inv << std::endl;
-
-        auto check2 = P * c;
-        std::cout << "Should be zero: " << std::endl;
-        std::cout << check2 << std::endl;
-         */
 
         // Find and normalise direction vector
         cv::Vec3d x = { u.x , u.y, 1 };
-        auto v = R.inv() * x;
-
-        // Just ignore homogenous coords for now
-        // cv::Vec4d dir4 = { dir3(0), dir3(1), dir3(2), 0 };
+        auto v = R.inv() * K.inv() * x;
 
         return {{c_mat(0), c_mat(1), c_mat(2)}, { v(0), v(1), v(2) } };
     }

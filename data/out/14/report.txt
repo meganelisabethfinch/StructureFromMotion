@@ -1,0 +1,6 @@
+#registrations: 16
+#points: 631
+#radial outliers: 29
+#statistical outliers: 4
+registrations: 001.jpg 002.jpg 003.jpg 004.jpg 005.jpg 006.jpg 007.jpg 008.jpg 009.jpg 010.jpg 011.jpg 012.jpg 013.jpg 014.jpg 015.jpg 016.jpg 
+Total reprojection error: 6926.62

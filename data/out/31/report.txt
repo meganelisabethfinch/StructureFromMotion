@@ -1,0 +1,6 @@
+#registrations: 31
+#points: 8254
+#radial outliers: 0
+#statistical outliers: 296
+registrations: Camera.008.png Camera.009.png Camera.010.png Camera.011.png Camera.012.png Camera.013.png Camera.014.png Camera.015.png Camera.016.png Camera.017.png Camera.018.png Camera.019.png Camera.020.png Camera.021.png Camera.022.png Camera.023.png Camera.024.png Camera.025.png Camera.026.png Camera.027.png Camera.028.png Camera.029.png Camera.030.png Camera.031.png Camera.032.png Camera.033.png Camera.034.png Camera.035.png Camera.036.png Camera.037.png Camera.038.png 
+Total reprojection error: 72789.7

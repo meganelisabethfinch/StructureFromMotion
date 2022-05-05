@@ -133,6 +133,7 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
     std::cout << "--------- Register Image " << imageId << " ---------" << std::endl;
     _mDoneViews.insert(imageId);
 
+
     try {
         // Recover camera pose for new image to be registered
         Pose newCameraPose = SFMUtilities::recoverPoseFrom2D3DMatches(_mCameras[imageId], match2D3D);
@@ -147,12 +148,17 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
             try {
                 cv::Mat mask;
 
-                // use essential matrix recovery to prune matches
+                // Use essential matrix recovery to prune matches only
                 auto pose_right = SFMUtilities::recoverPoseFromMatches(_mCameras[ip.left], _mCameras[ip.right],
                                                                        _mImageFeatures[ip.left], _mImageFeatures[ip.right],
                                                                        _mFeatureMatchMatrix.get(ip),
                                                                        mask);
                 _mFeatureMatchMatrix.prune(ip, mask);
+
+                // Note the pruning may have reduced the number of matches to zero
+                if (_mFeatureMatchMatrix.get(ip).empty()) {
+                    throw std::runtime_error("No matches between images after pruning pose outliers.");
+                }
 
                 auto pc = _triangulator->triangulateImages(ip.left, ip.right,
                                                              _mCameras[ip.left], _mCameras[ip.right],

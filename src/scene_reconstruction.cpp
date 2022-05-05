@@ -133,7 +133,6 @@ bool SceneReconstruction::registerImage(ImageID imageId, Image2D3DMatch &match2D
     std::cout << "--------- Register Image " << imageId << " ---------" << std::endl;
     _mDoneViews.insert(imageId);
 
-
     try {
         // Recover camera pose for new image to be registered
         Pose newCameraPose = SFMUtilities::recoverPoseFrom2D3DMatches(_mCameras[imageId], match2D3D);
@@ -217,6 +216,12 @@ void SceneReconstruction::registerMoreImages() {
                 bestView = match2D3D.first;
                 bestCount = count;
             }
+        }
+
+        if (bestCount == 0) {
+            // If no unregistered image with 2D-3D matches found,
+            std::cout << "Cannot register any further images." << std::endl;
+            break;
         }
 
         // register best view

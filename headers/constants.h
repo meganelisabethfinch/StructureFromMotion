@@ -37,6 +37,7 @@ const double BA_ETA = 1e-2;
 const int POINTS_NEEDED_HOMOGRAPHY_MATRIX = 100;
 const int POINTS_NEEDED_ESSENTIAL_MATRIX = 10;
 const int POINTS_NEEDED_FUNDAMENTAL_MATRIX = 10;
+const int POINTS_NEEDED_PNP_RANSAC = 6;
 
 // SOR - considers K nearest neighbours
 const int SOR_K = 6;
